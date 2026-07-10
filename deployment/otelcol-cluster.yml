@@ -1,0 +1,51 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: "vminsert"
+          static_configs:
+            - targets: [ "vminsert-1:8480", "vminsert-2:8480" ]
+        - job_name: "vmselect"
+          static_configs:
+            - targets: [ "vmselect-1:8481", "vmselect-2:8481" ]
+        - job_name: "vmstorage"
+          static_configs:
+            - targets: [ "vmstorage-1:8482", "vmstorage-2:8482" ]
+
+        - job_name: "vlinsert"
+          static_configs:
+            - targets: [ "vlinsert-1:9428", "vlinsert-2:9428" ]
+        - job_name: "vlselect"
+          static_configs:
+            - targets: [ "vlselect-1:9428", "vlselect-2:9428" ]
+        - job_name: "vlstorage"
+          static_configs:
+            - targets: [ "vlstorage-1:9428", "vlstorage-2:9428" ]
+
+        - job_name: "vtinsert"
+          static_configs:
+            - targets: [ "vtinsert-1:10428", "vtinsert-2:10428" ]
+        - job_name: "vtselect"
+          static_configs:
+            - targets: [ "vtselect-1:10428", "vtselect-2:10428" ]
+        - job_name: "vtstorage"
+          static_configs:
+            - targets: [ "vtstorage-1:10428", "vtstorage-2:10428" ]
+
+processors:
+  batch:
+
+exporters:
+  otlp_http/vm-metrics: { metrics_endpoint: http://vmauth:8427/metrics/insert/opentelemetry/v1/metrics, headers: { AccountID: "0", ProjectID: "0" } }
+  otlp_http/vm-logs: { logs_endpoint: http://vmauth:8427/logs/insert/opentelemetry/v1/logs, headers: { AccountID: "0", ProjectID: "0" } }
+  otlp_http/vm-traces: { traces_endpoint: http://vmauth:8427/traces/insert/opentelemetry/v1/traces, headers: { AccountID: "0", ProjectID: "0" } }
+
+service:
+  pipelines:
+    logs: { receivers: [ otlp ], processors: [ batch ], exporters: [ otlp_http/vm-logs ] }
+    traces: { receivers: [ otlp ], processors: [ batch ], exporters: [ otlp_http/vm-traces ] }
+    metrics: { receivers: [ prometheus ], processors: [ batch ], exporters: [ otlp_http/vm-metrics ] }

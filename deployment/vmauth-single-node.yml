@@ -1,0 +1,16 @@
+unauthorized_user:
+  url_map:
+    - src_paths: ["/metrics/.*"]
+      url_prefix: "http://victoriametrics:8428/"
+      # drop /metrics/ path prefix from the original request before proxying it to url_prefix.
+      drop_src_path_prefix_parts: 1
+
+    - src_paths: ["/logs/.*"]
+      url_prefix: "http://victorialogs:9428/"
+      # drop /logs/ path prefix from the original request before proxying it to url_prefix.
+      drop_src_path_prefix_parts: 1
+
+    - src_paths: ["/traces/.*"]
+      url_prefix: "http://victoriatraces:10428/"
+      # drop /traces/ path prefix from the original request before proxying it to url_prefix.
+      drop_src_path_prefix_parts: 1

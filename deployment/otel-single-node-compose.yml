@@ -1,0 +1,73 @@
+services:
+  otelcol:
+    image: otel/opentelemetry-collector-contrib:latest
+    command: [ "--config=/etc/otelcol/config.yml" ]
+    volumes: [ "./otelcol.yml:/etc/otelcol/config.yml" ]
+
+  victoriametrics:
+    image: victoriametrics/victoria-metrics:latest
+    command: [ "-vmalert.proxyURL=http://rules-metrics:8880" ]
+    ports: [ "8428:8428" ]
+    volumes: [ "vm-data:/victoria-metrics-data" ]
+
+  victorialogs:
+    image: victoriametrics/victoria-logs:v1.51.0
+    ports: [ "9428:9428" ]
+    volumes: [ "vl-data:/victoria-logs-data" ]
+
+  victoriatraces:
+    image: victoriametrics/victoria-traces:latest
+    ports: [ "10428:10428" ]
+    volumes: [ "vt-data:/victoria-traces-data" ]
+
+  grafana:
+    image: grafana/grafana:latest
+    ports: [ "3000:3000" ]
+    environment:
+      # VictoriaMetrics is using Prometheus datasource.
+      # VictoriaTraces is using Jaeger datasource.
+      # Only VictoriaLogs requires Grafana plugin to install.
+      - GF_INSTALL_PLUGINS=victoriametrics-logs-datasource
+    volumes:
+      - grafanadata:/var/lib/grafana
+      - ./provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./provisioning/dashboards/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
+
+  vmauth:
+    image: victoriametrics/vmauth:latest
+    volumes: [ "./vmauth.yml:/etc/auth.yml" ]
+    command: [ "--auth.config=/etc/auth.yml" ]
+    ports: [ "8427:8427" ]
+
+  rules-metrics:
+    image: victoriametrics/vmalert:latest
+    command:
+      - "-datasource.url=http://victoriametrics:8428"
+      - "-remoteWrite.url=http://victoriametrics:8428"
+      - "-rule=/etc/vmalert/*.yml"
+      # Replace "-notifier.blackhole" with actual "-notifier.url=<alertmanager_url>" for sending alerts
+      - "-notifier.blackhole"
+    volumes: [ "./victoriametrics/rules.yml:/etc/vmalert/rules.yml" ]
+
+  # Define telemetry generators for logs and traces.
+  # Metrics are scraped by OTEL collector from deployed services.
+  generate-traces:
+    image: ghcr.io/krzko/otelgen:latest
+    command:
+      - --otel-exporter-otlp-endpoint=otelcol:4317
+      - --insecure
+      - --d=9999
+      - traces
+      - multi
+
+
+  generate-logs:
+    image: ghcr.io/krzko/otelgen:latest
+    command:
+      - --otel-exporter-otlp-endpoint=otelcol:4317
+      - --insecure
+      - --d=9999
+      - logs
+      - multi
+
+volumes: { vm-data: {}, vt-data: {}, vl-data: {}, grafanadata: {} }

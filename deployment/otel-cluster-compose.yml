@@ -1,0 +1,171 @@
+services:
+  otelcol:
+    image: otel/opentelemetry-collector-contrib:latest
+    command: [ "--config=/etc/otelcol/config.yml" ]
+    volumes: [ "./otelcol-cluster.yml:/etc/otelcol/config.yml" ]
+
+# VictoriaMetrics cluster definition
+
+  # vmstorage shards. Each shard receives 1/N of all samples, where N is number of vmstorages (2 in this case).
+  vmstorage-1:
+    image: victoriametrics/vmstorage:latest
+    volumes: [ "vmdata-1:/storage" ]
+  vmstorage-2:
+    image: victoriametrics/vmstorage:latest
+    volumes: [ "vmdata-2:/storage" ]
+
+  # vminsert is an ingestion frontend. It receives metrics pushed by OTEL collector,
+  # and distributes them across configured vmstorage shards.
+  vminsert-1:
+    image: victoriametrics/vminsert:latest
+    command:
+      - "--storageNode=vmstorage-1:8400"
+      - "--storageNode=vmstorage-2:8400"
+      - "--enableMultitenancyViaHeaders"
+  vminsert-2:
+    image: victoriametrics/vminsert:latest
+    command:
+      - "--storageNode=vmstorage-1:8400"
+      - "--storageNode=vmstorage-2:8400"
+      - "--enableMultitenancyViaHeaders"
+
+  # vmselect is a query fronted. It serves read queries by fetching data from configured `--storageNode` shards.
+  vmselect-1:
+    image: victoriametrics/vmselect:latest
+    command:
+      - "--storageNode=vmstorage-1:8401"
+      - "--storageNode=vmstorage-2:8401"
+      - "--vmalert.proxyURL=http://vmalert:8880"
+      - "--enableMultitenancyViaHeaders"
+  vmselect-2:
+    image: victoriametrics/vmselect:latest
+    command:
+      - "--storageNode=vmstorage-1:8401"
+      - "--storageNode=vmstorage-2:8401"
+      - "--vmalert.proxyURL=http://vmalert:8880"
+      - "--enableMultitenancyViaHeaders"
+
+# VictoriaLogs cluster definition
+
+  # vlstorage shards. Each shard receives 1/N of all log entries, where N is number of vlstorage (2 in this case).
+  vlstorage-1:
+    image: victoriametrics/victoria-logs:latest
+    command: [ "--storageDataPath=/vlogs" ]
+    volumes: [ "vldata-1:/vlogs" ]
+  vlstorage-2:
+    image: victoriametrics/victoria-logs:latest
+    command: [ "--storageDataPath=/vlogs" ]
+    volumes: [ "vldata-2:/vlogs" ]
+
+  vlinsert-1:
+    image: victoriametrics/victoria-logs:latest
+    command:
+      - "--storageNode=vlstorage-1:9428"
+      - "--storageNode=vlstorage-2:9428"
+  vlinsert-2:
+    image: victoriametrics/victoria-logs:latest
+    command:
+      - "--storageNode=vlstorage-1:9428"
+      - "--storageNode=vlstorage-2:9428"
+
+  vlselect-1:
+    image: victoriametrics/victoria-logs:latest
+    command:
+      - "--storageNode=vlstorage-1:9428"
+      - "--storageNode=vlstorage-2:9428"
+  vlselect-2:
+    image: victoriametrics/victoria-logs:latest
+    command:
+      - "--storageNode=vlstorage-1:9428"
+      - "--storageNode=vlstorage-2:9428"
+
+
+# VictoriaTraces cluster definition
+
+  # vtstorage shards. Each shard receives 1/N of all log entries, where N is number of vlstorage (2 in this case).
+  vtstorage-1:
+    image: victoriametrics/victoria-traces:latest
+    command: [ "--storageDataPath=/vtraces" ]
+    volumes: [ "vtdata-1:/vtraces" ]
+  vtstorage-2:
+    image: victoriametrics/victoria-traces:latest
+    command: [ "--storageDataPath=/vtraces" ]
+    volumes: [ "vtdata-2:/vtraces" ]
+
+  vtinsert-1:
+    image: victoriametrics/victoria-traces:latest
+    command:
+      - "--storageNode=vtstorage-1:10428"
+      - "--storageNode=vtstorage-2:10428"
+  vtinsert-2:
+    image: victoriametrics/victoria-traces:latest
+    command:
+      - "--storageNode=vtstorage-1:10428"
+      - "--storageNode=vtstorage-2:10428"
+
+  vtselect-1:
+    image: victoriametrics/victoria-traces:latest
+    command:
+      - "--storageNode=vtstorage-1:10428"
+      - "--storageNode=vtstorage-2:10428"
+  vtselect-2:
+    image: victoriametrics/victoria-traces:latest
+    command:
+      - "--storageNode=vtstorage-1:10428"
+      - "--storageNode=vtstorage-2:10428"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports: [ "3000:3000" ]
+    environment:
+      # VictoriaMetrics is using Prometheus datasource.
+      # VictoriaTraces is using Jaeger datasource.
+      # Only VictoriaLogs requires Grafana plugin to install.
+      - GF_INSTALL_PLUGINS=victoriametrics-logs-datasource
+    volumes:
+      - grafanadata:/var/lib/grafana
+      - ./provisioning/datasources/cluster:/etc/grafana/provisioning/datasources
+      - ./provisioning/dashboards/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
+
+  vmauth:
+    image: victoriametrics/vmauth:latest
+    volumes: [ "./vmauth-cluster.yml:/etc/auth.yml" ]
+    command: [ "--auth.config=/etc/auth.yml" ]
+    ports: [ "8427:8427" ]
+
+  rules-metrics:
+    image: victoriametrics/vmalert:latest
+    command:
+      - "-datasource.url=http://victoriametrics:8428"
+      - "-remoteWrite.url=http://victoriametrics:8428"
+      - "-rule=/etc/vmalert/*.yml"
+      # Replace "-notifier.blackhole" with actual "-notifier.url=<alertmanager_url>" for sending alerts
+      - "-notifier.blackhole"
+    volumes: [ "./victoriametrics/rules.yml:/etc/vmalert/rules.yml" ]
+
+  # Define telemetry generators for logs and traces.
+  # Metrics are scraped by OTEL collector from deployed services.
+  generate-traces:
+    image: ghcr.io/krzko/otelgen:latest
+    command:
+      - --otel-exporter-otlp-endpoint=otelcol:4317
+      - --insecure
+      - --d=9999
+      - traces
+      - multi
+
+  generate-logs:
+    image: ghcr.io/krzko/otelgen:latest
+    command:
+      - --otel-exporter-otlp-endpoint=otelcol:4317
+      - --insecure
+      - --d=9999
+      - logs
+      - multi
+
+volumes: {
+  vmdata-1: {}, vmdata-2: {},
+  vldata-1: {}, vldata-2: {},
+  vtdata-1: {}, vtdata-2: {},
+  grafanadata: {}
+}
