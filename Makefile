@@ -1,6 +1,8 @@
 DOCKER ?= docker
 DOCKER_COMPOSE ?= $(DOCKER) compose
 
+include docs/Makefile
+
 otel-single-up:
 	$(DOCKER_COMPOSE) -f deployment/otel-compose.yml up -d
 

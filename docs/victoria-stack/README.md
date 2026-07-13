@@ -7,7 +7,7 @@ design philosophy, operational model, and ecosystem:
 | **Logs**    | [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/)       | [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/)                                                                                                                                                                                 | Yes                | Yes     | Yes          | Yes      |
 | **Traces**  | [VictoriaTraces](https://docs.victoriametrics.com/victoriatraces/)   | [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/), [Jaeger API](https://docs.victoriametrics.com/victoriatraces/querying/#jaeger-http-api), [Tempo API](https://docs.victoriametrics.com/victoriatraces/querying/#tempo-http-api) | Yes                | Yes     | Yes          | Yes      |
 
-> VictoriaMetrics software supports native [OpenTelemetry](https://opentelemetry.io/) ingestion for **metrics**,
+> VictoriaMetrics software natively supports [OpenTelemetry](https://opentelemetry.io/) ingestion for **metrics**,
 **logs**, and **traces** - see [these docs](https://docs.victoriametrics.com/opentelemetry/) for more details.
 
 
@@ -22,10 +22,9 @@ VictoriaMetrics software is built with three core principles in mind: **simplici
 Software that is easy to run and maintain, that fits well in home labs and can be reliably scaled to large production
 environments. Each of the databases was heavily battle-tested in production environments.
 
-These principles are achieved by focusing on what matters most for every signal. VictoriaMetrics is heavily optimized
-for
-time series workload, while VictoriaLogs design and architecture is optimized for log ingestion. In VictoriaStack, we
-cover three main pillars of observability with fine-tuned solutions for each of the signals. 
+These principles are achieved by focusing on what matters most for every signal. VictoriaMetrics is optimized
+for time series workload, while VictoriaLogs design and architecture is optimized for log ingestion. 
+VictoriaStack covers three main pillars of observability with fine-tuned solutions for each of the signals. 
 
 ## Quick Start
 
@@ -41,7 +40,7 @@ git clone -b main https://github.com/VictoriaMetrics/VictoriaStack.git
 make otel-single-up
 ```
 
-> Please note, docker-compose environment is very much simplified for demonstration purposes, it is **not intended for
+> Note: docker-compose environment is very much simplified for demonstration purposes, it is **not intended for
 production use**.
 > The data it ingests is not representative of real-world data.
 
@@ -50,7 +49,7 @@ Once running, the following links will be available:
 - [VictoriaMetrics UI - http://localhost:8428/](http://localhost:8428/vmui/?#/cardinality)
 - [VictoriaLogs UI - http://localhost:9428](http://localhost:9428/select/vmui)
 - [VictoriaTraces UI - http://localhost:10428](http://localhost:10428/select/vmui), but it is better to use [Grafana](http://localhost:3000)
-- [Grafana - http://localhost:3000](http://localhost:3000/explore) with all 3 datasources preconfigured.
+- [Grafana - http://localhost:3000](http://localhost:3000/explore) with all 3 datasources preconfigured (login with admin:admin).
 
 > More detailed Quick Start instructions for running in various environments, ingesting and querying data are available in
 each product's documentation: [VictoriaMetrics Quick Start](https://docs.victoriametrics.com/victoriametrics/quick-start/),
@@ -86,21 +85,21 @@ receivers:
 
 exporters:
   otlp_http/vm-metrics: { metrics_endpoint: http://victoriametrics:8428/opentelemetry/v1/metrics }
-  otlp_http/vm-logs: { logs_endpoint: http://victorialogs:9428/insert/opentelemetry/v1/logs }
-  otlp_http/vm-traces: { traces_endpoint: http://victoriatraces:10428/insert/opentelemetry/v1/traces }
+  otlp_http/vm-logs:    { logs_endpoint: http://victorialogs:9428/insert/opentelemetry/v1/logs }
+  otlp_http/vm-traces:  { traces_endpoint: http://victoriatraces:10428/insert/opentelemetry/v1/traces }
 
 service:
   pipelines:
-    logs: { receivers: [ otlp ], exporters: [ otlp_http/vm-logs ] }
-    traces: { receivers: [ otlp ], exporters: [ otlp_http/vm-traces ] }
+    logs:    { receivers: [ otlp ], exporters: [ otlp_http/vm-logs ] }
+    traces:  { receivers: [ otlp ], exporters: [ otlp_http/vm-traces ] }
     metrics: { receivers: [ otlp ], exporters: [ otlp_http/vm-metrics ] }
 ```
 
-In the example above, it is expected that OpenTelemetry collector receives signals via gRPC protocol,
+In the example above, OpenTelemetry collector receives signals via gRPC protocol,
 and forwards them to VictoriaStack via HTTP endpoints:
-* `metrics_endpoint: http://victoriametrics:8428/opentelemetry/v1/metrics`
-* `logs_endpoint: http://victorialogs:9428/insert/opentelemetry/v1/logs`
-* `traces_endpoint: http://victoriatraces:10428/insert/opentelemetry/v1/traces`
+* `http://victoriametrics:8428/opentelemetry/v1/metrics` for metrics
+* `http://victorialogs:9428/insert/opentelemetry/v1/logs` for logs
+* `http://victoriatraces:10428/insert/opentelemetry/v1/traces` for traces
 
 That's it! Generally, no additional configuration is required. However, there are some tweaks that can be applied
 to each integration. See the following docs for more details:
@@ -125,26 +124,26 @@ VictoriaTraces only supports integration with [OpenTelemetry](https://docs.victo
 
 Each database has its own list of supported ingestion protocols, most suitable for the type of the signal:
 
-* VictoriaMetrics - [InfluxDB line, CSV, JSON...](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#how-to-import-time-series-data)
-* VictoriaLogs - [JSON, Loki, Journald](https://docs.victoriametrics.com/victorialogs/data-ingestion/#http-apis)
+* VictoriaMetrics: [InfluxDB line, CSV, JSON...](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#how-to-import-time-series-data)
+* VictoriaLogs: [JSON, Loki, Journald](https://docs.victoriametrics.com/victorialogs/data-ingestion/#http-apis)
 
 VictoriaTraces only supports integration with [OpenTelemetry](https://docs.victoriametrics.com/victoriatraces/data-ingestion/).
 
-## Querying
+## UI integrations
 
 ### Grafana
 
 Grafana is a great choice of a visualization tool that integrates with VictoriaStack.
 
 The integration is happening via datasource plugins:
-* VictoriaMetrics integrates via [Prometheus datasource plugin](https://docs.victoriametrics.com/victoriametrics/integrations/grafana/#prometheus-datasource).
-* VictoriaLogs integrates via [VictoriaLogs datasource plugin](https://docs.victoriametrics.com/victorialogs/integrations/grafana/)
-* VictoriaTraces integrates via [Jaeger](https://docs.victoriametrics.com/victoriatraces/querying/grafana/#jaeger-datasource) or [Tempo](https://docs.victoriametrics.com/victoriatraces/querying/grafana/#grafana-tempo-datasource) datasource plugins.
+* VictoriaMetrics via [Prometheus](https://docs.victoriametrics.com/victoriametrics/integrations/grafana/#prometheus-datasource) or [VictoriaMetrics](https://docs.victoriametrics.com/victoriametrics/integrations/grafana/#victoriametrics-datasource) datasource plugins.
+* VictoriaLogs via [VictoriaLogs datasource plugin](https://docs.victoriametrics.com/victorialogs/integrations/grafana/).
+* VictoriaTraces via [Jaeger](https://docs.victoriametrics.com/victoriatraces/querying/grafana/#jaeger-datasource) or [Tempo](https://docs.victoriametrics.com/victoriatraces/querying/grafana/#grafana-tempo-datasource) datasource plugins.
 
 > See [Grafana integration examples]() for single-node and clustered VictoriaStack.
 
 Grafana provides queryless experience for exploring metrics, logs and traces using query builders within the datasource plugins.
-It is the easiest way to get started with VictoriaStack, but if you need advanced querying capabilities - see [querying docs]().
+It is the easiest way to get started reading data from VictoriaStack. But if you need advanced querying capabilities - see [querying docs]().
 
 Grafana is also a great tool for building dashboards, running alerting rules and [correlating signals]().
 
@@ -155,43 +154,90 @@ using all the features of the corresponding database.
 
 > VictoriaTraces doesn't have a dedicated UI yet, and it is recommended to use [Grafana](#) for exploring traces.
 
-vmui comes out-of-the-box with VictoriaMetrics and VictoriaLogs components:
+vmui is built-in into VictoriaMetrics and VictoriaLogs components:
 * [VictoriaMetrics UI](https://docs.victoriametrics.com/victoriametrics/#vmui)
 * [VictoriaLogs UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui)
 
 > Have a quick look at vmui demo for [VictoriaMetrics](https://docs.victoriametrics.com/playgrounds/#victoriametrics-playground)
 > and [VictoriaLogs](https://docs.victoriametrics.com/playgrounds/#victorialogs-playground) at our playgrounds.
 
-We recommend using vmui for exploring metrics and logs, when you value simplicity and speed. But it doesn't have dashboarding functionality.
+We recommend using vmui for exploring metrics and logs when you value simplicity and speed. 
+Use [Grafana]() or [Perses]() for dashboarding functionality.
 
 ### Perses
 
-Similarly to [Grafana](#grafana), Perses intergrates with VictoriaStack via datasource plugins:
+Similarly to [Grafana](#grafana), Perses integrates with VictoriaStack via datasource plugins:
 * VictoriaMetrics integrates via [Prometheus datasource plugin](https://docs.victoriametrics.com/victoriametrics/integrations/perses/).
-* VictoriaLogs integrates via [VictoriaLogs datasource plugin](https://docs.victoriametrics.com/victorialogs/integrations/perses/)
-* VictoriaTraces integrates via [Jaeger](https://docs.victoriametrics.com/victoriatraces/querying/grafana/#jaeger-datasource) or [Tempo](https://docs.victoriametrics.com/victoriatraces/querying/grafana/#grafana-tempo-datasource) datasource plugins.
+* VictoriaLogs integrates via [VictoriaLogs datasource plugin](https://docs.victoriametrics.com/victorialogs/integrations/perses/).
+* VictoriaTraces integrates via [Jaeger](https://github.com/perses/plugins/tree/main/jaeger) or [Tempo](https://docs.victoriametrics.com/victoriatraces/querying/grafana/#grafana-tempo-datasource) datasource plugins.
 
+If you need advanced querying capabilities - see [querying docs]().
 
-### 
-
+## Querying
 
 Metrics, logs and traces aren't alike. They are all different types of data with different querying patterns.
 Expressing these specifics within one query language would inevitably result into losing practicality and flexibility.
-That's why each database in the stack has its own list of Querying integrations, tailored to the type of the signal.
+That's why each database in the stack has its own query languages and integrations, tailored to the type of the signal.
 
 ### Querying metrics
 
 VictoriaMetrics query language [MetricsQL](https://docs.victoriametrics.com/victoriametrics/metricsql/) is inspired
-by [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/).
+by [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/). MetricsQL is backwards-compatible with PromQL,
+so Grafana dashboards backed by Prometheus datasource or alerting/recording rules should work the same after switching 
+from Prometheus to VictoriaMetrics. However, there are some [intentional differences](https://medium.com/@romanhavronenko/victoriametrics-promql-compliance-d4318203f51e)
+between these two languages.
 
+If you're not familiar with PromQL or MetricsQL, please read basic concepts of [MetricsQL](https://docs.victoriametrics.com/victoriametrics/keyconcepts/#metricsql).
 
+Additionally, VictoriaMetrics implements [Graphite API](https://docs.victoriametrics.com/victoriametrics/integrations/graphite/#graphite-api-usage) 
+for querying, which makes it a drop-in replacement for Graphite.
 
-### Grafana
+> For querying experience, take a quick look at [vmui](https://docs.victoriametrics.com/playgrounds/#victoriametrics-playground)
+> and [Grafana](https://docs.victoriametrics.com/playgrounds/#grafana-playground) playgrounds.
 
-VictoriaStack integrates with Grafana using datasource plugins:
-* 
+See [migrating from PromQL to MetricsQL].
 
+### Querying logs
 
+VictoriaLogs query language [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/) is specifically designed for 
+querying logs and provides the following features:
+* Full-text search in any field.
+* Ability to combine filters into arbitrary complex [logical filters](https://docs.victoriametrics.com/victorialogs/logsql/#logical-filter).
+* Ability to extract structured fields from unstructured logs at query time via [transformations](https://docs.victoriametrics.com/victorialogs/logsql/#transformations).
+* Ability to calculate various stats over the selected log entries via [stats](https://docs.victoriametrics.com/victorialogs/logsql/#stats-pipe).
+
+> LogsQL provides excellent analytical capabilities and participates in the [ClickBench - a benchmark for analytical databases](https://github.com/ClickHouse/ClickBench/tree/main/victorialogs).
+
+To get the basic concepts of LogsQL please read [LogsQL tutorial](https://docs.victoriametrics.com/victorialogs/logsql/#logsql-tutorial).
+
+> For querying experience, take a quick look at [vmui](https://docs.victoriametrics.com/playgrounds/#victorialogs-playground)
+> and [Grafana](https://docs.victoriametrics.com/playgrounds/#grafana-playground) playgrounds.
+
+See also [SQL to LogsQL Tutorial](https://docs.victoriametrics.com/victorialogs/sql-to-logsql/) and
+[How To Convert Loki Queries to VictoriaLogs Queries](https://docs.victoriametrics.com/victorialogs/logql-to-logsql/).
+
+### Querying traces
+
+VictoriaTraces query language is the same as for VictoriaLogs: [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/).
+But most of the tracing experience comes from the User Interface capabilities where traces are filtered and visualized
+in queryless fashion. This is why it is better to use [Grafana] or [Perses] for exploring traces.
+
+However, querying capabilites with LogsQL are still available and are especially useful for [alerting with traces](https://docs.victoriametrics.com/victoriatraces/vmalert/).
+
+## Correlations
+
+Signals can be correlated together if they share the same list of attributes, so they can uniquely identify the
+same system or event. The recommended user interface for correlations is Grafana thanks to its [correlation](https://grafana.com/docs/grafana/latest/administration/correlations/)
+and derived fields features.
+
+Depending on the Grafana datasource plugin there could be multiple correlations available:
+1. Trace to logs, log to trace, log to metrics - see [correlations via VictoriaLogs plugin](https://docs.victoriametrics.com/victorialogs/integrations/grafana/#correlations).
+1. Trace to metrics, metric to logs, metric to traces - see [correlations via VictoriaMetrics plugin](https://docs.victoriametrics.com/victoriametrics/integrations/grafana/datasource/#correlations).
+1. Metrics to logs or traces correlations are possible via Prometheus datasource as well.
+1. Plugins Tempo, Jaeger, and Zipkin can correlate with logs or metrics using [Trace to logs](https://grafana.com/docs/grafana/latest/explore/trace-integration/#trace-to-logs)
+   and [Trace to metrics](https://grafana.com/docs/grafana/latest/visualizations/explore/trace-integration/#trace-to-metrics) feature.
+
+Logs and Traces can be converted to metrics via [alerting and recording rules](), that opens further possibilities for correlation.
 
 ## Security
 

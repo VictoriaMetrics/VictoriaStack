@@ -2,9 +2,9 @@
 title: Victoria Stack
 menu:
   docs:
-    weight: 30
+    weight: 16
     identifier: victoria-stack
-    pageRef: "/"
+    pageRef: "/victoria-stack/"
 tags:
   - metrics
   - logs
