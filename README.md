@@ -3,6 +3,9 @@ To run the docs locally:
 make docs-debug 
 ```
 
+Image sources are located at [Excalidraw+](https://app.excalidraw.com/s/4YgcNXX7lhO/43QV2antCeJ).
+I didn't put them locally as I assume they will be changing a lot until the stable release.
+
 To run the stack with single-nodes locally:
 ```sh
 make otel-single-up

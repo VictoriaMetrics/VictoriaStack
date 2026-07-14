@@ -16,7 +16,7 @@ Requests from the Internet must be properly **authorized before** being proxied 
 via [vmauth](https://docs.victoriametrics.com/vmauth/)
 or any other tool of your choice.
 
-![vmauth.png](vmauth.png)
+![vmauth.png](security-vmauth.png)
 
 vmauth can perform the following actions:
 
