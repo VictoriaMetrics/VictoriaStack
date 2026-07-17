@@ -33,7 +33,8 @@ services:
       - ./provisioning/datasources:/etc/grafana/provisioning/datasources
       - ./provisioning/dashboards/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
 
-  vmauth:
+  # Entry point into VictoriaStack: authorizes and routes requests to VictoriaMetrics, VictoriaTraces, and VictoriaLogs.
+  vmstack:
     image: victoriametrics/vmauth:latest
     volumes: [ "./vmauth.yml:/etc/auth.yml" ]
     command: [ "--auth.config=/etc/auth.yml" ]

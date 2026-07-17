@@ -4,5 +4,5 @@ datasources:
     - name: VictoriaTraces
       type: jaeger
       access: proxy
-      url: http://vmauth:8427/traces/select/jaeger/
+      url: http://vmstack:8427/traces/select/jaeger/
       isDefault: false

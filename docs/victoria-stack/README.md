@@ -63,6 +63,8 @@ each product's documentation:
 
 Depending on your requirements, check the following docs:
 
+// TODO: add links to docs
+
 * Ingestion: OpenTelemetry + other protocols
 * Querying: Grafana, built-in UIs
 * Correlations between signals

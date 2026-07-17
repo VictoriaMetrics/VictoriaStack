@@ -4,7 +4,7 @@ datasources:
     - name: VictoriaMetrics
       type: prometheus
       access: proxy
-      url: http://vmauth:8427/metrics/
+      url: http://vmstack:8427/metrics/
       isDefault: true
       jsonData:
         prometheusType: Prometheus

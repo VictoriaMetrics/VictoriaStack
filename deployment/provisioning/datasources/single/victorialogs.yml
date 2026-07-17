@@ -4,5 +4,5 @@ datasources:
     - name: VictoriaLogs
       type: victoriametrics-logs-datasource
       access: proxy
-      url: http://vmauth:8427/logs/
+      url: http://vmstack:8427/logs/
       isDefault: false
