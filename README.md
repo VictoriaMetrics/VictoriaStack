@@ -1,10 +1,17 @@
+
+# Docs
+
 To run the docs locally:
 ```shell
 make docs-debug 
 ```
 
+Visit http://localhost:1313/.
+
 Image sources are located at [Excalidraw+](https://app.excalidraw.com/s/4YgcNXX7lhO/43QV2antCeJ).
 I didn't put them locally as I assume they will be changing a lot until the stable release.
+
+# Docker compose demo 
 
 To run the stack with single-nodes locally:
 ```sh
