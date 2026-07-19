@@ -15,7 +15,7 @@ Multitenancy lets a single VictoriaStack installation store data for many isolat
 environments, or customers. Each group is a **tenant**, and every tenant sees only its own metrics, logs, and traces.
 
 VictoriaMetrics, VictoriaLogs, and VictoriaTraces share the same tenant model. The only per-signal difference is how a
-request selects its tenant. This page explains the shared model first, then the per-signal specifics.
+request selects its tenant. This page first explains the shared model, then the per-signal specifics.
 
 > VictoriaMetrics supports multitenancy only in [cluster mode](https://docs.victoriametrics.com/victoriametrics/cluster-victoriametrics/#multitenancy).
 > The single-node version stores all data in one tenant. The rest of this page assumes VictoriaMetrics runs in cluster mode.
@@ -23,8 +23,7 @@ request selects its tenant. This page explains the shared model first, then the 
 ## The tenant model
 
 A tenant is identified by an `(AccountID, ProjectID)` pair. Both are arbitrary 32-bit unsigned integers in the
-range `[0 .. 2^32)`. `AccountID` groups a top-level owner such as a team; `ProjectID` is optional and splits that owner
-into sub-groups such as environments.
+range `[0 .. 2^32)`. `AccountID` groups a top-level owner such as a team; `ProjectID` is optional and can subdivide an account into sub-groups such as environments.
 
 The same rules apply to all three databases:
 
@@ -39,7 +38,7 @@ The same rules apply to all three databases:
 
 [//]: # (such a metadata will be assigned in the datasource configuration)
 
-[//]: # (The databases store no other information about a tenant, such as its name, limits, or owner.  See [access control]&#40;&#41; for how to map users to tenants.)
+[//]: # (The databases store no other information about a tenant, such as its name, limits, or owner. See [access control]&#40;&#41; for how to map users to tenants.)
 
 ## Assigning tenants via HTTP headers
 
@@ -47,15 +46,15 @@ The easiest way to assign tenants is to use the `AccountID` and `ProjectID` requ
 For example, the following request writes metrics to `AccountID=42` and `ProjectID=0`:
 ```sh
 curl -X POST http://<vmstack>:8427/metrics/insert/prometheus/api/v1/import/prometheus \
- -d 'up{instance="foo"} 123' \ 
+ -d 'up{instance="foo"} 123' \
  --header "AccountID: 42" \
- --header "ProjectID: 0" 
+ --header "ProjectID: 0"
 ```
 
-Once the request finished, tenant `AccountID=42, ProjectID=0` will be automatically created and populated with the
-metrics.
+Once the request completes, tenant `AccountID=42, ProjectID=0` will be automatically created and populated with the
+supplied metrics.
 
-To query the results run the following command:
+To query the results, run the following command:
 ```sh
 curl 'http://<vmstack>:8427/select/prometheus/api/v1/query' \
  -d 'query=up' \
@@ -81,17 +80,17 @@ users:
         - "ProjectID: 0"
 ```
 
-> See more about tenants access control [here](http://localhost:1313/victoria-stack/access-control/#tenants-filtering).
+> See more about tenants access control [here](https://docs.victoriametrics.com/victoria-stack/access-control/#tenants-filtering).
 
 With the configuration above, all requests with Basic Auth credentials of `team-prod` will get access to logs and traces
 of the tenant `AccountID=42, ProjectID=0` only. This example also shows how to associate a string username with a
 numeric tenant: `team-prod` maps to `AccountID=42, ProjectID=0`.
 
 In a similar way, data access can be controlled via Grafana in datasource settings by setting Basic Auth:
-![img.png](multitenancy-grafana-auth.png)
+![Basic auth settings in Grafana](multitenancy-grafana-auth.png)
 
 Or by setting HTTP headers:
-![img_1.png](multitenancy-grafana-headers.png)
+![Setting HTTP headers in Grafana](multitenancy-grafana-headers.png)
 
 
 
@@ -101,3 +100,5 @@ Or by setting HTTP headers:
 
 
 // TODO: make a unified usage dashboards for all signals per-tenant
+
+
