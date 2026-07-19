@@ -11,7 +11,7 @@ tags:
   - traces
 ---
 
-The easiest way to ingest data into VictoriaStack is to [integrate with OpenTelemetry collector](https://docs.victoriametrics.com/opentelemetry/),
+The easiest way to ingest data into VictoriaStack is to [integrate with the OpenTelemetry collector](https://docs.victoriametrics.com/opentelemetry/),
 as it can forward all three types of signals at once.
 
 ## OpenTelemetry
@@ -36,7 +36,7 @@ service:
     metrics: { receivers: [ otlp ], exporters: [ otlp_http/vm-metrics ] }
 ```
 
-In the example above, OpenTelemetry collector receives signals via gRPC protocol,
+In the example above, the OpenTelemetry collector receives signals via the gRPC protocol,
 and forwards them to VictoriaStack via HTTP endpoints:
 * `http://victoriametrics:8428/opentelemetry/v1/metrics` for metrics
 * `http://victorialogs:9428/insert/opentelemetry/v1/logs` for logs
@@ -52,7 +52,7 @@ to each integration. See the following docs for more details:
 
 ## Integrations
 
-Just like with [OpenTelemetry collector](), the easiest way to start ingesting data is to integrate with telemetry agents
+Just like with [OpenTelemetry Collector](), the easiest way to start ingesting data is to integrate with telemetry agents
 that you already have in place. Do you use Prometheus or Grafana Alloy for metrics? Do you use Vector or Filebeat for logs?
 All these agents can push directly to VictoriaStack:
 
@@ -63,9 +63,10 @@ VictoriaTraces only supports integration with [OpenTelemetry](https://docs.victo
 
 ## Ingestion protocols
 
-Each database has its own list of supported ingestion protocols, most suitable for the type of the signal:
+Each database has its own list of supported ingestion protocols. These are the most suitable for each type of signal:
 
 * VictoriaMetrics: [InfluxDB line, CSV, JSON...](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#how-to-import-time-series-data)
 * VictoriaLogs: [JSON, Loki, Journald](https://docs.victoriametrics.com/victorialogs/data-ingestion/#http-apis)
 
 VictoriaTraces only supports integration with [OpenTelemetry](https://docs.victoriametrics.com/victoriatraces/data-ingestion/).
+
