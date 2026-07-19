@@ -11,9 +11,8 @@ tags:
   - traces
 ---
 
-VictoriaMetrics, VictoriaLogs and VictoriaTraces components **must run inside a protected trusted network**.
-Requests from the Internet must be properly **authorized before** being proxied to databases
-via [vmauth](https://docs.victoriametrics.com/vmauth/) or any other authentication tool of your choice.
+VictoriaMetrics, VictoriaLogs, and VictoriaTraces components **must run inside a protected trusted network**.
+For internet-facing deployments, use [vmauth](https://docs.victoriametrics.com/vmauth/) or another authentication proxy to authenticate requests before they reach the databases.
 
 ![vmauth.png](access-control-vmauth.png)
 
@@ -49,7 +48,7 @@ unauthorized_user:
       drop_src_path_prefix_parts: 1
 ```
 
-With the configuration above, each service can be accessed via vmauth endpoint using its own URL:
+With the configuration above, each service can be accessed via the vmauth endpoint using its own URL:
 
 - `https://vmauth/metrics/...` - to access VictoriaMetrics
 - `https://vmauth/logs/...` - to access VictoriaLogs
@@ -59,7 +58,7 @@ See how to configure vmauth to authorize users and control access to the data in
 
 ### Access control
 
-By default, VictoriaMetrics, VictoriaLogs and VictoriaTraces databases do not limit access to their endpoints or to the
+By default, VictoriaMetrics, VictoriaLogs, and VictoriaTraces databases do not limit access to their endpoints or to the
 stored data. Instead, they provide various mechanisms for limiting access to the data via [multitenancy]() or
 enforcing [extra filters](). 
 
@@ -97,9 +96,9 @@ users:
 
 #### Tenants filtering
 
-> For tenants filtering please first read [Multitenancy]() docs.
+For tenant filtering, please read the [Multitenancy]() docs first.
 
-In vmauth configuration it is easy to route a username to the specific tenant:
+In vmauth configuration, it is easy to route a username to the specific tenant:
 
 ```yaml
 users:
@@ -149,7 +148,7 @@ The `src_paths` in [vmauth config]() can be further modified to allow access onl
     url_prefix: "http://victoriametrics:8428/"
 ```
 
-With this configuration, even authorized user will be able to normally query metrics and use Grafana, but won't be able
+With this configuration, even authorized users will be able to normally query metrics and use Grafana, but won't be able
 to access [Sensitive Endpoints](http://localhost:1313/victoria-stack/security/#sensitive-endpoints)
 like [/api/v1/admin/tsdb/delete_series](https://docs.victoriametrics.com/victoriametrics/#how-to-delete-time-series).
 
@@ -178,11 +177,13 @@ users:
 
 VictoriaStack components, including vmauth, expose sensitive endpoints for config hot reloading, metrics scraping,
 profiling, etc.
-It is recommended to protect these endpoints from the public or unauthorized access. Follow recommendations
-per-component below:
+It is recommended to protect these endpoints from public or unauthorized access. Follow recommendations
+per component below:
 
 - [vmauth security](https://docs.victoriametrics.com/vmauth/#security)
 - [VictoriaMetrics security](https://docs.victoriametrics.com/victoriametrics/#general-security-recommendations)
 - [VictoriaLogs system endpoints](https://docs.victoriametrics.com/victorialogs/security-and-lb/#system-endpoints)
 - [VictoriaTraces security](https://docs.victoriametrics.com/victoriatraces/#security)
 - [vmalert security](https://docs.victoriametrics.com/vmalert/#security)
+
+
