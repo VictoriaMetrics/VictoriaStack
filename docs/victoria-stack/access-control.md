@@ -96,7 +96,7 @@ users:
 
 #### Tenants filtering
 
-For tenant filtering, please read the [Multitenancy]() docs first.
+> For tenant filtering, please read the [Multitenancy]() docs first.
 
 In vmauth configuration, it is easy to route a username to the specific tenant:
 
@@ -148,9 +148,7 @@ The `src_paths` in [vmauth config]() can be further modified to allow access onl
     url_prefix: "http://victoriametrics:8428/"
 ```
 
-With this configuration, even authorized users will be able to normally query metrics and use Grafana, but won't be able
-to access [Sensitive Endpoints](http://localhost:1313/victoria-stack/security/#sensitive-endpoints)
-like [/api/v1/admin/tsdb/delete_series](https://docs.victoriametrics.com/victoriametrics/#how-to-delete-time-series).
+With this configuration, authorized users can query metrics and use Grafana as usual, but they cannot access [Sensitive Endpoints](https://docs.victoriametrics.com/victoria-stack/security/#sensitive-endpoints), like `/api/v1/admin/tsdb/delete_series`.
 
 #### IP filtering
 
@@ -177,8 +175,8 @@ users:
 
 VictoriaStack components, including vmauth, expose sensitive endpoints for config hot reloading, metrics scraping,
 profiling, etc.
-It is recommended to protect these endpoints from public or unauthorized access. Follow recommendations
-per component below:
+It is recommended to protect these endpoints from public or unauthorized access. Follow per-component recommendations
+below:
 
 - [vmauth security](https://docs.victoriametrics.com/vmauth/#security)
 - [VictoriaMetrics security](https://docs.victoriametrics.com/victoriametrics/#general-security-recommendations)
