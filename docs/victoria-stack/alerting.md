@@ -43,7 +43,7 @@ With the configuration above, vmalert will periodically evaluate rules read from
 The key features of vmalert are:
 * Supports Prometheus [alerting rules syntax](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#defining-alerting-rules),
   making it easier to migrate from a Prometheus stack.
-* Supports [recording rules](http://localhost:1313/vmalert/#recording-rules), allowing you to convert query results into metrics.
+* Supports [recording rules](https://docs.victoriametrics.com/vmalert/#recording-rules), allowing you to convert query results into metrics.
 * Can [hot reload](https://docs.victoriametrics.com//victoriametrics/vmalert/#hot-config-reload) configuration rules.
 * Can [persist alert state across restarts](https://docs.victoriametrics.com/#alerts-state-on-restarts).
 * Supports recording and alerting rules backfilling (also known as `replay`). See [these docs](https://docs.victoriametrics.com/#rules-backfilling) to learn more.
@@ -51,7 +51,7 @@ The key features of vmalert are:
 ## Rules
 
 vmalert is configured with [rules in yaml format](https://docs.victoriametrics.com/vmalert.html#groups) that it can
-fetch from the local file system, remote URL, or object storage. Rule expressions are set as regular query expressions
+fetch from the local file system, remote URL, or object storage. Rule expressions are configured with regular query expressions
 in the corresponding language. For example, the following alerting rule for VictoriaLogs triggers if the number of `error`
 or `warn` logs on a single pod in `env=prod` exceeds 10 during the last 5 minutes:
 ```yaml
