@@ -51,7 +51,7 @@ The key features of vmalert are:
 ## Rules
 
 vmalert is configured with [rules in yaml format](https://docs.victoriametrics.com/vmalert.html#groups) that it can
-fetch from the local file system, remote URL, or object storage. Rule expressions are configured with regular query expressions
+fetch from the local file system, remote URL, or object storage. Rules are configured using regular query expressions
 in the corresponding language. For example, the following alerting rule for VictoriaLogs triggers if the number of `error`
 or `warn` logs on a single pod in `env=prod` exceeds 10 during the last 5 minutes:
 ```yaml
