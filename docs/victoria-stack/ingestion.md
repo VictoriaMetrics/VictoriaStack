@@ -11,12 +11,12 @@ tags:
   - traces
 ---
 
-The easiest way to ingest data into VictoriaStack is to [integrate with the OpenTelemetry collector](https://docs.victoriametrics.com/opentelemetry/),
+The easiest way to ingest data into VictoriaStack is to [integrate with the OpenTelemetry Collector](https://docs.victoriametrics.com/opentelemetry/),
 as it can forward all three types of signals at once.
 
 ## OpenTelemetry
 
-See the example of the OpenTelemetry collector configuration below:
+See the example of the OpenTelemetry Collector configuration below:
 ```yaml
 receivers:
   otlp:
@@ -36,7 +36,7 @@ service:
     metrics: { receivers: [ otlp ], exporters: [ otlp_http/vm-metrics ] }
 ```
 
-In the example above, the OpenTelemetry collector receives signals via the gRPC protocol,
+In the example above, the OpenTelemetry Collector receives signals via the gRPC protocol,
 and forwards them to VictoriaStack via HTTP endpoints:
 * `http://victoriametrics:8428/opentelemetry/v1/metrics` for metrics
 * `http://victorialogs:9428/insert/opentelemetry/v1/logs` for logs
