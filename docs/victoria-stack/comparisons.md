@@ -108,7 +108,7 @@ unified UI with Lucene-style search, SQL support, dashboards, alerting, and sess
 * ClickStack has bundled HyperDX UI: one interface for everything.
   VictoriaStack's answer is [Grafana with all three datasources](http://docs.victoriametrics.com/victoria-stack/ui/#grafana)
   plus per-database [vmui](http://docs.victoriametrics.com/victoria-stack/ui/#vmui).
-  That setup is more flexible, but it is not a single out-of-the-box solution.
+  This setup is more flexible, but Grafana is an extra component. It's not a single out-of-the-box solution.
 * ClickStack deploys ClickHouse, HyperDX, MongoDB (for HyperDX metadata), and an OpenTelemetry
   Collector. VictoriaStack is three self-contained binaries with no external dependencies.
 * ClickHouse-based metrics lack a PromQL-compatible engine. This gap matters if your team
@@ -189,7 +189,7 @@ and service discovery.
 * **A healthy, stable Prometheus setup needs no migration.** If it fits in one node and works, keep it.
 * Teams usually evaluate VictoriaMetrics when they hit scale pain: high cardinality, RAM pressure, slow queries over
   long retention, or the operational cost of Thanos components (sidecars, store gateways, compactors, object storage).
-  VictoriaMetrics replaces that setup with a [simpler architecture]((https://docs.victoriametrics.com/victoriametrics/cluster-victoriametrics/)).
+  VictoriaMetrics replaces this setup with a [simpler architecture]((https://docs.victoriametrics.com/victoriametrics/cluster-victoriametrics/)).
 * Thanos transparently supports offloading of historical data to S3, which theoretically provides an infinitely scalable
   storage solution. However, storing and reading data from S3 is not free and comes with additional challenges.
 * Prometheus and Thanos cover metrics only. Logs and traces still need a second and a third stack.
