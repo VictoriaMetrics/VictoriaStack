@@ -16,7 +16,7 @@ tags:
 vmui is a UI frontend for VictoriaMetrics and VictoriaLogs. It is designed for ad-hoc exploration of metrics and logs,
 using all the features of the corresponding database.
 
-VictoriaTraces doesn't have a dedicated UI yet, so it is recommended to use [Grafana](#) to explore traces.
+> VictoriaTraces doesn't have a dedicated UI yet, so it is recommended to use [Grafana](#) to explore traces.
 
 vmui is built into the VictoriaMetrics and the VictoriaLogs components:
 * [VictoriaMetrics UI](https://docs.victoriametrics.com/victoriametrics/#vmui)
