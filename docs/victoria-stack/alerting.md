@@ -11,8 +11,7 @@ tags:
   - traces
 ---
 
-Alerting constantly evaluates rules and sends notifications if certain conditions are met. It helps to get notified
-if service is down, HTTP request rate increases, log entries contain errors, traces taking too long.
+Alerting evaluates rules against metrics, logs, or traces and sends notifications when conditions are met. Common examples include service outages, error messages in log entries, spikes in HTTP request rate, or slow traces.
 
 In VictoriaStack, [vmalert](https://docs.victoriametrics.com/vmalert/) components acts as an alerting engine and
 integrates with [Alertmanager](https://github.com/prometheus/alertmanager) - a tool for dispatching alerting notifications
@@ -22,7 +21,7 @@ to various destinations like [email, Slack, PagerDuty, MS Teams, etc](https://pr
 
 ## Quick Start
 
-There are following things required to start using alerting:
+The following things are required to start using alerting:
 1. A list of [rules](#rules) to execute.
 2. A datasource URL to execute the rules against.
 3. Alertmanager service URL to send notifications to.
@@ -38,21 +37,21 @@ vmalert is a single binary service that can be started with the following comman
 
 > See more detailed documentation in [vmalert Quick Start docs](https://docs.victoriametrics.com/vmalert/#quickstart).
 
-With configuration above, vmalert will periodically evaluate rules read from `alert.rules` file by querying specified
+With the configuration above, vmalert will periodically evaluate rules read from the `alert.rules` file by querying the specified
 `-datasource.url` and sending notifications to `-notifier.url` if conditions are met.
 
 The key features of vmalert are:
-* Supports Prometheus [alerting rules definition format](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#defining-alerting-rules),
-  making it easier to migrate from Prometheus stack
-* Supports [recording rules](http://localhost:1313/vmalert/#recording-rules), aka converting query results into metrics
-* [Hot reload](https://docs.victoriametrics.com//victoriametrics/vmalert/#hot-config-reload) of rules configuration
-* Keeps the alert [state on restarts](https://docs.victoriametrics.com/#alerts-state-on-restarts)
-* Supports recording and alerting rules backfilling (aka `replay`). See [these docs](https://docs.victoriametrics.com/#rules-backfilling);
+* Supports Prometheus [alerting rules syntax](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#defining-alerting-rules),
+  making it easier to migrate from a Prometheus stack.
+* Supports [recording rules](https://docs.victoriametrics.com/vmalert/#recording-rules), allowing you to convert query results into metrics.
+* Can [hot reload](https://docs.victoriametrics.com//victoriametrics/vmalert/#hot-config-reload) configuration rules.
+* Can [persist alert state across restarts](https://docs.victoriametrics.com/#alerts-state-on-restarts).
+* Supports recording and alerting rules backfilling (also known as `replay`). See [these docs](https://docs.victoriametrics.com/#rules-backfilling) to learn more.
 
 ## Rules
 
 vmalert is configured with [rules in yaml format](https://docs.victoriametrics.com/vmalert.html#groups) that it can
-fetch from the local file system, remote URL, or object storage. Rules expressions are set as regular query expressions
+fetch from the local file system, remote URL, or object storage. Rules are configured using regular query expressions
 in the corresponding language. For example, the following alerting rule for VictoriaLogs triggers if the number of `error`
 or `warn` logs on a single pod in `env=prod` exceeds 10 during the last 5 minutes:
 ```yaml
@@ -80,3 +79,5 @@ vmalert allows specifying only one datasource URL for rules evaluation.
 ## Alertmanager
 
 ## High Availability
+
+

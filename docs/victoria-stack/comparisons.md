@@ -15,10 +15,10 @@ This page compares VictoriaStack with the most popular alternatives, so you can 
 for your requirements.
 
 > **How to read this comparison.** VictoriaMetrics maintainers wrote this page, so bias is possible despite our
-> best efforts. We only make claims we can link to sources for, and we list the cases where competitors are a better fit.
+> best efforts. We only make claims we can back with sources, and we list the cases where competitors are a better fit.
 > If you find an outdated or wrong statement,
 > please [open an issue](https://github.com/VictoriaMetrics/VictoriaStack/issues).
-> Verify performance claims on **your** workload: all benchmarks below are linked.
+> Verify performance claims on **your** workload: we provide links to our benchmarks for reference.
 
 ## Design philosophies
 
@@ -26,7 +26,7 @@ Open-source observability stacks follow one of the following architectural philo
 
 1. **A specialized database per signal** (*VictoriaStack, Grafana LGTM*).
    Each signal (metrics, logs, traces) gets a database optimized for its access patterns, accessed via a unified UI.
-   Provides the highest efficiency and flexibility, as each signal is processed via specialized optimized pipeline and
+   Provides the highest efficiency and flexibility, as each signal is processed via a specialized optimized pipeline and
    can be scaled independently.
 2. **One general-purpose database for all signals** (*ClickStack, SigNoz, Elastic Stack*).
    All signals land in a single analytical database with a bundled UI on top. You get maximum query flexibility,
@@ -43,19 +43,19 @@ Open-source observability stacks follow one of the following architectural philo
 | **Query languages**         | [MetricsQL](https://docs.victoriametrics.com/victoriametrics/metricsql/) (PromQL-compatible), [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/) | PromQL, LogQL, TraceQL                   | SQL, Lucene-style search                                                                                                                                       | PromQL, SQL                                                                                | ES QL, KQL, Lucene                  |
 | **OpenTelemetry ingestion** | Yes                                                                                                                                                           | Yes                                      | Yes                                                                                                                                                            | Yes                                                                                        | Yes                                 |
 | **Horizontal scalability**  | Yes                                                                                                                                                           | Yes                                      | Yes                                                                                                                                                            | Yes                                                                                        | Yes                                 |
-| **Multitenancy**            | via labels or HTTP headers                                                                                                                                    | via HTTP headers                         | Via ClickHouse databases/RBAC                                                                                                                                  | Single-tenant self-hosted, via organizations in Cloud                                      | Via Spaces/RBAC                     |
+| **Multitenancy**            | Via labels or HTTP headers                                                                                                                                    | Via HTTP headers                         | Via ClickHouse databases/RBAC                                                                                                                                  | Single-tenant self-hosted, via organizations in Cloud                                      | Via Spaces/RBAC                     |
 | **Bundled UI**              | [vmui](https://docs.victoriametrics.com/victoriametrics/#vmui) for ad-hoc queries; Grafana for dashboards and correlation                                     | Grafana                                  | HyperDX (unified)                                                                                                                                              | SigNoz UI (unified)                                                                        | Kibana (unified)                    |
 | **Kubernetes**              | [Operator](https://docs.victoriametrics.com/operator/) + [Helm charts](https://docs.victoriametrics.com/helm/) covering the full stack                        | Helm charts, Grafana Operator            | Helm charts                                                                                                                                                    | Helm charts                                                                                | ECK operator                        |
 
 ## VictoriaStack vs Grafana LGTM (Mimir + Loki + Tempo)
 
-The LGTM stack is the closest architectural relative of VictoriaStack. Both use specialized databases per signal,
+The LGTM stack is the closest architectural relative of VictoriaStack. Both use specialized databases for each signal,
 and both use Grafana as the primary visualization layer.
 
 **Key differences:**
 
 * **Operational model.** LGTM components scale by splitting work across microservice roles: distributor, ingester,
-  querier, compactor, and others. This design scales far. It also adds more parts to configure, monitor, and upgrade.
+  querier, compactor, and others. This design scales well, but it also adds more components to configure, monitor, and upgrade.
   VictoriaStack databases run as single binaries.
   [Cluster versions](https://docs.victoriametrics.com/victoriametrics/cluster-victoriametrics/) use three simple roles.
   That means fewer components to operate.
@@ -67,7 +67,7 @@ and both use Grafana as the primary visualization layer.
   the [VictoriaLogs vs Loki benchmarks](https://docs.victoriametrics.com/victorialogs/faq/#how-does-victorialogs-compare-to-loki)
   and third-party reports such
   as [TrueFoundry's migration from Loki](https://www.truefoundry.com/blog/victorialogs-vs-loki).
-* **Storage.** LGTM stack natively supports S3 for historical data, storing recent data on local file system and uploading historical
+* **Storage.** LGTM stack natively supports S3 for historical data, storing recent data on the local file system and uploading historical
   data to S3. VictoriaStack relies on the local file system for the stored data,
   and S3 support only for backups. There is ongoing work to [support S3 for historical data](https://github.com/VictoriaMetrics/VictoriaLogs/issues/48) in VictoriaStack. 
 * **Query languages.** Mimir, Loki, and Tempo use PromQL, LogQL, and TraceQL.
@@ -76,11 +76,11 @@ and both use Grafana as the primary visualization layer.
   MetricsQL is a PromQL superset with
   [documented intentional differences](https://medium.com/@romanhavronenko/victoriametrics-promql-compliance-d4318203f51e).
   LogsQL queries both logs and traces.
-* **Grafana integration.** LGTM stack is developed by Grafana Labs and has better integration with Grafana interfaces.
-  Third-party integrations via datasource plugins are simply not allowed to have access to the full Grafana ecosystem.
+* **Grafana integration.** The LGTM stack is developed by Grafana Labs and integrates naturally with Grafana. 
+  Third-party datasource plugins do not have the same level of native integration.
 * **License.** LGTM projects use the AGPLv3 license. VictoriaStack uses Apache 2.0.
-  For most end users this difference changes nothing. For teams that embed the databases into distributed products,
-  Apache 2.0 is simpler to adopt.
+  For most end users there is no practical difference between the licenses. 
+  For teams that embed the databases into distributed products, Apache 2.0 is simpler to adopt.
 
 **Prefer LGTM when:**
 
@@ -97,18 +97,18 @@ and both use Grafana as the primary visualization layer.
 ## VictoriaStack vs ClickStack (ClickHouse + HyperDX)
 
 [ClickStack](https://github.com/ClickHouse/ClickStack) stores all signals in ClickHouse and ships HyperDX as a
-unified UI with Lucene-style search, SQL, dashboards, alerting, and session replay.
+unified UI with Lucene-style search, SQL support, dashboards, alerting, and session replay.
 
 **Key differences:**
 
 * ClickStack is built on top of ClickHouse, a general-purpose analytical database.
   Putting all signals in it gives you SQL over everything. The trade-off: a general-purpose engine needs tuning
   for each workload (schemas, codecs, TTLs, merges). VictoriaStack databases apply those optimizations by design.
-  There are no schemas to manage for metrics, logs or traces.
+  There are no schemas to manage for metrics, logs, or traces.
 * ClickStack has bundled HyperDX UI: one interface for everything.
-  VictoriaStack's answer is [Grafana with all three datasources](http://localhost:1313/victoria-stack/ui/#grafana)
-  plus per-database [vmui](http://localhost:1313/victoria-stack/ui/#vmui).
-  This setup is more flexible, but Grafana is an extra component, not a single out-of-the-box experience.
+  VictoriaStack's answer is [Grafana with all three datasources](http://docs.victoriametrics.com/victoria-stack/ui/#grafana)
+  plus per-database [vmui](http://docs.victoriametrics.com/victoria-stack/ui/#vmui).
+  This setup is more flexible, but Grafana is an extra component. It's not a single out-of-the-box solution.
 * ClickStack deploys ClickHouse, HyperDX, MongoDB (for HyperDX metadata), and an OpenTelemetry
   Collector. VictoriaStack is three self-contained binaries with no external dependencies.
 * ClickHouse-based metrics lack a PromQL-compatible engine. This gap matters if your team
@@ -142,19 +142,17 @@ unified UI with Lucene-style search, SQL, dashboards, alerting, and session repl
 * SigNoz is built on top of ClickHouse, a general-purpose analytical database.
   Putting all signals in it gives you SQL over everything. The trade-off: a general-purpose engine needs tuning
   for each workload (schemas, codecs, TTLs, merges). VictoriaStack databases apply those optimizations by design.
-  There are no schemas to manage for metrics, logs or traces.
+  There are no schemas to manage for metrics, logs, or traces.
 * SigNoz metrics support PromQL queries, but the primary interface is SigNoz's query builder.
-  The Prometheus ecosystem (recording rules, remote_write from existing Prometheus fleets, Grafana dashboards)
-  is more natural with VictoriaMetrics.
-* Multitenancy is built into every VictoriaStack database. Self-hosted SigNoz is single-tenant with multitenancy support
-  in the Cloud offering.
+  VictoriaMetrics is a more natural fit for the Prometheus ecosystem, especially for recording rules, remote_write from existing Prometheus fleets, and Grafana dashboards.
+* Multitenancy is built into every VictoriaStack database. Self-hosted SigNoz is single-tenant, with multitenancy available in the Cloud offering.
 
 **Prefer SigNoz when:** a small team wants a Datadog-like APM experience, self-hosted, with minimal composition work.
 
 **Prefer VictoriaStack when:**
 
-* You are building a platform for many teams and need multitenancy, access control, per-tenant limits.
-* You are migrating an existing Prometheus estate.
+* You are building a platform for many teams and need multitenancy, access control, and per-tenant limits.
+* You are migrating an existing Prometheus setup.
 * You operate at a scale where per-signal efficiency dominates costs.
 
 ## VictoriaStack vs Elastic Stack
@@ -177,7 +175,7 @@ queries over logs), or you already run Elastic for search and want observability
 
 **Prefer VictoriaStack when:** 
 * You value cost-efficiency and flexibility. The savings could reach x30.
-* You are migrating an existing Prometheus estate.
+* You are migrating an existing Prometheus setup.
 * You operate at a scale where per-signal efficiency dominates costs.
 
 ## VictoriaStack vs Prometheus + Thanos (and friends)
@@ -191,9 +189,9 @@ and service discovery.
 * **A healthy, stable Prometheus setup needs no migration.** If it fits in one node and works, keep it.
 * Teams usually evaluate VictoriaMetrics when they hit scale pain: high cardinality, RAM pressure, slow queries over
   long retention, or the operational cost of Thanos components (sidecars, store gateways, compactors, object storage).
-  VictoriaMetrics replaces that setup with a [simpler architecture]((https://docs.victoriametrics.com/victoriametrics/cluster-victoriametrics/))
+  VictoriaMetrics replaces this setup with a [simpler architecture]((https://docs.victoriametrics.com/victoriametrics/cluster-victoriametrics/)).
 * Thanos transparently supports offloading of historical data to S3, which theoretically provides an infinitely scalable
-  storage solution. However, storing and reading data from S3 is not free and comes additional challenges.
+  storage solution. However, storing and reading data from S3 is not free and comes with additional challenges.
 * Prometheus and Thanos cover metrics only. Logs and traces still need a second and a third stack.
   VictoriaStack fills exactly that gap with a shared operational model.
 
@@ -205,7 +203,9 @@ and service discovery.
 | You need one bundled UI with session replay, and your team thinks in SQL                                   | **ClickStack**                            |
 | You want a self-hosted, Datadog-like APM for one team                                                      | **SigNoz**                                |
 | You require strict PromQL compatibility and native integration with Grafana                                | **Grafana LGTM**                          |
-| You mostly focused on Logs search ignoring cost-efficiency                                                 | **Elastic**                               |
+| You mostly focused on Logs search,  and cost efficiency is not a priority                                                 | **Elastic**                               |
 
 > Found a mistake on this page, or a comparison dimension we should add?
 > [Open an issue](https://github.com/VictoriaMetrics/VictoriaStack/issues). We welcome corrections and apply them.
+
+

@@ -1,4 +1,4 @@
-**Victoria Stack** is a unified observability platform built with three specialized databases that share the same
+**VictoriaStack** is a unified observability platform built with three specialized databases that share the same
 design philosophy, operational model, and ecosystem:
 
 | Signal      | Product                                                              | Query language                                                                                                                                                                                                                                  | Horizontal scaling | Grafana | Multitenancy | Alerting |
@@ -14,16 +14,16 @@ design philosophy, operational model, and ecosystem:
 ![stack.webp](stack.png)
 {width="700"}
 
-Each product is Open Source, Apache2 licensed, production-ready and has its own extensive documentation.
+Each product is Open Source, Apache-2.0 licensed, production-ready, and has its own extensive documentation.
 
 ## Why VictoriaStack?
 
-VictoriaMetrics software is built with three core principles in mind: **simplicity, reliability, efficiency**.
+VictoriaMetrics software is built on three core principles: **simplicity, reliability, and efficiency**.
 Software that is easy to run and maintain, that fits well in home labs and can be reliably scaled to large production
 environments. Each of the databases was heavily battle-tested in production environments.
 
 These principles are achieved by focusing on what matters most for every signal. VictoriaMetrics is optimized
-for time series workload, while VictoriaLogs design and architecture is optimized for log ingestion. 
+for time series workload, while VictoriaLogs design and architecture are optimized for log ingestion. 
 VictoriaStack covers three main pillars of observability with fine-tuned solutions for each of the signals. 
 
 //TODO: and some more motivation on choosing why
@@ -35,14 +35,14 @@ visit [Playgrounds page](https://docs.victoriametrics.com/playgrounds/)
 and try publicly running installations of VictoriaStack, fed
 with [OpenTelemetry Astronomy Shop demo](https://github.com/open-telemetry/opentelemetry-demo) data.
 
-To run the stack locally with docker-compose, follow docs [here]():
+To run the stack locally with Docker Compose, follow the docs [here]():
 
 ```sh
 git clone https://github.com/VictoriaMetrics/VictoriaStack.git
 make otel-single-up
 ```
 
-> Note: docker-compose environment is very much simplified for demonstration purposes, it is **not intended for
+> Note: the Docker Compose environment is very much simplified for demonstration purposes; it is **not intended for
 production use**.
 > The data it ingests is not representative of real-world data.
 
@@ -75,5 +75,7 @@ Depending on your requirements, check the following docs:
 * Security
 * Backups & Restore
 * Operations: monitoring, upgrades, scaling
+
+
 
 
