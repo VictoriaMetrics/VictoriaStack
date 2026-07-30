@@ -1,0 +1,31 @@
+apiVersion: 1
+
+datasources:
+    - name: VictoriaLogs
+      type: victoriametrics-logs-datasource
+      access: proxy
+      url: http://vmstack:8427/logs/
+      isDefault: false
+      jsonData:
+        multitenancyHeaders:
+          AccountID: 0
+          ProjectID: 0
+        otelPreset:
+          enabled: true
+          # `uid` of a Jaeger datasource the generated trace ID derived field
+          # links to (currently only Jaeger is supported).
+          # Omit to skip trace linking.
+          tracesDatasourceUid: victoriatraces-jaeger-ds
+          detection:
+            # Log field holding the trace ID, e.g. trace_id, traceId or TraceId.
+            traceIdField: trace_id
+            # Omit `severity` to skip generating log level rules.
+            severity:
+              # Log field holding the severity, e.g. severity_text or severity_number.
+              field: severity_text
+              # `string` for text severities (info, WARN, ...) or
+              # `number` for numeric OTel severities (1-24).
+              valueCase: string
+              # `manual` because the field is set explicitly here
+              # (`auto` is reserved for UI auto-detection).
+              source: manual

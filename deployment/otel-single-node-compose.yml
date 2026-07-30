@@ -2,7 +2,7 @@ services:
   otelcol:
     image: otel/opentelemetry-collector-contrib:latest
     command: [ "--config=/etc/otelcol/config.yml" ]
-    volumes: [ "./otelcol.yml:/etc/otelcol/config.yml" ]
+    volumes: [ "./otelcol-single-node.yml:/etc/otelcol/config.yml" ]
 
   victoriametrics:
     image: victoriametrics/victoria-metrics:latest
@@ -24,19 +24,20 @@ services:
     image: grafana/grafana:latest
     ports: [ "3000:3000" ]
     environment:
-      # VictoriaMetrics is using Prometheus datasource.
-      # VictoriaTraces is using Jaeger datasource.
-      # Only VictoriaLogs requires Grafana plugin to install.
+      # Install VictoriaLogs datasource plugin
       - GF_INSTALL_PLUGINS=victoriametrics-logs-datasource
+      # VictoriaMetrics is using native Prometheus datasource.
+      # VictoriaTraces is using native Jaeger datasource.
     volumes:
       - grafanadata:/var/lib/grafana
       - ./provisioning/datasources:/etc/grafana/provisioning/datasources
       - ./provisioning/dashboards/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
+      - ./provisioning/dashboards/demo.json:/var/lib/grafana/dashboards/demo.json
 
   # Entry point into VictoriaStack: authorizes and routes requests to VictoriaMetrics, VictoriaTraces, and VictoriaLogs.
   vmstack:
     image: victoriametrics/vmauth:latest
-    volumes: [ "./vmauth.yml:/etc/auth.yml" ]
+    volumes: [ "./vmauth-single-node.yml:/etc/auth.yml" ]
     command: [ "--auth.config=/etc/auth.yml" ]
     ports: [ "8427:8427" ]
 
@@ -48,7 +49,7 @@ services:
       - "-rule=/etc/vmalert/*.yml"
       # Replace "-notifier.blackhole" with actual "-notifier.url=<alertmanager_url>" for sending alerts
       - "-notifier.blackhole"
-    volumes: [ "./victoriametrics/rules.yml:/etc/vmalert/rules.yml" ]
+    volumes: [ "./rules:/etc/vmalert" ]
 
   # Define telemetry generators for logs and traces.
   # Metrics are scraped by OTEL collector from deployed services.

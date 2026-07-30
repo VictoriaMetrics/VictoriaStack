@@ -40,9 +40,9 @@ processors:
   batch:
 
 exporters:
-  otlp_http/vm-metrics: { metrics_endpoint: http://vmauth:8427/metrics/insert/opentelemetry/v1/metrics, headers: { AccountID: "0", ProjectID: "0" } }
-  otlp_http/vm-logs: { logs_endpoint: http://vmauth:8427/logs/insert/opentelemetry/v1/logs, headers: { AccountID: "0", ProjectID: "0" } }
-  otlp_http/vm-traces: { traces_endpoint: http://vmauth:8427/traces/insert/opentelemetry/v1/traces, headers: { AccountID: "0", ProjectID: "0" } }
+  otlp_http/vm-metrics: { metrics_endpoint: http://vmstack:8427/metrics/insert/opentelemetry/v1/metrics, headers: { AccountID: "0", ProjectID: "0" } }
+  otlp_http/vm-logs:    { logs_endpoint: http://vmstack:8427/logs/insert/opentelemetry/v1/logs, headers: { AccountID: "0", ProjectID: "0" } }
+  otlp_http/vm-traces:  { traces_endpoint: http://vmstack:8427/traces/insert/opentelemetry/v1/traces, headers: { AccountID: "0", ProjectID: "0" } }
 
 service:
   pipelines:

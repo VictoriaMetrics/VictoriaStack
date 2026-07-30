@@ -12,5 +12,5 @@ datasources:
         httpHeaderName1: AccountID
         httpHeaderName2: ProjectID
       secureJsonData:
-        httpHeaderValue1: 1
-        httpHeaderValue2: 1
+        httpHeaderValue1: 0
+        httpHeaderValue2: 0

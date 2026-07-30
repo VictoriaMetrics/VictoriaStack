@@ -6,9 +6,11 @@ datasources:
       access: proxy
       url: http://vmstack:8427/traces/select/jaeger/
       isDefault: false
+      # is needed to link correlation from VictoriaLogs datasource
+      uid: "victoriatraces-jaeger-ds"
       jsonData:
         httpHeaderName1: AccountID
         httpHeaderName2: ProjectID
       secureJsonData:
-        httpHeaderValue1: 1
-        httpHeaderValue2: 1
+        httpHeaderValue1: 0
+        httpHeaderValue2: 0
