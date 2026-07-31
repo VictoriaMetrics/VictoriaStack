@@ -77,3 +77,7 @@ It allows you to manage Victoria Metrics components in Kubernetes or OpenShift c
 to [GitOps](https://www.redhat.com/en/topics/devops/what-is-gitops) and [IaC](https://en.wikipedia.org/wiki/Infrastructure_as_code) concepts.
 
 See [Quick Start instructions](https://docs.victoriametrics.com/operator/quick-start/) for the operator.
+
+## Backups
+
+## Monitoring

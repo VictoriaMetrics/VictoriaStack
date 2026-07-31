@@ -52,6 +52,7 @@ platform ready for future scaling and growth.
 | **[Visualization](http://localhost:1313/victoriastack/ui/)**                            | [Grafana](http://localhost:1313/victoriastack/ui/#grafana) and [Perses](http://localhost:1313/victoriastack/ui/#perses) for unified observability and dashboarding. Built-in [vmui](http://localhost:1313/victoriastack/ui/#vmui) for ad-hoc exploration.                          |
 | **[Alerting](http://localhost:1313/victoriastack/alerting/)**                           | [vmalert](https://docs.victoriametrics.com/victoriametrics/vmalert/) integrated with [Alertmanager](http://localhost:1313/victoriastack/alerting/#alertmanager) for rules evaluation and dispatching notifications                                                                 |
 | **[Anomaly detection]()**                                                               | [vmaonmaly]() ...                                                                                                                                                                                                                                                                  |
+| **[Enterprise Support]()**                                                              |                                                                                                                                                                                                                                                                                    |
 
 // TODO: add links to stack components
 
@@ -62,7 +63,8 @@ platform ready for future scaling and growth.
 > and try publicly running installations of VictoriaStack, fed
 > with [OpenTelemetry Astronomy Shop demo](https://github.com/open-telemetry/opentelemetry-demo) data.
 
-VictoriaStack can be deployed on bare metal as binaries, as docker containers, using helm charts, or Kubernetes operator.
+VictoriaStack can be deployed on bare metal as binaries, as docker containers, using helm charts, or Kubernetes
+operator.
 See more detailed [deployment docs](http://localhost:1313/victoriastack/deployment/).
 
 In the sections below, we'll go through examples of deploying VictoriaStack via docker compose that is
@@ -71,7 +73,8 @@ easy to run and experiment with locally.
 ### Single-node version
 
 The simplest version of the stack would be to run VictoriaMetrics, VictoriaLogs and VictoriaTraces as single-node
-deployments. To run [the stack locally with docker compose](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-single-node-compose.yml)
+deployments. To
+run [the stack locally with docker compose](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-single-node-compose.yml)
 use the following command:
 
 ```sh
@@ -79,10 +82,11 @@ git clone https://github.com/VictoriaMetrics/VictoriaStack.git && cd VictoriaSta
 make otel-single-up
 ```
 
-> Note: the Docker Compose environment is very much simplified for demonstration purposes; 
+> Note: the Docker Compose environment is very much simplified for demonstration purposes;
 > it is **not intended for production use**.
 
 The compose command will start:
+
 - Generator of telemetry + OpenTelemetry collector;
 - Single-node versions of VictoriaMetrics, VictoriaLogs, VictoriaTraces for storing and querying signals;
 - vmalert for executing alerting rules;
@@ -99,46 +103,50 @@ Once running, the following links will be available:
 - [VictoriaLogs UI - http://localhost:8427/logs/select/vmui](http://localhost:8427/logs/select/vmui)
   ![readme-logs-vmui-demo.webp](readme-logs-vmui-demo.png)
   {width="500"}
-- [VictoriaTraces UI - http://localhost:8427/traces/select/vmui](http://localhost:8427/traces/select/vmui), but it is better to
+- [VictoriaTraces UI - http://localhost:8427/traces/select/vmui](http://localhost:8427/traces/select/vmui), but it is
+  better to
   use [Grafana](http://localhost:3000)
-- [Grafana - http://localhost:3000](http://localhost:3000/explore) with preconfigured datasources 
+- [Grafana - http://localhost:3000](http://localhost:3000/explore) with preconfigured datasources
   and a simple demo dashboard (_login with admin:admin_).
   ![readme-grafana-demo.webp](readme-grafana-demo.png)
   {width="500"}
 
-
 While running, the generator will continue pushing telemetry signals via OpenTelemetry collector to the stack, and
 vmalert will execute alerting rules. To stop the stack, run the following command:
+
 ```sh
 make otel-single-down
 ```
 
-The single-node version of the stack is the best and simplest to start with, experiment and learn how components are 
+The single-node version of the stack is the best and simplest to start with, experiment and learn how components are
 interconnected. To see how to scale stack horizontally - see the [clustered version](#clustered-version) of the stack.
 
 ### Clustered version
 
-To run the [clustered version of the stack](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-cluster-compose.yml)
+To run
+the [clustered version of the stack](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-cluster-compose.yml)
 run the following command:
+
 ```sh
 git clone https://github.com/VictoriaMetrics/VictoriaStack.git && cd VictoriaStack
 make otel-cluster-up
 ```
 
 It runs the same setup as the [single-node version](#single-node-version), but each database is deployed in a clustered
-version, represented by three independently scalable types of components: insert, select and storage. 
+version, represented by three independently scalable types of components: insert, select and storage.
 In this topology, vmauth also balances requests among insert and select components.
 
 ![readme-compose-cluster.webp](readme-compose-cluster.png)
 
 Once running, the links remain the same as for single-node deployment since vmauth continues handling all the routing:
+
 - [VictoriaMetrics UI - http://localhost:8427/metrics/select/vmui](http://localhost:8427/metrics/select/vmui/?#/cardinality)
 - [VictoriaLogs UI - http://localhost:8427/logs/select/vmui](http://localhost:8427/logs/select/vmui)
-- [VictoriaTraces UI - http://localhost:8427/traces/select/vmui](http://localhost:8427/traces/select/vmui), but it is better to
+- [VictoriaTraces UI - http://localhost:8427/traces/select/vmui](http://localhost:8427/traces/select/vmui), but it is
+  better to
   use [Grafana](http://localhost:3000)
 - [Grafana - http://localhost:3000](http://localhost:3000/explore) with preconfigured datasources
   and a simple demo dashboard (_login with admin:admin_).
-
 
 ## Deployment
 

@@ -11,23 +11,6 @@ tags:
   - traces
 ---
 
-## vmui
-
-vmui is a UI frontend for VictoriaMetrics and VictoriaLogs. It is designed for ad-hoc exploration of metrics and logs,
-using all the features of the corresponding database.
-
-> VictoriaTraces doesn't have a dedicated UI yet, so it is recommended to use [Grafana](#) to explore traces.
-
-vmui is built into the VictoriaMetrics and the VictoriaLogs components:
-* [VictoriaMetrics UI](https://docs.victoriametrics.com/victoriametrics/#vmui)
-* [VictoriaLogs UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui)
-
-> Have a quick look at the vmui demo for [VictoriaMetrics](https://docs.victoriametrics.com/playgrounds/#victoriametrics-playground)
-> and [VictoriaLogs](https://docs.victoriametrics.com/playgrounds/#victorialogs-playground) at our playgrounds.
-
-We recommend using vmui for exploring metrics and logs when you value simplicity and speed.
-Use [Grafana]() or [Perses]() for dashboard functionality.
-
 ## Grafana
 
 Grafana is a great choice of a visualization tool that integrates with VictoriaStack.
@@ -37,7 +20,23 @@ The integration is happening via datasource plugins:
 * VictoriaLogs via the [VictoriaLogs datasource plugin](https://docs.victoriametrics.com/victorialogs/integrations/grafana/).
 * VictoriaTraces via the [Jaeger](https://docs.victoriametrics.com/victoriatraces/querying/grafana/#jaeger-datasource) or the [Tempo](https://docs.victoriametrics.com/victoriatraces/querying/grafana/#grafana-tempo-datasource) datasource plugins.
 
-> See [Grafana integration examples]() for single-node and clustered VictoriaStack.
+```yaml
+apiVersion: 1
+datasources:
+  - name: VictoriaMetrics
+    type: prometheus
+    url: http://vmstack:8427/metrics/select/prometheus/
+  
+  - name: VictoriaLogs
+    type: victoriametrics-logs-datasource
+    url: http://vmstack:8427/logs/
+  
+  - name: VictoriaTraces
+    type: jaeger
+    url: http://vmstack:8427/traces/select/jaeger/
+```
+
+> See [Grafana integration examples](https://github.com/VictoriaMetrics/VictoriaStack/tree/main/deployment/provisioning/datasources) for VictoriaStack.
 
 Grafana provides a queryless experience for exploring metrics, logs, and traces using the query builders within the datasource plugins.
 It is the easiest way to get started reading data from VictoriaStack. But if you need advanced querying capabilities, see [querying docs]().
@@ -52,6 +51,23 @@ Similarly to [Grafana](#grafana), Perses integrates with VictoriaStack via datas
 * VictoriaTraces integrates via [Jaeger](https://github.com/perses/plugins/tree/main/jaeger) or [Tempo](https://docs.victoriametrics.com/victoriatraces/querying/grafana/#grafana-tempo-datasource) datasource plugins.
 
 If you need advanced querying capabilities, see [querying docs]().
+
+## vmui
+
+vmui is a UI frontend for VictoriaMetrics and VictoriaLogs. It is designed for ad-hoc exploration of metrics and logs,
+using all the features of the corresponding database.
+
+> VictoriaTraces doesn't have a dedicated UI yet - use [Grafana](#) to explore traces.
+
+vmui is built into the VictoriaMetrics and the VictoriaLogs components:
+* [VictoriaMetrics UI](https://docs.victoriametrics.com/victoriametrics/#vmui)
+* [VictoriaLogs UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui)
+
+> Have a quick look at the vmui demo for [VictoriaMetrics](https://docs.victoriametrics.com/playgrounds/#victoriametrics-playground)
+> and [VictoriaLogs](https://docs.victoriametrics.com/playgrounds/#victorialogs-playground) at our playgrounds.
+
+We recommend using vmui for exploring metrics and logs when you value simplicity and speed.
+Use [Grafana]() or [Perses]() for dashboard functionality.
 
 ## Correlations
 

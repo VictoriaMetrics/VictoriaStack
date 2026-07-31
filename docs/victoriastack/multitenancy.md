@@ -87,10 +87,14 @@ of the tenant `AccountID=42, ProjectID=0` only. This example also shows how to a
 numeric tenant: `team-prod` maps to `AccountID=42, ProjectID=0`.
 
 In a similar way, data access can be controlled via Grafana in datasource settings by setting Basic Auth:
+
 ![Basic auth settings in Grafana](multitenancy-grafana-auth.png)
+{width="500"}
 
 Or by setting HTTP headers:
+
 ![Setting HTTP headers in Grafana](multitenancy-grafana-headers.png)
+{width="500"}
 
 
 
