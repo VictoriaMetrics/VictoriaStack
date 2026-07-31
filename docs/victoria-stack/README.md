@@ -51,6 +51,7 @@ platform ready for future scaling and growth.
 | **Access control**         | [vmauth](https://docs.victoriametrics.com/victoriametrics/vmauth/) for user's authentication, requests routing, load balancing.                                                                                                                       |
 | **Visualization**          | [Grafana]() and [Perses]() for unified observability and dashboarding. Built-in [vmui]() for ad-hoc exploration.                                                                                                                                      |
 | **Alerting**               | [vmalert]() integrated with [Alertmanager]() for rules evaluation and dispatching notifications                                                                                                                                                       |
+| **Anomaly detection**      | [vmaonmaly]() ...                                                                                                                                                                                                                                     |
 
 // TODO: add links to stack components
 
@@ -61,22 +62,28 @@ platform ready for future scaling and growth.
 > and try publicly running installations of VictoriaStack, fed
 > with [OpenTelemetry Astronomy Shop demo](https://github.com/open-telemetry/opentelemetry-demo) data.
 
+VictoriaStack can be deployed on bare metal as binaries, as docker containers, using helm charts, or Kubernetes operator.
+See more detailed [deployment docs]().
+
+In the sections below, we'll go through examples of deploying VictoriaStack via docker compose that is
+easy to run and experiment with locally.
+
 ### Single-node version
 
-To run [the stack locally with docker compose](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-single-node-compose.yml)
-run the following command:
+The simplest version of the stack would be to run VictoriaMetrics, VictoriaLogs and VictoriaTraces as single-node
+deployments. To run [the stack locally with docker compose](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-single-node-compose.yml)
+use the following command:
 
 ```sh
-git clone https://github.com/VictoriaMetrics/VictoriaStack.git
+git clone https://github.com/VictoriaMetrics/VictoriaStack.git && cd VictoriaStack
 make otel-single-up
 ```
 
 > Note: the Docker Compose environment is very much simplified for demonstration purposes; 
 > it is **not intended for production use**.
-> The data it ingests is not representative of real-world data. 
 
 The compose command will start:
-- OpenTelemetry collector + generator for telemetry signals;
+- Generator of telemetry + OpenTelemetry collector;
 - Single-node versions of VictoriaMetrics, VictoriaLogs, VictoriaTraces for storing and querying signals;
 - vmalert for executing alerting rules;
 - Grafana for visualizing signals;
@@ -94,55 +101,46 @@ Once running, the following links will be available:
   {width="500"}
 - [VictoriaTraces UI - http://localhost:8427/traces/select/vmui](http://localhost:8427/traces/select/vmui), but it is better to
   use [Grafana](http://localhost:3000)
-- [Grafana - http://localhost:3000](http://localhost:3000/explore) with preconfigured datasources (_login with admin:
-  admin_).
+- [Grafana - http://localhost:3000](http://localhost:3000/explore) with preconfigured datasources 
+  and a simple demo dashboard (_login with admin:admin_).
   ![readme-grafana-demo.webp](readme-grafana-demo.png)
   {width="500"}
 
-> More detailed Quick Start instructions for running in various environments, ingesting and querying data are available in
-> each product's documentation:
-> - [VictoriaMetrics Quick Start](https://docs.victoriametrics.com/victoriametrics/quick-start/)
-> - [VictoriaLogs Quick Start](https://docs.victoriametrics.com/victorialogs/quick-start/)
-> - [VictoriaTraces Quick Start](https://docs.victoriametrics.com/victoriatraces/quick-start/)
 
-To stop the stack, run the following command:
+While running, the generator will continue pushing telemetry signals via OpenTelemetry collector to the stack, and
+vmalert will execute alerting rules. To stop the stack, run the following command:
 ```sh
 make otel-single-down
 ```
 
-The single-node version of the stack is best and simplest to start with. Each database component can be scaled vertically
-to process an impressive amount of data. If you're looking for horizontal scaling, take a look at the
-clustered version of the stack.
+The single-node version of the stack is the best and simplest to start with, experiment and learn how components are 
+interconnected. To see how to scale stack horizontally - see the [clustered version](#clustered-version) of the stack.
 
 ### Clustered version
 
-To run the [clustered version of the stack](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-cluster-compose.yml) run the following command:
+To run the [clustered version of the stack](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-cluster-compose.yml)
+run the following command:
 ```sh
+git clone https://github.com/VictoriaMetrics/VictoriaStack.git && cd VictoriaStack
 make otel-cluster-up
 ```
 
-It runs the same setup as the single-node version, but each database is deployed in a clustered version represented by
-three independently scalable types of components: insert, select and storage. vmauth in this topology also does load
-balancing between insert and select components.
+It runs the same setup as the [single-node version](#single-node-version), but each database is deployed in a clustered
+version, represented by three independently scalable types of components: insert, select and storage. 
+In this topology, vmauth also balances requests among insert and select components.
+
+![readme-compose-cluster.webp](readme-compose-cluster.png)
+
+Once running, the links remain the same as for single-node deployment since vmauth continues handling all the routing:
+- [VictoriaMetrics UI - http://localhost:8427/metrics/select/vmui](http://localhost:8427/metrics/select/vmui/?#/cardinality)
+- [VictoriaLogs UI - http://localhost:8427/logs/select/vmui](http://localhost:8427/logs/select/vmui)
+- [VictoriaTraces UI - http://localhost:8427/traces/select/vmui](http://localhost:8427/traces/select/vmui), but it is better to
+  use [Grafana](http://localhost:3000)
+- [Grafana - http://localhost:3000](http://localhost:3000/explore) with preconfigured datasources
+  and a simple demo dashboard (_login with admin:admin_).
 
 
+## Deployment
 
-
-Depending on your requirements, check the following docs:
-
-// TODO: add links to docs
-
-* Ingestion: OpenTelemetry + other protocols
-* Querying: Grafana, built-in UIs
-* Correlations between signals
-* Access control
-* Alerting
-* Horizontal scaling
-* Multitenancy
-* Security
-* Backups & Restore
-* Operations: monitoring, upgrades, scaling
-
-
-
+See [deployment docs]() for details.
 
