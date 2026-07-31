@@ -3,6 +3,7 @@ receivers:
     protocols:
       grpc:
         endpoint: 0.0.0.0:4317
+  # Optional. Make collector to scrape services to generate metrics workload
   prometheus:
     config:
       scrape_configs:

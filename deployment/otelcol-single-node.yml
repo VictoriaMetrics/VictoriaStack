@@ -3,6 +3,7 @@ receivers:
     protocols:
       grpc:
         endpoint: 0.0.0.0:4317
+  # Optional. Make collector to scrape services to generate metrics workload
   prometheus:
     config:
       scrape_configs:
@@ -20,7 +21,7 @@ processors:
   batch:
 
 exporters:
-  # Single-node VictoriaMetrics installation doesn't support multi-tenancy
+  # Single-node VictoriaMetrics installation doesn't support multi-tenancy, so we don't pass headers for it.
   otlp_http/vm-metrics: { metrics_endpoint: http://vmstack:8427/metrics/insert/opentelemetry/v1/metrics }
   otlp_http/vm-traces:  { traces_endpoint: http://vmstack:8427/traces/insert/opentelemetry/v1/traces, headers: { AccountID: "0", ProjectID: "0" } }
   # k8s.pod.name is ignored due to https://github.com/krzko/otelgen/issues/156
