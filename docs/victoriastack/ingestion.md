@@ -42,6 +42,13 @@ and forwards them to VictoriaStack via HTTP endpoints:
 * `http://victorialogs:9428/insert/opentelemetry/v1/logs` for logs
 * `http://victoriatraces:10428/insert/opentelemetry/v1/traces` for traces
 
+```mermaid
+flowchart LR
+    A["OpenTelemetry Collector"] --> |<a href="https://docs.victoriametrics.com/victoriametrics/integrations/opentelemetry/">metrics</a>| M[VictoriaMetrics]
+    A --> |<a href="https://docs.victoriametrics.com/victorialogs/data-ingestion/opentelemetry/">logs</a>| L[VictoriaLogs]
+    A --> |<a href="https://docs.victoriametrics.com/victoriatraces/data-ingestion/opentelemetry/">traces</a>| T[VictoriaTraces]
+```
+
 That's it! Generally, no additional configuration is required. However, there are some tweaks that can be applied
 to each integration. See the following docs for more details:
 * [VictoriaMetrics OpenTelemetry Setup](https://docs.victoriametrics.com/victoriametrics/integrations/opentelemetry/)
@@ -121,15 +128,15 @@ and forwarding them to the specified destinations. Its core features are the fol
   native support for collecting logs from Kubernetes Pods
 - [on-disk buffering and replication](https://docs.victoriametrics.com/victorialogs/vlagent/#replication-and-high-availability):
   allows building High Available scalable pipelines for logs delivery
-- [outstanding performance](https://victoriametrics.com/blog/log-collectors-benchmark-2026/): results in significant
+- [outstanding performance](https://victoriametrics.com/blog/log-collectors-benchmark-2026/): significant
   savings on compute for collecting and delivering logs
 
 Additionally to features above, vlagent supports all the same ingestion protocols for logs as VictoriaLogs.
 Which makes it a perfect entry point in delivery pipeline for reliability:
 ```mermaid
 flowchart LR
-    A["Fluentbit"] --> |<a href="https://docs.victoriametrics.com/victorialogs/data-ingestion/">logs</a>| V[vlagent<br><br>On-disk buffering, replication]
-    B["OpenTelemetry"] --> |<a href="https://docs.victoriametrics.com/victorialogs/data-ingestion/">logs</a>| V
+    A["Fluentbit"] --> |<a href="https://docs.victoriametrics.com/victorialogs/data-ingestion/fluentbit/">logs</a>| V[vlagent<br><br>On-disk buffering, replication]
+    B["OpenTelemetry"] --> |<a href="https://docs.victoriametrics.com/victorialogs/data-ingestion/opentelemetry/">logs</a>| V
     V --> |"replicate"| C[VictoriaLogs A]
     V --> |"replicate"| D[VictoriaLogs B]
 ```

@@ -142,5 +142,5 @@ Once running, the links remain the same as for single-node deployment since vmau
 
 ## Deployment
 
-See [deployment docs]() for details.
+See [deployment docs](http://localhost:1313/victoriastack/deployment/) for details.
 

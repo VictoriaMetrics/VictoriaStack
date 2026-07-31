@@ -76,4 +76,4 @@ applications on top of Kubernetes as easy as possible while preserving Kubernete
 It allows you to manage Victoria Metrics components in Kubernetes or OpenShift clusters in a declarative style according
 to [GitOps](https://www.redhat.com/en/topics/devops/what-is-gitops) and [IaC](https://en.wikipedia.org/wiki/Infrastructure_as_code) concepts.
 
-See [Quick Start instructions](https://docs.victoriametrics.com/operator/quick-start/) for tje operator.
+See [Quick Start instructions](https://docs.victoriametrics.com/operator/quick-start/) for the operator.
