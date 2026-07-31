@@ -3,8 +3,8 @@ title: Querying
 menu:
   docs:
     weight: 3
-    identifier: victoria-stack-querying
-    parent: victoria-stack
+    identifier: victoriastack-querying
+    parent: victoriastack
 tags:
   - metrics
   - logs

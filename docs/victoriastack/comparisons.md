@@ -3,8 +3,8 @@ title: Comparisons
 menu:
   docs:
     weight: 7
-    identifier: victoria-stack-comparisons
-    parent: victoria-stack
+    identifier: victoriastack-comparisons
+    parent: victoriastack
 tags:
   - metrics
   - logs
@@ -106,8 +106,8 @@ unified UI with Lucene-style search, SQL support, dashboards, alerting, and sess
   for each workload (schemas, codecs, TTLs, merges). VictoriaStack databases apply those optimizations by design.
   There are no schemas to manage for metrics, logs, or traces.
 * ClickStack has bundled HyperDX UI: one interface for everything.
-  VictoriaStack's answer is [Grafana with all three datasources](http://docs.victoriametrics.com/victoria-stack/ui/#grafana)
-  plus per-database [vmui](http://docs.victoriametrics.com/victoria-stack/ui/#vmui).
+  VictoriaStack's answer is [Grafana with all three datasources](http://docs.victoriametrics.com/victoriastack/ui/#grafana)
+  plus per-database [vmui](http://docs.victoriametrics.com/victoriastack/ui/#vmui).
   This setup is more flexible, but Grafana is an extra component. It's not a single out-of-the-box solution.
 * ClickStack deploys ClickHouse, HyperDX, MongoDB (for HyperDX metadata), and an OpenTelemetry
   Collector. VictoriaStack is three self-contained binaries with no external dependencies.

@@ -3,8 +3,8 @@ title: Alerting
 menu:
   docs:
     weight: 5
-    identifier: victoria-stack-alerting
-    parent: victoria-stack
+    identifier: victoriastack-alerting
+    parent: victoriastack
 tags:
   - metrics
   - logs

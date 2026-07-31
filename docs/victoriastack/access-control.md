@@ -3,8 +3,8 @@ title: Access control
 menu:
   docs:
     weight: 4
-    identifier: victoria-stack-access-control
-    parent: victoria-stack
+    identifier: victoriastack-access-control
+    parent: victoriastack
 tags:
   - metrics
   - logs
@@ -70,7 +70,7 @@ It is recommended to use vmauth as a proxy between VictoriaStack components and 
 - Limit access to specific tenants
 - Enforce label filters
 
-> See also how to limit access to the [Sensitive Endpoints](http://localhost:1313/victoria-stack/security/#sensitive-endpoints).
+> See also how to limit access to the [Sensitive Endpoints](http://localhost:1313/victoriastack/security/#sensitive-endpoints).
 
 #### Authenticate users
 
@@ -148,7 +148,7 @@ The `src_paths` in [vmauth config]() can be further modified to allow access onl
     url_prefix: "http://victoriametrics:8428/"
 ```
 
-With this configuration, authorized users can query metrics and use Grafana as usual, but they cannot access [Sensitive Endpoints](https://docs.victoriametrics.com/victoria-stack/security/#sensitive-endpoints), like `/api/v1/admin/tsdb/delete_series`.
+With this configuration, authorized users can query metrics and use Grafana as usual, but they cannot access [Sensitive Endpoints](https://docs.victoriametrics.com/victoriastack/security/#sensitive-endpoints), like `/api/v1/admin/tsdb/delete_series`.
 
 #### IP filtering
 

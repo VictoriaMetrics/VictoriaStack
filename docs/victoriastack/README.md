@@ -63,7 +63,7 @@ platform ready for future scaling and growth.
 > with [OpenTelemetry Astronomy Shop demo](https://github.com/open-telemetry/opentelemetry-demo) data.
 
 VictoriaStack can be deployed on bare metal as binaries, as docker containers, using helm charts, or Kubernetes operator.
-See more detailed [deployment docs]().
+See more detailed [deployment docs](http://localhost:1313/victoriastack/deployment/).
 
 In the sections below, we'll go through examples of deploying VictoriaStack via docker compose that is
 easy to run and experiment with locally.

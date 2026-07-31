@@ -3,8 +3,8 @@ title: Ingestion
 menu:
   docs:
     weight: 1
-    identifier: victoria-stack-ingestion
-    parent: victoria-stack
+    identifier: victoriastack-ingestion
+    parent: victoriastack
 tags:
   - metrics
   - logs

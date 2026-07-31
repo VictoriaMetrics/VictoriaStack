@@ -3,8 +3,8 @@ title: UI integrations
 menu:
   docs:
     weight: 2
-    identifier: victoria-stack-ui-integrations
-    parent: victoria-stack
+    identifier: victoriastack-ui-integrations
+    parent: victoriastack
 tags:
   - metrics
   - logs

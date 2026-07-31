@@ -3,7 +3,7 @@ title: VictoriaStack
 menu:
   docs:
     weight: 16
-    identifier: victoria-stack
+    identifier: victoriastack
     pageRef: "/victoriastack/"
 tags:
   - metrics
