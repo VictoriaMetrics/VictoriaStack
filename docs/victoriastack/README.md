@@ -34,9 +34,8 @@ It is well integrated into the modern observability ecosystem by supporting vari
 and User Interfaces like Grafana and Perses for querying. It supports multitenancy, alerting, out-of-order backfilling,
 efficient compression, sane defaults for simplified setup, wide community and support.
 
-VictoriaStack is the best choice if you want to own your observability stack, build a reliable and effieicient
-multitenant
-platform ready for future scaling and growth.
+VictoriaStack is the best choice if you want to own your observability stack, build a reliable, cost-effieicient
+multitenant platform ready for future growth.
 
 ## Architecture Overview
 
@@ -52,22 +51,22 @@ platform ready for future scaling and growth.
 | **[Visualization](http://localhost:1313/victoriastack/ui/)**                            | [Grafana](http://localhost:1313/victoriastack/ui/#grafana) and [Perses](http://localhost:1313/victoriastack/ui/#perses) for unified observability and dashboarding. Built-in [vmui](http://localhost:1313/victoriastack/ui/#vmui) for ad-hoc exploration.                          |
 | **[Alerting](http://localhost:1313/victoriastack/alerting/)**                           | [vmalert](https://docs.victoriametrics.com/victoriametrics/vmalert/) integrated with [Alertmanager](http://localhost:1313/victoriastack/alerting/#alertmanager) for rules evaluation and dispatching notifications                                                                 |
 | **[Anomaly detection]()**                                                               | [vmaonmaly]() ...                                                                                                                                                                                                                                                                  |
-| **[Enterprise Support]()**                                                              |                                                                                                                                                                                                                                                                                    |
+| **[Enterpris](), [Long Term Support(LTS) releases]()**                                  |                                                                                                                                                                                                                                                                                    |
 
 // TODO: add links to stack components
 
 ## Quick Start
 
-> If you're looking for a visual impression of the stack,
+> If you're looking for a visual impression of the VictoriaStack,
 > visit [Playgrounds page](https://docs.victoriametrics.com/playgrounds/)
-> and try publicly running installations of VictoriaStack, fed
+> and try publicly running installations fed
 > with [OpenTelemetry Astronomy Shop demo](https://github.com/open-telemetry/opentelemetry-demo) data.
 
 VictoriaStack can be deployed on bare metal as binaries, as docker containers, using helm charts, or Kubernetes
 operator.
 See more detailed [deployment docs](http://localhost:1313/victoriastack/deployment/).
 
-In the sections below, we'll go through examples of deploying VictoriaStack via docker compose that is
+In the sections below, we'll go through examples of deploying VictoriaStack via docker compose to make it is
 easy to run and experiment with locally.
 
 ### Single-node version
@@ -82,7 +81,9 @@ git clone https://github.com/VictoriaMetrics/VictoriaStack.git && cd VictoriaSta
 make otel-single-up
 ```
 
-> Note: the Docker Compose environment is very much simplified for demonstration purposes;
+All manifests and configs that run this environment are available at [VictoriaStack/deployment](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-single-node-compose.yml).
+
+> Note: the Docker Compose environment is very much simplified for demonstration purposes -
 > it is **not intended for production use**.
 
 The compose command will start:
@@ -123,7 +124,7 @@ interconnected. To see how to scale stack horizontally - see the [clustered vers
 
 ### Clustered version
 
-To run
+To start
 the [clustered version of the stack](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-cluster-compose.yml)
 run the following command:
 
@@ -132,13 +133,15 @@ git clone https://github.com/VictoriaMetrics/VictoriaStack.git && cd VictoriaSta
 make otel-cluster-up
 ```
 
+All manifests and configs that run this environment are available at [VictoriaStack/deployment](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-single-node-compose.yml).
+
 It runs the same setup as the [single-node version](#single-node-version), but each database is deployed in a clustered
 version, represented by three independently scalable types of components: insert, select and storage.
 In this topology, vmauth also balances requests among insert and select components.
 
 ![readme-compose-cluster.webp](readme-compose-cluster.png)
 
-Once running, the links remain the same as for single-node deployment since vmauth continues handling all the routing:
+Once running, the links remain the same as for single-node deployment - all thanks to vmauth handling the routing:
 
 - [VictoriaMetrics UI - http://localhost:8427/metrics/select/vmui](http://localhost:8427/metrics/select/vmui/?#/cardinality)
 - [VictoriaLogs UI - http://localhost:8427/logs/select/vmui](http://localhost:8427/logs/select/vmui)
@@ -150,5 +153,5 @@ Once running, the links remain the same as for single-node deployment since vmau
 
 ## Deployment
 
-See [deployment docs](http://localhost:1313/victoriastack/deployment/) for details.
+For more options to deploy VictoriaStack in various environments see [deployment docs](http://localhost:1313/victoriastack/deployment/).
 

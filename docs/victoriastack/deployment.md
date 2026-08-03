@@ -12,9 +12,13 @@ tags:
 ---
 
 VictoriaStack consists of multiple components that can be deployed together or separately, in many different ways and
-in different environments. Choose what suits your needs best.
+in different environments:
+- [Local or bare metal](#local--bare-metal) deployments require more actions to compose components together but provide the most flexibility.
+- [Kubernetes deployments](#kubernetes) are easier to set up and run thanks to helm charts and operator.
 
-## Local / Development
+Choose what suits your needs best.
+
+## Local / Bare Metal
 
 All VictoriaStack components have extensive Quick Start instructions for running in various environments:
 - [VictoriaMetrics Quick Start](https://docs.victoriametrics.com/victoriametrics/quick-start/) (metrics)
@@ -22,6 +26,8 @@ All VictoriaStack components have extensive Quick Start instructions for running
 - [VictoriaTraces Quick Start](https://docs.victoriametrics.com/victoriatraces/quick-start/) (traces)
 - [vmauth Quick Start](https://docs.victoriametrics.com/victoriametrics/vmauth/) (authentication, routing, load balancing)
 - [vmalert Quick Start](https://docs.victoriametrics.com/victoriametrics/vmalert/#quickstart) (alerting)
+
+See references to the specific documentation in sections below.
 
 ### Binary
 
@@ -73,11 +79,44 @@ See the full list of [available charts](https://docs.victoriametrics.com/helm/) 
 
 [VictoriaMetrics Kuberentes Operator](https://docs.victoriametrics.com/operator/) makes running VictoriaMetrics 
 applications on top of Kubernetes as easy as possible while preserving Kubernetes-native configuration options.
-It allows you to manage Victoria Metrics components in Kubernetes or OpenShift clusters in a declarative style according
-to [GitOps](https://www.redhat.com/en/topics/devops/what-is-gitops) and [IaC](https://en.wikipedia.org/wiki/Infrastructure_as_code) concepts.
+It allows you to manage Victoria Metrics components in Kubernetes or OpenShift clusters in a declarative style following
+[GitOps](https://www.redhat.com/en/topics/devops/what-is-gitops) and [IaC](https://en.wikipedia.org/wiki/Infrastructure_as_code) concepts.
 
 See [Quick Start instructions](https://docs.victoriametrics.com/operator/quick-start/) for the operator.
 
 ## Backups
 
+Backups in VictoriaStack are implemented using data snapshots - an instanteneous mechanism for making a copy of the data
+within a second and without any impact on the database. The snapshots then can be uploaded to any durable storage
+like S3 for storing backups:
+- [VictoriaMetrics backups management: vmbackup, vmrestore, vmbackupmanager](https://docs.victoriametrics.com/victoriametrics/vmbackup/)
+- [VictoriaLogs backup and restore](https://docs.victoriametrics.com/victorialogs/#backup-and-restore)
+- [VictoriaTraces backup and restore](https://docs.victoriametrics.com/victoriatraces/#backup-and-restore)
+
+Besides snapshots API, VictoriaMetrics has more advanced tools for backup management: [vmbackup](https://docs.victoriametrics.com/victoriametrics/vmbackup/),
+[vmrestore](https://docs.victoriametrics.com/victoriametrics/vmrestore/) and [vmbackupmanager](https://docs.victoriametrics.com/victoriametrics/vmbackupmanager/).
+With these tools, it is possible to schedule and automate backups management without additional tooling. These tools
+are also incorportated into helm charts and operator.
+
+The same tooling is only about to come to VictoriaLogs and VictoriaTraces - see progress in [issue #123](https://github.com/VictoriaMetrics/VictoriaLogs/issues/123) for more details. 
+
+
 ## Monitoring
+
+The whole VictoriaStack, every component in it was built with monitoring in mind. Every service exposes metrics in 
+Prometheus exposition format, produces descriptive logs for significant events, cares about transparency of internal processes.
+
+VictoriaStack components are shipped together with descriptive, production-ready Grafana dashboards available at
+[grafana.com/victoriametrics/dashboards](https://grafana.com/orgs/victoriametrics/dashboards). The dashboards are
+constantly updated and maintained by the VictoriaMetrics team.
+
+The same goes for the alerting. You can find the list of recommended alerting rules to run with the stack below:
+- [VictoriaMetrics rules](https://github.com/VictoriaMetrics/VictoriaMetrics/tree/master/deployment/docker/rules)
+- [VictoriaLogs rules](https://github.com/VictoriaMetrics/Victorialogs/tree/master/deployment/docker/rules)
+- [VictoriaTraces rules](https://github.com/VictoriaMetrics/Victoriatraces/tree/master/deployment/docker/rules)
+
+Alerting rules are closely interconnected with the Grafana dashboards, providing transparent monitoring experience for 
+the end-users. 
+
+The alerting rules and Grafana dashboards bring high value and are always up to date because VictoriaMetrics team is 
+dogfooding the whole stack internally, in cloud and for Enterprise customers.
