@@ -13,11 +13,16 @@ tags:
 
 Alerting evaluates rules against metrics, logs, or traces and sends notifications when conditions are met. Common examples include service outages, error messages in log entries, spikes in HTTP request rate, or slow traces.
 
-In VictoriaStack, [vmalert](https://docs.victoriametrics.com/vmalert/) components acts as an alerting engine and
-integrates with [Alertmanager](https://github.com/prometheus/alertmanager) - a tool for dispatching alerting notifications
+In VictoriaStack, [vmalert](https://docs.victoriametrics.com/vmalert/) component acts as an alerting engine and
+integrates with [Alertmanager](https://github.com/prometheus/alertmanager) for dispatching alerting notifications
 to various destinations like [email, Slack, PagerDuty, MS Teams, etc](https://prometheus.io/docs/alerting/latest/integrations/#available-integrations).
 
 ![alerting.webp](alerting.png)
+
+It is recommended to use a separate vmalert instance for each signal type. This simplifies rules configuration and
+isolates pipelines for different signal types. However, it is still possible to use a single vmalert instance for
+[multiple signal types](https://docs.victoriametrics.com/victorialogs/vmalert/#how-to-use-one-vmalert-for-victorialogs-and-victoriametrics-rules-at-the-same-time).
+
 
 ## Quick Start
 
@@ -43,10 +48,10 @@ With the configuration above, vmalert will periodically evaluate rules read from
 The key features of vmalert are:
 * Supports Prometheus [alerting rules syntax](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#defining-alerting-rules),
   making it easier to migrate from a Prometheus stack.
-* Supports [recording rules](https://docs.victoriametrics.com/vmalert/#recording-rules), allowing you to convert query results into metrics.
-* Can [hot reload](https://docs.victoriametrics.com//victoriametrics/vmalert/#hot-config-reload) configuration rules.
-* Can [persist alert state across restarts](https://docs.victoriametrics.com/#alerts-state-on-restarts).
-* Supports recording and alerting rules backfilling (also known as `replay`). See [these docs](https://docs.victoriametrics.com/#rules-backfilling) to learn more.
+* Supports [recording rules](https://docs.victoriametrics.com/vmalert/#recording-rules), allowing you to convert query results, logs and traces into metrics.
+* [Hot reload](https://docs.victoriametrics.com//victoriametrics/vmalert/#hot-config-reload) of configuration rules from S3, URL, or local file system.
+* Persists [alert state across restarts](https://docs.victoriametrics.com/#alerts-state-on-restarts).
+* Supports recording and alerting rules backfilling (`replay`). See [these docs](https://docs.victoriametrics.com/#rules-backfilling) to learn more.
 
 ## Rules
 
@@ -66,18 +71,38 @@ groups:
           description: 'Too big number of errors and warnings on pod {{ index .Labels "k8s.pod.name" }} during the last 5 minutes: {{$value}}'
 ```
 
-> It is recommended to use a separate vmalert instance for each signal type. This simplifies rules configuration and
-> isolates pipelines for different signal types. However, it is still possible to use a single vmalert instance for
-> [multiple signal types](https://docs.victoriametrics.com/victorialogs/vmalert/#how-to-use-one-vmalert-for-victorialogs-and-victoriametrics-rules-at-the-same-time).
-
 See production-ready examples of alerting rules for VictoriaMetrics monitoring [here](https://github.com/VictoriaMetrics/VictoriaMetrics/tree/master/deployment/docker/rules).
 
 ## Datasource
 
-vmalert allows specifying only one datasource URL for rules evaluation.
+Datasource is specified by the `-datasource.url` flag. It is a URL where vmalert can send queries for rules evaluation.
+It could be a VictoriaMetrics URL, VictoriaLogs URL or VictoriaTraces URL, depending on the [type of integration](https://docs.victoriametrics.com/vmalert.html#integrations).
+
+vmalert will periodically execute the rules against the configured datasource and send notifications to Alertmanager 
+if conditions are met.
 
 ## Alertmanager
 
+Alertmanager is specified by the `-notifier.url` flag. It is a URL where vmalert will send notifications if conditions 
+in rules are met. Alertmanager then can be configured to send notifications to various destinations like email or slack,
+silence, group and suppress alerts. See [Alertmanager docs](https://prometheus.io/docs/alerting/latest/alertmanager/) for more details.
+
+> If you have a cluster of Alertmanager instances, then all of the instances should be specified in the 
+`-notifier.url` flag separated by comma.
+
+Alertmanager can be discovered by vmalert via Consul or DNS service discovery. 
+See more details in [vmalert docs](https://docs.victoriametrics.com/vmalert.html#notifier-configuration-file).
+
 ## High Availability
+
+For High Availability, run multiple identically configured vmalert instances. It means all of them will execute 
+the same rules, write state and results to the same destinations, and send alert notifications to multiple configured 
+Alertmanagers. See more details in [vmalert docs](https://docs.victoriametrics.com/vmalert.html#high-availability).
+
+Please note, vmalert is stateless and its reload usually doesn't take more than a few seconds. Even if vmalert is restarted,
+it will [restore its state from the -remoteRead.url](https://docs.victoriametrics.com/vmalert.html#alerts-state-on-restarts).
+Deploying multiple vmalert instances doesn't usually justify additional costs on query processing.
+
+## Scalability
 
 

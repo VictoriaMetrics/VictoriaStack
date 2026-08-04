@@ -5,7 +5,7 @@ design philosophy, operational model, and ecosystem:
 |-------------|----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
 | **Metrics** | [VictoriaMetrics](https://docs.victoriametrics.com/victoriametrics/) | [MetricsQL](https://docs.victoriametrics.com/metricsql/) (PromQL-compatible)                                                                                                                                                                    | Billions of [active time series](), Millions of [samples]() ingested per second |
 | **Logs**    | [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/)       | [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/)                                                                                                                                                                                 | Hundreds of TBs a day, with avg compression ratio of x10                        |
-| **Traces**  | [VictoriaTraces](https://docs.victoriametrics.com/victoriatraces/)   | [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/), [Jaeger API](https://docs.victoriametrics.com/victoriatraces/querying/#jaeger-http-api), [Tempo API](https://docs.victoriametrics.com/victoriatraces/querying/#tempo-http-api) | Millions of traces ingested per second                                          |
+| **Traces**  | [VictoriaTraces](https://docs.victoriametrics.com/victoriatraces/)   | [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/), [Jaeger API](https://docs.victoriametrics.com/victoriatraces/querying/#jaeger-http-api), [Tempo API](https://docs.victoriametrics.com/victoriatraces/querying/#tempo-http-api) | Billions of spans per day with avg compression ratio of x10                     |
 
 //todo: update scalability numbers for traces and logs
 <br>
@@ -34,7 +34,8 @@ It is well integrated into the modern observability ecosystem by supporting vari
 and User Interfaces like Grafana and Perses for querying. It supports multitenancy, alerting, out-of-order backfilling,
 efficient compression, sane defaults for simplified setup, wide community and support.
 
-VictoriaStack is the best choice if you want to **own your observability stack**, build a **reliable**, **cost-effieicient
+VictoriaStack is the best choice if you want to **own your observability stack**, build a **reliable**, *
+*cost-effieicient
 multitenant platform** ready for future growth.
 
 ## Architecture Overview
@@ -81,7 +82,8 @@ git clone https://github.com/VictoriaMetrics/VictoriaStack.git && cd VictoriaSta
 make otel-single-up
 ```
 
-All manifests and configs that run this environment are available at [VictoriaStack/deployment](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-single-node-compose.yml).
+All manifests and configs that run this environment are available
+at [VictoriaStack/deployment](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-single-node-compose.yml).
 
 > Note: the Docker Compose environment is very much simplified for demonstration purposes -
 > it is **not intended for production use**.
@@ -133,7 +135,8 @@ git clone https://github.com/VictoriaMetrics/VictoriaStack.git && cd VictoriaSta
 make otel-cluster-up
 ```
 
-All manifests and configs that run this environment are available at [VictoriaStack/deployment](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-single-node-compose.yml).
+All manifests and configs that run this environment are available
+at [VictoriaStack/deployment](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-single-node-compose.yml).
 
 It runs the same setup as the [single-node version](#single-node-version), but each database is deployed in a clustered
 version, represented by three independently scalable types of components: insert, select and storage.
@@ -151,10 +154,72 @@ Once running, the links remain the same as for single-node deployment - all than
 - [Grafana - http://localhost:3000](http://localhost:3000/explore) with preconfigured datasources
   and a simple demo dashboard (_login with admin:admin_).
 
-From now on, scaling the stack is as simple as changing the number of replicas for the components. No additional
-caches, compactors, or other components are required. See more about [cluster scalability](http://localhost:1313/victoriastack/deployment/#scalability).
+### Scalability
+
+VictoriaMetrics, VictoriaLogs and VictoriaTraces are designed to be highly scalable and simple to operate:
+
+- one VictoriaMetrics cluster can handle thousands of tenants, billions of time series, millions of samples per second,
+  thousands of read requests per second;
+- one VictoriaLogs cluster can handle thousands of tenants, hundreds of terabytes of logs per day,
+  thousands of read requests per second;
+- one VictoriaTraces cluster can handle thousands of tenants, billions of spans per day with avg compression ratio of
+  x15.
+
+All 3 databases share similiar architecture and can be scaled independently:
+
+```mermaid
+flowchart LR
+
+    Sources["Telemetry"]
+
+    Sources --> VI
+
+    subgraph Ingestion
+        direction TB
+        VI["insert × N"]
+    end
+
+    subgraph Storage
+        direction TB
+        VS["storage × M"]
+    end
+
+    subgraph Query
+        direction TB
+        VQ["select × K"]
+    end
+
+    VI -->|"shard <br>among storages"| VS
+    VS -->|"read <br>from storages"| VQ
+
+    Clients["Grafana / VMUI"]
+
+    VQ --> Clients
+```
+
+Each database has 3 types of components:
+
+* stateless **insert** - processes incoming data and shards it between storages;
+* stateful **storage** - efficiently stores and manages data;
+* stateless **select** - processes incoming read queries and returns results.
+
+**insert** and **select** components need to know only about **storages**, they don't need to know about each other.
+And **storages** don't know about each other, **inserts** or **selects**.
+
+**inserts**, **selects** and **storages** can be scaled independently:
+
+* add more **insert** replicas to increase ingestion throughput;
+* add more **select** replicas to increase query throughput.
+* add more **storage** shards to increase overall performance and overcome physical hardware limitations like CPU/Mem/IO
+  limits
+  or filesystem capacity.
+
+Cluster architecture doesn't require any additional services: no extra caches, databases, compactors, etc. We only
+recommend using [vmauth for load balancing](http://localhost:1313/victoriametrics/vmauth/#load-balancing) for stateless
+components, or any other load balancer of your choice.
 
 ## Deployment
 
-For more options to deploy VictoriaStack in various environments see [deployment docs](http://localhost:1313/victoriastack/deployment/).
+For more options to deploy VictoriaStack in various environments
+see [deployment docs](http://localhost:1313/victoriastack/deployment/).
 
