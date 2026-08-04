@@ -140,3 +140,5 @@ flowchart LR
     V --> |"replicate"| C[VictoriaLogs A]
     V --> |"replicate"| D[VictoriaLogs B]
 ```
+
+vlagent is recommended to use for achieving [high availability in VictoriaLogs](https://docs.victoriametrics.com/victorialogs/#high-availability).
