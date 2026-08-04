@@ -106,11 +106,20 @@ Additionally to features above, vmagent supports all the same ingestion protocol
 Which makes it a perfect entry point in delivery pipeline for metrics:
 ```mermaid
 flowchart LR
-    A["Prometheus RW"] --> |<a href="https://docs.victoriametrics.com/victoriametrics/vmagent/#how-to-push-data-to-vmagent">metrics</a>| V[vmagent<br><br>On-disk buffering, in-flight modification, sharding, replication]
-    B["OpenTelemetry"] --> |<a href="https://docs.victoriametrics.com/victoriametrics/vmagent/#how-to-push-data-to-vmagen">metrics</a>| V
-    V --> |"push"| C[VictoriaMetrics A]
-    V --> |"push"| D[VictoriaMetrics B]
-    V --> |"push"| E[VictoriaMetrics C]
+    PRW["Prometheus<br/>Remote Write"]
+    OTel["OpenTelemetry"]
+
+    PRW -->|"metrics"| V
+    OTel -->|"metrics"| V
+
+    V["vmagent<br/><hr/>Buffer • Transform • Shard • Replicate"]
+
+    subgraph Destinations
+        direction TB
+        VM["VictoriaMetrics × N"]
+    end
+
+    V -->|"replicated to N destinations"| VM
 ```
 
 As an entry point, vmagent can filter, [deduplicate](https://docs.victoriametrics.com/victoriametrics/vmagent/#flexible-deduplication),
@@ -135,10 +144,20 @@ Additionally to features above, vlagent supports all the same ingestion protocol
 Which makes it a perfect entry point in delivery pipeline for reliability:
 ```mermaid
 flowchart LR
-    A["Fluentbit"] --> |<a href="https://docs.victoriametrics.com/victorialogs/data-ingestion/fluentbit/">logs</a>| V[vlagent<br><br>On-disk buffering, replication]
-    B["OpenTelemetry"] --> |<a href="https://docs.victoriametrics.com/victorialogs/data-ingestion/opentelemetry/">logs</a>| V
-    V --> |"replicate"| C[VictoriaLogs A]
-    V --> |"replicate"| D[VictoriaLogs B]
+    FB["Fluent Bit"]
+    OTel["OpenTelemetry"]
+
+    FB -->|"logs"| V
+    OTel -->|"logs"| V
+
+    V["vlagent<br/><hr/>Buffer • Replicate"]
+
+    subgraph Destinations
+        direction TB
+        VL["VictoriaLogs × N"]
+    end
+
+    V -->|"replicate to N destinations"| VL
 ```
 
 vlagent is recommended to use for achieving [high availability in VictoriaLogs](https://docs.victoriametrics.com/victorialogs/#high-availability).
