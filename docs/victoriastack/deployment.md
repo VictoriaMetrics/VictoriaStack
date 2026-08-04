@@ -84,6 +84,64 @@ It allows you to manage Victoria Metrics components in Kubernetes or OpenShift c
 
 See [Quick Start instructions](https://docs.victoriametrics.com/operator/quick-start/) for the operator.
 
+## Scalability
+
+VictoriaMetrics, VictoriaLogs and VictoriaTraces are designed to be highly scalable and simple to operate:
+- one VictoriaMetrics cluster can handle thousands of tenants, billions of time series, millions of samples per second,
+  thousands of read requests per second;
+- one VictoriaLogs cluster can handle thousands of tenants, hundreds of terabytes of logs per day,
+  thousands of read requests per second;
+- one VictoriaTraces cluster can handle thousands of tenants, billions of spans per day with avg compression ratio of x15.
+  
+All 3 databases share similiar architecture and can be scaled independently:
+```mermaid
+flowchart LR
+
+    Sources["Telemetry"]
+
+    Sources --> VI
+
+    subgraph Ingestion
+        direction TB
+        VI["insert × N"]
+    end
+
+    subgraph Storage
+        direction TB
+        VS["storage × M"]
+    end
+
+    subgraph Query
+        direction TB
+        VQ["select × K"]
+    end
+
+    VI -->|"shard <br>among storages"| VS
+    VS -->|"read <br>from storages"| VQ
+
+    Clients["Grafana / VMUI"]
+
+    VQ --> Clients
+```
+
+Each database has 3 types of components:
+  * stateless **insert** - processes incoming data and shards it between storages;
+  * stateful **storage** - efficiently stores and manages data;
+  * stateless **select** - processes incoming read queries and returns results.
+
+**insert** and **select** components need to know only about **storages**, they don't need to know about each other.
+And **storages** don't know about each other, **inserts** or **selects**.
+
+**inserts**, **selects** and **storages** can be scaled independently:
+  * add more **insert** replicas to increase ingestion throughput;
+  * add more **select** replicas to increase query throughput.
+  * add more **storage** shards to increase overall performance and overcome physical hardware limitations like CPU/Mem/IO limits
+    or filesystem capacity.
+
+Cluster architecture doesn't require any additional services: no extra caches, databases, compactors, etc. We only
+recommend using [vmauth for load balancing](http://localhost:1313/victoriametrics/vmauth/#load-balancing) for stateless
+components, or any other load balancer of your choice.
+
 ## Backups
 
 Backups in VictoriaStack are implemented using data snapshots - an instanteneous mechanism for making a copy of the data

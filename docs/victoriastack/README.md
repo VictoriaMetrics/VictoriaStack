@@ -4,7 +4,7 @@ design philosophy, operational model, and ecosystem:
 | Signal      | Product                                                              | Query language                                                                                                                                                                                                                                  | Scalability                                                                     |
 |-------------|----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
 | **Metrics** | [VictoriaMetrics](https://docs.victoriametrics.com/victoriametrics/) | [MetricsQL](https://docs.victoriametrics.com/metricsql/) (PromQL-compatible)                                                                                                                                                                    | Billions of [active time series](), Millions of [samples]() ingested per second |
-| **Logs**    | [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/)       | [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/)                                                                                                                                                                                 | Hundreds of TBs a day with avg compression ratio of x10                         |
+| **Logs**    | [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/)       | [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/)                                                                                                                                                                                 | Hundreds of TBs a day, with avg compression ratio of x10                        |
 | **Traces**  | [VictoriaTraces](https://docs.victoriametrics.com/victoriatraces/)   | [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/), [Jaeger API](https://docs.victoriametrics.com/victoriatraces/querying/#jaeger-http-api), [Tempo API](https://docs.victoriametrics.com/victoriatraces/querying/#tempo-http-api) | Millions of traces ingested per second                                          |
 
 //todo: update scalability numbers for traces and logs
@@ -34,8 +34,8 @@ It is well integrated into the modern observability ecosystem by supporting vari
 and User Interfaces like Grafana and Perses for querying. It supports multitenancy, alerting, out-of-order backfilling,
 efficient compression, sane defaults for simplified setup, wide community and support.
 
-VictoriaStack is the best choice if you want to own your observability stack, build a reliable, cost-effieicient
-multitenant platform ready for future growth.
+VictoriaStack is the best choice if you want to **own your observability stack**, build a **reliable**, **cost-effieicient
+multitenant platform** ready for future growth.
 
 ## Architecture Overview
 
@@ -150,6 +150,9 @@ Once running, the links remain the same as for single-node deployment - all than
   use [Grafana](http://localhost:3000)
 - [Grafana - http://localhost:3000](http://localhost:3000/explore) with preconfigured datasources
   and a simple demo dashboard (_login with admin:admin_).
+
+From now on, scaling the stack is as simple as changing the number of replicas for the components. No additional
+caches, compactors, or other components are required. See more about [cluster scalability](http://localhost:1313/victoriastack/deployment/#scalability).
 
 ## Deployment
 
