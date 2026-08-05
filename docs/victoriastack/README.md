@@ -101,19 +101,22 @@ The compose command will start:
 
 ![readme-compose-single.webp](readme-compose-single.png)
 
-Once running, the following links will be available:
+Once running for a few minutes, the following links will be available:
 
-- [VictoriaMetrics UI - http://localhost:8427/metrics/select/vmui](http://localhost:8427/metrics/select/vmui/?#/cardinality)
+- Visit [VictoriaMetrics UI - http://localhost:8427/metrics/select/vmui](http://localhost:8427/metrics/select/vmui/?#/cardinality)
+  to explore the stored metrics or [run a query to plot charts](http://localhost:8427/metrics/select/vmui/#/?g0.range_input=15m&g0.relative_time=last_15_minutes&g0.tab=0&g0.expr=sum%28rate%28vm_http_requests_total%29%29+by+%28path%29+%3E+0):
   ![readme-metrics-vmui-demo.webp](readme-metrics-vmui-demo.png)
   {width="500"}
-- [VictoriaLogs UI - http://localhost:8427/logs/select/vmui](http://localhost:8427/logs/select/vmui)
+- Visit [VictoriaLogs UI - http://localhost:8427/logs/select/vmui](http://localhost:8427/logs/select/vmui) to see recently
+  ingested logs or [run a query to plot charts](http://localhost:8427/logs/select/vmui/?#/?g0.range_input=5m&g0.relative_time=last_5_minutes&step=5s&query=Error+%7C+by%28http.method%29+count%28%29&group_hits=http.method):
   ![readme-logs-vmui-demo.webp](readme-logs-vmui-demo.png)
   {width="500"}
 - [VictoriaTraces UI - http://localhost:8427/traces/select/vmui](http://localhost:8427/traces/select/vmui), but it is
-  better to
-  use [Grafana](http://localhost:3000)
+  better to use [Grafana's Explore via Jaeger](http://localhost:3000/explore?schemaVersion=1&panes=%7B%220ut%22:%7B%22datasource%22:%22victoriatraces-jaeger-ds%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22jaeger%22,%22uid%22:%22victoriatraces-jaeger-ds%22%7D,%22queryType%22:%22search%22,%22service%22:%22otelgen%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D,%22compact%22:false%7D%7D&orgId=1)(_login with admin:admin_):
+  ![readme-traces-grafana-explore.webp](readme-traces-grafana-explore.png)
+  {width="500"}
 - [Grafana - http://localhost:3000](http://localhost:3000/explore) with preconfigured datasources
-  and a simple demo dashboard (_login with admin:admin_).
+  and a simple demo dashboard (_login with admin:admin_):
   ![readme-grafana-demo.webp](readme-grafana-demo.png)
   {width="500"}
 
