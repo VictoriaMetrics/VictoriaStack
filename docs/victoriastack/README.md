@@ -68,6 +68,11 @@ See more detailed [deployment docs](http://localhost:1313/victoriastack/deployme
 In the sections below, we'll go through examples of deploying VictoriaStack via docker compose to make it is
 easy to run and experiment with locally.
 
+### Prerequisites
+
+To run the examples below, install [Docker](https://docs.docker.com/get-started/get-docker/)
+with [Compose v2](https://docs.docker.com/compose/) and `git`.
+
 ### Single-node version
 
 The simplest version of the stack would be to run VictoriaMetrics, VictoriaLogs and VictoriaTraces as single-node

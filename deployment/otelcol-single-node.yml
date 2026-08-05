@@ -9,7 +9,7 @@ receivers:
       scrape_configs:
         - job_name: "victoriametrics"
           static_configs:
-            - targets: [ "victoriametics:8428" ]
+            - targets: [ "victoriametrics:8428" ]
         - job_name: "victorialogs"
           static_configs:
             - targets: [ "victorialogs:9428" ]
@@ -25,7 +25,7 @@ exporters:
   otlp_http/vm-metrics: { metrics_endpoint: http://vmstack:8427/metrics/insert/opentelemetry/v1/metrics }
   otlp_http/vm-traces:  { traces_endpoint: http://vmstack:8427/traces/insert/opentelemetry/v1/traces, headers: { AccountID: "0", ProjectID: "0" } }
   # k8s.pod.name is ignored due to https://github.com/krzko/otelgen/issues/156
-  otlp_http/vm-logs:    { logs_endpoint: http://vmstack:8427/logs/insert/opentelemetry/v1/logs, headers: { AccountID: "0", ProjectID: "0", VL-Ignore-Fields: k8s.pod.name } } }
+  otlp_http/vm-logs:    { logs_endpoint: http://vmstack:8427/logs/insert/opentelemetry/v1/logs, headers: { AccountID: "0", ProjectID: "0", VL-Ignore-Fields: k8s.pod.name } }
 
 service:
   pipelines:
