@@ -232,6 +232,29 @@ Cluster architecture doesn't require any additional services: no extra caches, d
 recommend using [vmauth for load balancing](http://localhost:1313/victoriametrics/vmauth/#load-balancing) for stateless
 components, or any other load balancer of your choice.
 
+## Retention and storage
+
+All three databases store data on the local filesystem and delete it automatically once it falls outside the
+configured retention:
+
+| Database                                                                                                     | Default retention | How to configure                                                                                               |
+|--------------------------------------------------------------------------------------------------------------|-------------------|----------------------------------------------------------------------------------------------------------------|
+| [VictoriaMetrics](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#retention) | 1 month           | `-retentionPeriod`, from `1d` up to years                                                                      |
+| [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/#retention)                                     | 7 days            | `-retentionPeriod`, or a disk limit via `-retention.maxDiskSpaceUsageBytes` / `-retention.maxDiskUsagePercent` |
+| [VictoriaTraces](https://docs.victoriametrics.com/victoriatraces/#retention)                                 | 7 days            | `-retentionPeriod`, or a disk limit via `-retention.maxDiskSpaceUsageBytes` / `-retention.maxDiskUsagePercent` |
+
+Disk usage depends on your data, not on a fixed formula. Estimate it with the capacity planning docs
+for [VictoriaMetrics](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#capacity-planning)
+and [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/#capacity-planning).
+
+VictoriaStack has no object storage tiering: databases keep all data on local disks, and S3 or GCS is used
+for [backups](http://localhost:1313/victoriastack/deployment/#backups) only. Support for historical data in object
+storage is in progress, see [this issue](https://github.com/VictoriaMetrics/VictoriaLogs/issues/48).
+
+To store metrics longer without paying for full resolution,
+Enterprise adds [downsampling](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#downsampling)
+and per-tenant [retention filters](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#retention-filters).
+
 ## Next steps
 
 The examples above run on generated telemetry. To build an installation of your own, go through the following steps:
