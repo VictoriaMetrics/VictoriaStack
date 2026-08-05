@@ -78,6 +78,29 @@ See production-ready examples of alerting rules for VictoriaMetrics monitoring [
 Datasource is specified by the `-datasource.url` flag. It is a URL where vmalert can send queries for rules evaluation.
 It could be a VictoriaMetrics URL, VictoriaLogs URL or VictoriaTraces URL, depending on the [type of integration](https://docs.victoriametrics.com/vmalert.html#integrations).
 
+```mermaid
+flowchart LR
+
+    subgraph Logs
+        direction LR
+        VL["VictoriaLogs"]
+        VA1["vmalert<br>&nbsp;<code>rule.defaultRuleType=vlogs<br>datasource.url=VictoriaLogs</code>"]
+        VL --> VA1
+    end
+
+    subgraph Metrics
+        direction LR
+        VM["VictoriaMetrics"]
+        VA2["vmalert<br><code>rule.defaultRuleType=prometheus<br>datasource.url=VictoriaMetrics</code>"]
+        VM --> VA2
+    end
+
+    AM["Alertmanager"]
+
+    VA1 -->|"alerts"| AM
+    VA2 -->|"alerts"| AM
+```
+
 vmalert will periodically execute the rules against the configured datasource and send notifications to Alertmanager 
 if conditions are met.
 
@@ -87,6 +110,23 @@ Alertmanager is specified by the `-notifier.url` flag. It is a URL where vmalert
 in rules are met. Alertmanager then can be configured to send notifications to various destinations like email or slack,
 silence, group and suppress alerts. See [Alertmanager docs](https://prometheus.io/docs/alerting/latest/alertmanager/) for more details.
 
+```mermaid
+flowchart LR
+
+    V["vmalert<br><code>notifier.url=Alertmanager1<br>notifier.url=Alertmanager2</code>"]
+    V -->|"alerts"| A1
+    V -->|"alerts"| A2
+
+    subgraph Cluster
+        A1["Alertmanager1"]
+        A2["Alertmanager2"]
+    end
+
+    C["Slack, email..."]
+    A1 -->|"notifications"| C
+    A2 -->|"notifications"| C
+```
+
 > If you have a cluster of Alertmanager instances, then all of the instances should be specified in the 
 `-notifier.url` flag separated by comma.
 
@@ -95,14 +135,41 @@ See more details in [vmalert docs](https://docs.victoriametrics.com/vmalert.html
 
 ## High Availability
 
-For High Availability, run multiple identically configured vmalert instances. It means all of them will execute 
-the same rules, write state and results to the same destinations, and send alert notifications to multiple configured 
+For High Availability run multiple identically configured vmalert instances. 
+
+```mermaid
+flowchart LR
+
+    M["VictoriaMetrics<br/><code>dedup.minScrapeInterval=evalInterval</code>"]
+
+    subgraph HA["HA vmalert"]
+        direction LR
+
+        V1["vmalert<br/><code>notifier.url=Alertmanager<br/>datasource.url=VictoriaMetrics</code>"]
+        V2["vmalert<br/><code>notifier.url=Alertmanager<br/>datasource.url=VictoriaMetrics</code>"]
+    end
+
+    A["Alertmanager"]
+
+    M -->|"queries"| V1
+    M -->|"queries"| V2
+
+    V1 -->|"alerts"| A
+    V2 -->|"alerts"| A
+ ```
+
+It means all of them will execute the same rules **doubling the resource usage on datasource**, and send alert notifications to multiple configured 
 Alertmanagers. See more details in [vmalert docs](https://docs.victoriametrics.com/vmalert.html#high-availability).
 
 Please note, vmalert is stateless and its reload usually doesn't take more than a few seconds. Even if vmalert is restarted,
-it will [restore its state from the -remoteRead.url](https://docs.victoriametrics.com/vmalert.html#alerts-state-on-restarts).
-Deploying multiple vmalert instances doesn't usually justify additional costs on query processing.
+it can [quickly restore its state](https://docs.victoriametrics.com/vmalert.html#alerts-state-on-restarts).
+Deploying multiple vmalert instances doesn't usually justify extra resource usage on datasource.
 
 ## Scalability
 
+vmalert is a very lightweight service that only sends query requests to datasource and alerts to Alertmanager.
+It doesn't do any heavy lifting on its own and rarely requires sharding. One vmalert instance can handle thousands of rules
+consuming very low amount of resources.
 
+In cases when horizontal scaling is required, it is recommended to manually split configured rules by groups in separate
+files and run multiple vmalert instances to execute their own configuration files.
