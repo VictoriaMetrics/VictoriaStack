@@ -25,9 +25,16 @@ for time series workload, while VictoriaLogs design and architecture are optimiz
 The separation of storage backends allows keeping solutions simple, efficient, independent, and fine-tuned for each
 signal.
 
-It is well integrated into the modern observability ecosystem by supporting various protocols for ingestion
-and User Interfaces like Grafana and Perses for querying. It supports multitenancy, alerting, out-of-order backfilling,
-efficient compression, sane defaults for simplified setup, wide community and support.
+VictoriaStack [accepts the protocols](http://localhost:1313/victoriastack/ingestion/) popular agents already speak:
+* **Metrics**: Prometheus `remote_write`, OpenTelemetry, InfluxDB line, Graphite, DataDog, OpenTSDB.
+* **Logs**: Elasticsearch bulk, Loki JSON, syslog, journald, DataDog, OpenTelemetry.
+* **Traces**: OpenTelemetry.
+
+VictoriaMetrics serves a Prometheus-compatible API, and VictoriaTraces serves Jaeger- and Tempo-compatible APIs.
+Existing Grafana dashboards, alerting and recording rules keep working.
+
+The stack supports multitenancy, alerting, out-of-order backfilling, efficient compression, sane defaults for simplified 
+setup, wide community and support.
 
 VictoriaStack is the best choice if you want to **own your observability stack**, build a **reliable**, 
 **cost-efficient multitenant platform** ready for future growth.
