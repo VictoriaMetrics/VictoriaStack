@@ -4,13 +4,13 @@ design philosophy, operational model, and ecosystem:
 | Signal      | Product                                                              | Query language                                                                                                                                                                                                                                  | Scalability                                                                     |
 |-------------|----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
 | **Metrics** | [VictoriaMetrics](https://docs.victoriametrics.com/victoriametrics/) | [MetricsQL](https://docs.victoriametrics.com/metricsql/) (PromQL-compatible)                                                                                                                                                                    | Billions of [active time series](), Millions of [samples]() ingested per second |
-| **Logs**    | [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/)       | [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/)                                                                                                                                                                                 | Hundreds of TBs a day, with avg compression ratio of x10                        |
-| **Traces**  | [VictoriaTraces](https://docs.victoriametrics.com/victoriatraces/)   | [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/), [Jaeger API](https://docs.victoriametrics.com/victoriatraces/querying/#jaeger-http-api), [Tempo API](https://docs.victoriametrics.com/victoriatraces/querying/#tempo-http-api) | Billions of spans per day with avg compression ratio of x10                     |
+| **Logs**    | [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/)       | [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/)                                                                                                                                                                                 | Hundreds of TBs a day, with avg compression ratio of x15                        |
+| **Traces**  | [VictoriaTraces](https://docs.victoriametrics.com/victoriatraces/)   | [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/), [Jaeger API](https://docs.victoriametrics.com/victoriatraces/querying/#jaeger-http-api), [Tempo API](https://docs.victoriametrics.com/victoriatraces/querying/#tempo-http-api) | Billions of spans per day with avg compression ratio of x15                     |
 
 //todo: update scalability numbers for traces and logs
 <br>
 
-All three solutions support the following features out-of-the-box:
+All three solutions support the following features out-of-the-box:Le
 
 - [Horizontal scaling]()
 - [Multitenancy]()
@@ -34,9 +34,8 @@ It is well integrated into the modern observability ecosystem by supporting vari
 and User Interfaces like Grafana and Perses for querying. It supports multitenancy, alerting, out-of-order backfilling,
 efficient compression, sane defaults for simplified setup, wide community and support.
 
-VictoriaStack is the best choice if you want to **own your observability stack**, build a **reliable**, *
-*cost-effieicient
-multitenant platform** ready for future growth.
+VictoriaStack is the best choice if you want to **own your observability stack**, build a **reliable**, 
+**cost-efficient multitenant platform** ready for future growth.
 
 ## Architecture Overview
 
@@ -47,11 +46,11 @@ multitenant platform** ready for future growth.
 |-----------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **[Deployment](http://localhost:1313/victoriastack/deployment/)**                       | [Kubernetes Operator](http://localhost:1313/victoriastack/deployment/#victoriametrics-operator), [Helm charts](http://localhost:1313/victoriastack/deployment/#helm-charts), [Binaries](http://localhost:1313/victoriastack/deployment/#binary)                                    |
 | **[Ingestion integrations](http://localhost:1313/victoriastack/ingestion/)**            | [OpenTelemetry](http://localhost:1313/victoriastack/ingestion/#opentelemetry), [Vector](https://vector.dev/), [Grafana Alloy](https://grafana.com/docs/alloy/latest/), [10+ additional integrations](http://localhost:1313/victoriastack/ingestion/#integrations)                  |
-| **[Native ingestion](http://localhost:1313/victoriastack/ingestion/#native-ingestion)** | **High troughput, reliable on-disk buffering, replication, traffic compression** via [vmagent](http://localhost:1313/victoriastack/ingestion/#vmagent) for metrics and [vlagent](http://localhost:1313/victoriastack/ingestion/#vlagent) for logs.                                 |
+| **[Native ingestion](http://localhost:1313/victoriastack/ingestion/#native-ingestion)** | **High throughput, reliable on-disk buffering, replication, traffic compression** via [vmagent](http://localhost:1313/victoriastack/ingestion/#vmagent) for metrics and [vlagent](http://localhost:1313/victoriastack/ingestion/#vlagent) for logs.                                |
 | **[Access control](http://localhost:1313/victoriastack/access-control/)**               | [vmauth](https://docs.victoriametrics.com/victoriametrics/vmauth/) for [user's authentication](http://localhost:1313/victoriastack/access-control/#authenticate-users), [requests routing](http://localhost:1313/victoriastack/access-control/#tenants-filtering), load balancing. |
 | **[Visualization](http://localhost:1313/victoriastack/ui/)**                            | [Grafana](http://localhost:1313/victoriastack/ui/#grafana) and [Perses](http://localhost:1313/victoriastack/ui/#perses) for unified observability and dashboarding. Built-in [vmui](http://localhost:1313/victoriastack/ui/#vmui) for ad-hoc exploration.                          |
 | **[Alerting](http://localhost:1313/victoriastack/alerting/)**                           | [vmalert](https://docs.victoriametrics.com/victoriametrics/vmalert/) integrated with [Alertmanager](http://localhost:1313/victoriastack/alerting/#alertmanager) for rules evaluation and dispatching notifications                                                                 |
-| **[Anomaly detection]()**                                                               | [vmaonmaly]() ...                                                                                                                                                                                                                                                                  |
+| **[Anomaly detection]()**                                                               | [vmanomaly]() ...                                                                                                                                                                                                                                                                  |
 | **[Enterprise](), [Long Term Support(LTS) releases]()**                                 |                                                                                                                                                                                                                                                                                    |
 
 // TODO: add links to stack components
@@ -136,7 +135,7 @@ make otel-cluster-up
 ```
 
 All manifests and configs that run this environment are available
-at [VictoriaStack/deployment](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-single-node-compose.yml).
+at [VictoriaStack/deployment](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-cluster-compose.yml).
 
 It runs the same setup as the [single-node version](#single-node-version), but each database is deployed in a clustered
 version, represented by three independently scalable types of components: insert, select and storage.
@@ -165,7 +164,7 @@ VictoriaMetrics, VictoriaLogs and VictoriaTraces are designed to be highly scala
 - one VictoriaTraces cluster can handle thousands of tenants, billions of spans per day with avg compression ratio of
   x15.
 
-All 3 databases share similiar architecture and can be scaled independently:
+All 3 databases share similar architecture and can be scaled independently:
 
 ```mermaid
 flowchart LR

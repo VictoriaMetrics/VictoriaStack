@@ -60,7 +60,7 @@ Docker Compose examples for running VictoriaStack components can be found on [Vi
 VictoriaStack can be deployed on Kubernetes in two ways:
 
 - [Helm Charts](http://localhost:1313/victoriastack/deployment/#helm-charts): install and upgrade a complete VictoriaStack using [Helm](https://helm.sh/)
-- [VictoriaMetrics Kuberentes Operator](http://localhost:1313/victoriastack/deployment/#victoriametrics-operator): manage VictoriaStack components 
+- [VictoriaMetrics Kubernetes Operator](http://localhost:1313/victoriastack/deployment/#victoriametrics-operator): manage VictoriaStack components 
   using Kubernetes-native custom resources.
 
 ### Helm Charts
@@ -77,7 +77,7 @@ See the full list of [available charts](https://docs.victoriametrics.com/helm/) 
 
 ### VictoriaMetrics Operator
 
-[VictoriaMetrics Kuberentes Operator](https://docs.victoriametrics.com/operator/) makes running VictoriaMetrics 
+[VictoriaMetrics Kubernetes Operator](https://docs.victoriametrics.com/operator/) makes running VictoriaMetrics 
 applications on top of Kubernetes as easy as possible while preserving Kubernetes-native configuration options.
 It allows you to manage Victoria Metrics components in Kubernetes or OpenShift clusters in a declarative style following
 [GitOps](https://www.redhat.com/en/topics/devops/what-is-gitops) and [IaC](https://en.wikipedia.org/wiki/Infrastructure_as_code) concepts.
