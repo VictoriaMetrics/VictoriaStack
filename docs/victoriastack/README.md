@@ -43,10 +43,56 @@ Already running another observability stack? See [Comparisons](http://localhost:
 to learn how VictoriaStack differs from Grafana LGTM, ClickStack, SigNoz, Elastic Stack, and Prometheus with Thanos,
 and when each alternative is the better fit.
 
-## Architecture Overview
+## Architecture
 
 ![readme-stack.webp](readme-stack.png)
 {width="700"}
+
+All three databases share the same component model. Each of them runs either as a single binary, or as a cluster
+of three component types:
+
+```mermaid
+flowchart LR
+
+    Sources["Telemetry"]
+
+    Sources --> VI
+
+    subgraph Ingestion
+        direction TB
+        VI["insert × N"]
+    end
+
+    subgraph Storage
+        direction TB
+        VS["storage × M"]
+    end
+
+    subgraph Query
+        direction TB
+        VQ["select × K"]
+    end
+
+    VI -->|"shard <br>among storages"| VS
+    VS -->|"read <br>from storages"| VQ
+
+    Clients["Grafana / VMUI"]
+
+    VQ --> Clients
+```
+
+* stateless **insert** - processes incoming data and shards it between storages;
+* stateful **storage** - efficiently stores and manages data;
+* stateless **select** - processes incoming read queries and returns results.
+
+**insert** and **select** components need to know only about **storages**, they don't need to know about each other.
+And **storages** don't know about each other, **inserts** or **selects**.
+
+Cluster architecture doesn't require any additional services: no extra caches, databases, compactors, etc. We only
+recommend using [vmauth for load balancing](http://localhost:1313/victoriametrics/vmauth/#load-balancing) for stateless
+components, or any other load balancer of your choice.
+
+## What's in the stack
 
 | What                                                                                    | How                                                                                                                                                                                                                                                                                |
 |-----------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -73,12 +119,8 @@ operator.
 See more detailed [deployment docs](http://localhost:1313/victoriastack/deployment/).
 
 In the sections below, we'll go through examples of deploying VictoriaStack via docker compose to make it is
-easy to run and experiment with locally.
-
-### Prerequisites
-
-To run the examples below, install [Docker](https://docs.docker.com/get-started/get-docker/)
-with [Compose v2](https://docs.docker.com/compose/) and `git`.
+easy to run and experiment with locally. You will need [Docker](https://docs.docker.com/get-started/get-docker/)
+with [Compose v2](https://docs.docker.com/compose/) and `git`/
 
 ### Single-node version
 
@@ -157,16 +199,8 @@ In this topology, vmauth also balances requests among insert and select componen
 
 ![readme-compose-cluster.webp](readme-compose-cluster.png)
 
-Once running, the links remain the same as for single-node deployment - all thanks to vmauth handling the routing:
-
-- Visit [VictoriaMetrics UI - http://localhost:8427/metrics/select/vmui](http://localhost:8427/metrics/select/vmui/?#/cardinality)
-  to explore the stored metrics or [run a query to plot charts](http://localhost:8427/metrics/select/vmui/#/?g0.range_input=15m&g0.relative_time=last_15_minutes&g0.tab=0&g0.expr=sum%28rate%28vm_http_requests_total%29%29+by+%28path%29+%3E+0)
-- Visit [VictoriaLogs UI - http://localhost:8427/logs/select/vmui](http://localhost:8427/logs/select/vmui) to see recently
-  ingested logs or [run a query to plot charts](http://localhost:8427/logs/select/vmui/?#/?g0.range_input=5m&g0.relative_time=last_5_minutes&step=5s&query=Error+%7C+by%28http.method%29+count%28%29&group_hits=http.method)
-- [VictoriaTraces UI - http://localhost:8427/traces/select/vmui](http://localhost:8427/traces/select/vmui), but it is
-  better to use [Grafana's Explore via Jaeger](http://localhost:3000/explore?schemaVersion=1&panes=%7B%220ut%22:%7B%22datasource%22:%22victoriatraces-jaeger-ds%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22jaeger%22,%22uid%22:%22victoriatraces-jaeger-ds%22%7D,%22queryType%22:%22search%22,%22service%22:%22otelgen%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D,%22compact%22:false%7D%7D&orgId=1)(_login with admin:admin_)
-- [Grafana - http://localhost:3000](http://localhost:3000/explore) with preconfigured datasources
-  and a simple demo dashboard (_login with admin:admin_)
+vmauth routes the requests, so the UI links stay exactly
+the [same as in the single-node version](#single-node-version).
 
 While running, the generator will continue pushing telemetry signals via OpenTelemetry collector to the stack, and
 vmalert will execute alerting rules. To stop the stack, run the following command:
@@ -175,7 +209,7 @@ vmalert will execute alerting rules. To stop the stack, run the following comman
 make otel-cluster-down
 ```
 
-### Scalability
+## Scaling
 
 VictoriaMetrics, VictoriaLogs and VictoriaTraces are designed to be highly scalable and simple to operate:
 
@@ -183,61 +217,14 @@ VictoriaMetrics, VictoriaLogs and VictoriaTraces are designed to be highly scala
   thousands of read requests per second;
 - one VictoriaLogs cluster can handle thousands of tenants, hundreds of terabytes of logs per day,
   thousands of read requests per second;
-- one VictoriaTraces cluster can handle thousands of tenants, billions of spans per day with avg compression ratio of
-  x15.
+- one VictoriaTraces cluster can handle thousands of tenants, billions of spans per day.
 
-All 3 databases share similar architecture and can be scaled independently:
-
-```mermaid
-flowchart LR
-
-    Sources["Telemetry"]
-
-    Sources --> VI
-
-    subgraph Ingestion
-        direction TB
-        VI["insert × N"]
-    end
-
-    subgraph Storage
-        direction TB
-        VS["storage × M"]
-    end
-
-    subgraph Query
-        direction TB
-        VQ["select × K"]
-    end
-
-    VI -->|"shard <br>among storages"| VS
-    VS -->|"read <br>from storages"| VQ
-
-    Clients["Grafana / VMUI"]
-
-    VQ --> Clients
-```
-
-Each database has 3 types of components:
-
-* stateless **insert** - processes incoming data and shards it between storages;
-* stateful **storage** - efficiently stores and manages data;
-* stateless **select** - processes incoming read queries and returns results.
-
-**insert** and **select** components need to know only about **storages**, they don't need to know about each other.
-And **storages** don't know about each other, **inserts** or **selects**.
-
-**inserts**, **selects** and **storages** can be scaled independently:
+[**inserts**, **selects** and **storages**](#architecture) can be scaled independently:
 
 * add more **insert** replicas to increase ingestion throughput;
 * add more **select** replicas to increase query throughput.
-* add more **storage** shards to increase overall performance and overcome physical hardware limitations like CPU/Mem/IO
-  limits
-  or filesystem capacity.
-
-Cluster architecture doesn't require any additional services: no extra caches, databases, compactors, etc. We only
-recommend using [vmauth for load balancing](http://localhost:1313/victoriametrics/vmauth/#load-balancing) for stateless
-components, or any other load balancer of your choice.
+* add more **storage** shards to increase overall performance and overcome physical hardware limitations like CPU, Mem, 
+  IO limits, or filesystem capacity.
 
 ## Retention and storage
 
