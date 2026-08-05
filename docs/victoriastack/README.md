@@ -279,3 +279,16 @@ The examples above run on generated telemetry. To build an installation of your 
    thousands of isolated tenants.
 7. [Deploy to production](http://localhost:1313/victoriastack/deployment/): Kubernetes operator, Helm charts, or
    binaries. The docker compose examples above are for demonstration only.
+
+## Get help
+
+* Ask questions in the community [Slack](https://slack.victoriametrics.com/)
+  or [Telegram](https://t.me/VictoriaMetrics_en).
+  See the [full list of channels](https://docs.victoriametrics.com/victoriametrics/#community-and-contributions).
+* Report bugs and request features in GitHub
+  issues: [VictoriaMetrics](https://github.com/VictoriaMetrics/VictoriaMetrics/issues),
+  [VictoriaLogs](https://github.com/VictoriaMetrics/VictoriaLogs/issues),
+  [VictoriaTraces](https://github.com/VictoriaMetrics/VictoriaTraces/issues).
+  Found a problem on this page? [Open an issue](https://github.com/VictoriaMetrics/VictoriaStack/issues).
+* For commercial support and [enterprise features](https://docs.victoriametrics.com/victoriametrics/enterprise/),
+  contact [info@victoriametrics.com](mailto:info@victoriametrics.com).
