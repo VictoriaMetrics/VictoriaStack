@@ -152,13 +152,21 @@ In this topology, vmauth also balances requests among insert and select componen
 
 Once running, the links remain the same as for single-node deployment - all thanks to vmauth handling the routing:
 
-- [VictoriaMetrics UI - http://localhost:8427/metrics/select/vmui](http://localhost:8427/metrics/select/vmui/?#/cardinality)
-- [VictoriaLogs UI - http://localhost:8427/logs/select/vmui](http://localhost:8427/logs/select/vmui)
+- Visit [VictoriaMetrics UI - http://localhost:8427/metrics/select/vmui](http://localhost:8427/metrics/select/vmui/?#/cardinality)
+  to explore the stored metrics or [run a query to plot charts](http://localhost:8427/metrics/select/vmui/#/?g0.range_input=15m&g0.relative_time=last_15_minutes&g0.tab=0&g0.expr=sum%28rate%28vm_http_requests_total%29%29+by+%28path%29+%3E+0)
+- Visit [VictoriaLogs UI - http://localhost:8427/logs/select/vmui](http://localhost:8427/logs/select/vmui) to see recently
+  ingested logs or [run a query to plot charts](http://localhost:8427/logs/select/vmui/?#/?g0.range_input=5m&g0.relative_time=last_5_minutes&step=5s&query=Error+%7C+by%28http.method%29+count%28%29&group_hits=http.method)
 - [VictoriaTraces UI - http://localhost:8427/traces/select/vmui](http://localhost:8427/traces/select/vmui), but it is
-  better to
-  use [Grafana](http://localhost:3000)
+  better to use [Grafana's Explore via Jaeger](http://localhost:3000/explore?schemaVersion=1&panes=%7B%220ut%22:%7B%22datasource%22:%22victoriatraces-jaeger-ds%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22jaeger%22,%22uid%22:%22victoriatraces-jaeger-ds%22%7D,%22queryType%22:%22search%22,%22service%22:%22otelgen%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D,%22compact%22:false%7D%7D&orgId=1)(_login with admin:admin_)
 - [Grafana - http://localhost:3000](http://localhost:3000/explore) with preconfigured datasources
-  and a simple demo dashboard (_login with admin:admin_).
+  and a simple demo dashboard (_login with admin:admin_)
+
+While running, the generator will continue pushing telemetry signals via OpenTelemetry collector to the stack, and
+vmalert will execute alerting rules. To stop the stack, run the following command:
+
+```sh
+make otel-cluster-down
+```
 
 ### Scalability
 
@@ -224,8 +232,20 @@ Cluster architecture doesn't require any additional services: no extra caches, d
 recommend using [vmauth for load balancing](http://localhost:1313/victoriametrics/vmauth/#load-balancing) for stateless
 components, or any other load balancer of your choice.
 
-## Deployment
+## Next steps
 
-For more options to deploy VictoriaStack in various environments
-see [deployment docs](http://localhost:1313/victoriastack/deployment/).
+The examples above run on generated telemetry. To build an installation of your own, go through the following steps:
 
+1. [Ingest your own data](http://localhost:1313/victoriastack/ingestion/): point the telemetry agents you already run at
+   VictoriaStack, or use vmagent and vlagent for higher throughput and reliable delivery.
+2. [Query the signals](http://localhost:1313/victoriastack/querying/): MetricsQL for metrics, LogsQL for logs and traces.
+3. [Build dashboards](http://localhost:1313/victoriastack/ui/): Grafana or Perses for dashboarding, vmui for ad-hoc
+   exploration.
+4. [Set up alerting](http://localhost:1313/victoriastack/alerting/): vmalert for rules evaluation, Alertmanager for
+   notifications.
+5. [Protect the installation](http://localhost:1313/victoriastack/access-control/): vmauth for authentication, request
+   routing, and TLS termination.
+6. [Separate data between teams](http://localhost:1313/victoriastack/multitenancy/): one installation can serve
+   thousands of isolated tenants.
+7. [Deploy to production](http://localhost:1313/victoriastack/deployment/): Kubernetes operator, Helm charts, or
+   binaries. The docker compose examples above are for demonstration only.
