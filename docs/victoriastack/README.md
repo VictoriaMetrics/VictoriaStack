@@ -1,23 +1,18 @@
-**VictoriaStack** is a unified observability platform built with three specialized databases that share the same
-design philosophy, operational model, and ecosystem:
+**VictoriaStack** is an observability stack for metrics, logs, and traces. 
 
-| Signal      | Product                                                              | Query language                                                                                                                                                                                                                                  | Scalability                                                                     |
-|-------------|----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
-| **Metrics** | [VictoriaMetrics](https://docs.victoriametrics.com/victoriametrics/) | [MetricsQL](https://docs.victoriametrics.com/metricsql/) (PromQL-compatible)                                                                                                                                                                    | Billions of [active time series](), Millions of [samples]() ingested per second |
-| **Logs**    | [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/)       | [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/)                                                                                                                                                                                 | Hundreds of TBs a day, with avg compression ratio of x15                        |
-| **Traces**  | [VictoriaTraces](https://docs.victoriametrics.com/victoriatraces/)   | [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/), [Jaeger API](https://docs.victoriametrics.com/victoriatraces/querying/#jaeger-http-api), [Tempo API](https://docs.victoriametrics.com/victoriatraces/querying/#tempo-http-api) | Billions of spans per day with avg compression ratio of x15                     |
+| Signal      | Product                                                              | Query language                                                                                                                                                                                                                                  | Scalability                                                                 |
+|-------------|----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| **Metrics** | [VictoriaMetrics](https://docs.victoriametrics.com/victoriametrics/) | [MetricsQL](https://docs.victoriametrics.com/metricsql/) (PromQL-compatible)                                                                                                                                                                    | Billions of [active time series](), Millions of samples ingested per second |
+| **Logs**    | [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/)       | [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/)                                                                                                                                                                                 | Hundreds of TBs a day, with avg compression ratio of x15                    |
+| **Traces**  | [VictoriaTraces](https://docs.victoriametrics.com/victoriatraces/)   | [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/), [Jaeger API](https://docs.victoriametrics.com/victoriatraces/querying/#jaeger-http-api), [Tempo API](https://docs.victoriametrics.com/victoriatraces/querying/#tempo-http-api) | Billions of spans per day with avg compression ratio of x15                 |
 
-//todo: update scalability numbers for traces and logs
 <br>
 
-All three solutions support the following features out-of-the-box:Le
+Each database is a separate application, specialized on its own signal. But all three share the same design philosophy,
+operational model, and ecosystem.
 
-- [Horizontal scaling]()
-- [Multitenancy]()
-- [Alerting]()
-- [Grafana integration]()
-- [OpenTelemetry](https://docs.victoriametrics.com/opentelemetry/) for ingestion
-- Apache 2 licensed
+The stack has no bundled all-in-one UI. [Grafana](http://localhost:1313/victoriastack/ui/#grafana) brings all three
+signals onto shared dashboards, and every database ships with a built-in [vmui](http://localhost:1313/victoriastack/ui/#vmui) for ad-hoc exploration.
 
 ## Why VictoriaStack?
 
@@ -36,6 +31,10 @@ efficient compression, sane defaults for simplified setup, wide community and su
 
 VictoriaStack is the best choice if you want to **own your observability stack**, build a **reliable**, 
 **cost-efficient multitenant platform** ready for future growth.
+
+Already running another observability stack? See [Comparisons](http://localhost:1313/victoriastack/comparisons/)
+to learn how VictoriaStack differs from Grafana LGTM, ClickStack, SigNoz, Elastic Stack, and Prometheus with Thanos,
+and when each alternative is the better fit.
 
 ## Architecture Overview
 
