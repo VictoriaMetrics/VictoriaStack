@@ -220,6 +220,23 @@ The operator also documents high availability
 for [every individual resource](https://docs.victoriametrics.com/operator/resources/#high-availability) it manages,
 including vmagent, vlagent, vmauth, vmalert, and Alertmanager.
 
+## Security
+
+All three databases expect to run in a trusted network, unreachable from the internet. They perform no authentication
+of their own, so put [vmauth](https://docs.victoriametrics.com/victoriametrics/vmauth/) or another authorization proxy
+in front of them. It authenticates requests, terminates TLS, and routes them to the right component.
+See [Access control](http://localhost:1313/victoriastack/access-control/) for the configuration.
+
+Two more things to set up for every component:
+
+- **Protect the internal HTTP endpoints.** Stack components xpose sensitive endpoints for config hot reloading, 
+  metrics scraping, profiling, etc. See more about [Sensitive endpoints](http://localhost:1313/victoriastack/access-control/#sensitive-endpoints).
+- **Enable TLS on components that serve traffic without a proxy in front** with the `-tls`, `-tlsCertFile`, and
+  `-tlsKeyFile` flags. vmauth additionally supports mTLS and automatic issuing of TLS certificates.
+
+Security fixes are published in the latest release of every database, so staying current is part of keeping an
+installation secure. See [Upgrades](#upgrades).
+
 ## Upgrades
 
 Upgrades and downgrades are safe unless the release notes say otherwise. Skipping versions is safe too. Check the
