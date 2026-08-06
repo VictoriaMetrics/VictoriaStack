@@ -11,8 +11,19 @@ tags:
   - traces
 ---
 
-The easiest way to ingest data into VictoriaStack is to [integrate with the OpenTelemetry Collector](https://docs.victoriametrics.com/opentelemetry/),
-as it can forward all three types of signals at once.
+There are three ways to deliver data to VictoriaStack - pick the one that matches the pipeline you already have:
+
+| Path                                      | Use it when                                                                                                                                   |
+|-------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| [OpenTelemetry Collector](#opentelemetry) | you already collect telemetry with OpenTelemetry, or you start from scratch and want a single pipeline for all three signals                  |
+| [Agents you already run](#integrations)   | Prometheus, Vector, Grafana Alloy, Fluent Bit, Telegraf and others can push to VictoriaStack directly                                         |
+| [vmagent and vlagent](#native-ingestion)  | you want reliable and cost-efficient delivery: high throughput, on-disk buffering, replication between installations, and traffic compression |
+
+<br>
+
+The paths combine: OpenTelemetry Collector or a third-party agent can push to vmagent or vlagent, which buffer the
+data and forward it to the databases. That keeps the existing collection setup and still gets the delivery guarantees of
+the native agents.
 
 ## OpenTelemetry
 
@@ -36,8 +47,8 @@ service:
     metrics: { receivers: [ otlp ], exporters: [ otlp_http/vm-metrics ] }
 ```
 
-In the example above, the OpenTelemetry Collector receives signals via the gRPC protocol,
-and forwards them to VictoriaStack via HTTP endpoints:
+In the example above, OpenTelemetry Collector receives signals via the gRPC protocol,
+and then forwards data to VictoriaStack via HTTP endpoints:
 * `http://victoriametrics:8428/opentelemetry/v1/metrics` for metrics
 * `http://victorialogs:9428/insert/opentelemetry/v1/logs` for logs
 * `http://victoriatraces:10428/insert/opentelemetry/v1/traces` for traces
@@ -60,12 +71,24 @@ to each integration. See the following docs for more details:
 
 ## Integrations
 
-Just like with [OpenTelemetry Collector](), the easiest way to start ingesting data is to integrate with telemetry agents
-that you already have in place. Do you use Prometheus or Grafana Alloy for metrics? Do you use Vector or Filebeat for logs?
-All these agents can push directly to VictoriaStack:
+Just like with [OpenTelemetry Collector](#opentelemetry), the easiest way to start ingesting data is to integrate with
+telemetry agents that you already have in place. Prometheus and Grafana Alloy for metrics, Vector or Filebeat for logs -
+all these agents can push directly to VictoriaStack:
 
 * VictoriaMetrics: [Prometheus, Vector, Grafana Alloy, Telegraf...](https://docs.victoriametrics.com/victoriametrics/data-ingestion/)
 * VictoriaLogs: [Filebeat, Logstash, Vector, Promtail, Elasticsearch, Telegraf...](https://docs.victoriametrics.com/victorialogs/data-ingestion/)
+
+If you already run Prometheus, adding VictoriaMetrics as
+a [`remote_write`](https://docs.victoriametrics.com/victoriametrics/integrations/prometheus/) target is a two-line change,
+and it needs no changes to the scrape configs:
+
+```yaml
+remote_write:
+  - url: http://victoriametrics:8428/api/v1/write
+```
+
+Prometheus keeps scraping and evaluating rules as before, while VictoriaMetrics stores the data for the long term.
+The same endpoint accepts data from anything else that speaks the Prometheus remote write protocol.
 
 VictoriaTraces only supports integration with [OpenTelemetry](https://docs.victoriametrics.com/victoriatraces/data-ingestion/).
 
@@ -79,6 +102,8 @@ Each database has its own list of supported ingestion protocols. These are the m
 VictoriaTraces only supports integration with [OpenTelemetry](https://docs.victoriametrics.com/victoriatraces/data-ingestion/).
 
 ## Native Ingestion
+
+// TODO: READINESS: VTagent
 
 VictoriaStack supports variety of ingestion protocols, that makes it easy to integrate with existing installations.
 But for achieving cost-efficiency, high throughput, reliable on-disk buffering, replication and traffic compression
