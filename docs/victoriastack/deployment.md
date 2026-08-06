@@ -67,8 +67,6 @@ simple to run and to troubleshoot.
 
 <br>
 
-
-
 The scheme works the same way for single-node and for clustered installations, within one availability zone or across
 several. Run the stateless components in more than one replica as well: vmagent, vlagent, vmauth, vmalert, and
 Alertmanager.
@@ -110,7 +108,25 @@ See detailed instructions on downloading and running binaries:
 ### Docker
 
 VictoriaStack components Docker images can be found on [Docker Hub](https://hub.docker.com/u/victoriametrics) and 
-[Quay](https://quay.io/repository/victoriametrics/victoria-metrics?tab=tags).
+[Quay](https://quay.io/organization/victoriametrics).
+
+Every database keeps its data in a directory inside the container, so mount a volume for it. Without a volume the data
+stays in the container's writable layer and disappears together with the container:
+
+```sh
+docker run -it --rm -p 8428:8428 -v ./victoria-metrics-data:/victoria-metrics-data \
+  victoriametrics/victoria-metrics:latest
+
+docker run -it --rm -p 9428:9428 -v ./victoria-logs-data:/victoria-logs-data \
+  victoriametrics/victoria-logs:latest
+
+docker run -it --rm -p 10428:10428 -v ./victoria-traces-data:/victoria-traces-data \
+  victoriametrics/victoria-traces:latest
+```
+
+Each command runs a single-node database and publishes its HTTP port: 8428 for metrics, 9428 for logs, 10428 for traces.
+Both the API and the built-in vmui are served on that port. Pin an explicit image tag instead of `latest`, so that
+pulling an image never turns into an unplanned [upgrade](#upgrades).
 
 ### Docker Compose
 
@@ -126,9 +142,9 @@ Pick the entry point that matches how you manage Kubernetes:
 - **[k8s-stack chart](#helm-charts)**: the fastest way to a complete stack. One Helm release brings the operator, the
   databases, agents, alerting rules, Grafana, and the scrape configs for the cluster itself. Every component is still
   configured through its custom resource, under the `spec` key in the chart values.
-- **[Operator](#victoriametrics-operator)**: install the operator alone and write the custom resources yourself. This
-  suits teams that keep manifests in Git and apply them with ArgoCD, Flux, or similar tooling, and installations that
-  need a layout the chart doesn't cover.
+- **[Operator](#victoriametrics-operator)**: install only operator and write the custom resources yourself. The manifests
+  can be kept in Git and applied with ArgoCD, Flux, or similar tooling. It fits better for installations that need a layout
+  the chart doesn't cover.
 - **Single-component charts**: use [one of the other charts](https://docs.victoriametrics.com/helm/), such as
   `victoria-metrics-single` or `victoria-logs-single`, when you need one component rather than the whole stack.
 
