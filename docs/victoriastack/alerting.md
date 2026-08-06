@@ -83,6 +83,12 @@ groups:
           description: 'Too big number of errors and warnings on pod {{ index .Labels "k8s.pod.name" }} during the last 5 minutes: {{$value}}'
 ```
 
+The `type` field selects the query language for the whole group. Supported values are `prometheus` for MetricsQL and
+PromQL (the default), `vlogs` for LogsQL, and `graphite`. Use `-rule.defaultRuleType` to change the default for all
+groups. Rules for VictoriaTraces also use `type: vlogs`, because VictoriaTraces queries are written in LogsQL.
+See rule examples for [logs](https://docs.victoriametrics.com/victorialogs/vmalert/)
+and [traces](https://docs.victoriametrics.com/victoriatraces/vmalert/).
+
 See production-ready examples of alerting rules for VictoriaMetrics monitoring [here](https://github.com/VictoriaMetrics/VictoriaMetrics/tree/master/deployment/docker/rules).
 
 ## Datasource
@@ -107,10 +113,18 @@ flowchart LR
         VM --> VA2
     end
 
+    subgraph Traces
+        direction LR
+        VT["VictoriaTraces"]
+        VA3["vmalert<br><code>rule.defaultRuleType=vlogs<br>datasource.url=VictoriaTraces</code>"]
+        VT --> VA3
+    end
+
     AM["Alertmanager"]
 
     VA1 -->|"alerts"| AM
     VA2 -->|"alerts"| AM
+    VA3 -->|"alerts"| AM
 ```
 
 vmalert will periodically execute the rules against the configured datasource and send notifications to Alertmanager 
@@ -147,7 +161,10 @@ See more details in [vmalert docs](https://docs.victoriametrics.com/victoriametr
 
 ## High Availability
 
-For High Availability run multiple identically configured vmalert instances. 
+One vmalert instance is enough for most installations. vmalert is stateless, it restarts within a few seconds, and a
+restarted instance [restores the state of its alerts](https://docs.victoriametrics.com/victoriametrics/vmalert/#alerts-state-on-restarts).
+
+Run two or more identically configured instances when alerting has to survive the loss of a single vmalert:
 
 ```mermaid
 flowchart LR
@@ -170,12 +187,19 @@ flowchart LR
     V2 -->|"alerts"| A
  ```
 
-It means all of them will execute the same rules **doubling the resource usage on datasource**, and send alert notifications to multiple configured 
-Alertmanagers. See more details in [vmalert docs](https://docs.victoriametrics.com/victoriametrics/vmalert/#ha-vmalert).
+Every instance evaluates the same rules, writes the results to the same destinations, and notifies same
+Alertmanagers. Two things to keep in mind:
 
-Please note, vmalert is stateless and its reload usually doesn't take more than a few seconds. A restarted vmalert
-can also [restore the state of its alerts](https://docs.victoriametrics.com/victoriametrics/vmalert/#alerts-state-on-restarts).
-Deploying multiple vmalert instances doesn't usually justify extra resource usage on datasource.
+* **The load on the datasource grows with the number of instances**, since each replica queries it for every rule.
+* **Keep the configuration of the instances identical.** Alertmanager deduplicates alerts with identical labels, so
+  instances configured differently produce separate alerts instead of duplicates of the same one.
+
+When the instances persist the alert state or evaluate recording rules, that is when `-remoteWrite.url` is set,
+configure [deduplication](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#deduplication)
+on the storage as well. Set `-dedup.minScrapeInterval` equal to vmalert's `-evaluationInterval`, so that the identical
+results written by every instance collapse into a single data point.
+
+See more details in [vmalert docs](https://docs.victoriametrics.com/victoriametrics/vmalert/#ha-vmalert).
 
 ## Scalability
 
