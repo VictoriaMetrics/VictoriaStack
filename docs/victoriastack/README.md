@@ -8,24 +8,23 @@
 
 <br>
 
-Each database is a separate application, specialized on its own signal. But all three share the same design philosophy,
+Each database is a separate application, specialized for its own signal. All three share the same design philosophy,
 operational model, and ecosystem.
 
-The stack has no bundled all-in-one UI. [Grafana](http://localhost:1313/victoriastack/ui/#grafana)
-or [Perses](http://localhost:1313/victoriastack/ui/#perses)
-let building dashboards or correlating signals for all three, and every database ships with a
-built-in [vmui](http://localhost:1313/victoriastack/ui/#vmui) for ad-hoc exploration.
+The stack has no bundled all-in-one UI. Use [Grafana](http://localhost:1313/victoriastack/ui/#grafana)
+or [Perses](http://localhost:1313/victoriastack/ui/#perses) to build dashboards and correlate all three signals.
+Every database also ships with a built-in [vmui](http://localhost:1313/victoriastack/ui/#vmui) for ad-hoc exploration.
 
 ## Why VictoriaStack?
 
-VictoriaStack software is built on three core principles: **simplicity, reliability, and efficiency**.
-It is easy to run and maintain, it fits well in home labs and can be reliably scaled to large production
-environments. Each of the databases was heavily battle-tested in production environments.
+VictoriaStack is built on three core principles: **simplicity, reliability, and efficiency**.
+It is easy to run and maintain. It fits well in home labs and scales reliably to large production environments,
+and each database is battle-tested in production.
 
-The stack is focusing on what matters most for each signal. VictoriaMetrics is optimized
-for time series workload, while VictoriaLogs design and architecture are optimized for wide events (logs and traces).
-The separation of storage backends allows keeping solutions simple, efficient, independent, and fine-tuned for each
-signal. No schemas or indexes designs are required - just push data and let VictoriaStack take care of it.
+The stack focuses on what matters most for each signal. VictoriaMetrics is optimized for time series workloads,
+while VictoriaLogs is optimized for wide events (logs and traces). Separate storage backends keep each database
+simple, efficient, independent, and fine-tuned for its signal. No schema or index design is required: push the data
+and VictoriaStack takes care of the rest.
 
 VictoriaStack [accepts the most popular ingestion protocols](http://localhost:1313/victoriastack/ingestion/):
 
@@ -34,12 +33,12 @@ VictoriaStack [accepts the most popular ingestion protocols](http://localhost:13
 * **Traces**: OpenTelemetry.
 
 VictoriaMetrics serves a Prometheus-compatible API, and VictoriaTraces serves Jaeger- and Tempo-compatible APIs.
-Existing Grafana dashboards, alerting and recording rules keep working.
+Existing Grafana dashboards, alerting rules, and recording rules keep working.
 
-The stack supports multitenancy, alerting, out-of-order backfilling, efficient compression, sane defaults for simplified
-setup, wide community and support.
+The stack supports multitenancy, alerting, out-of-order backfilling, efficient compression, and sane defaults
+that simplify the setup.
 
-VictoriaStack is the best choice if you want to **own your observability stack**, build a **reliable**,
+Choose VictoriaStack to **own your observability stack** and build a **reliable**,
 **cost-efficient multitenant platform** ready for future growth.
 
 > Already running another observability stack? See [Comparisons](http://localhost:1313/victoriastack/comparisons/)
@@ -48,14 +47,14 @@ VictoriaStack is the best choice if you want to **own your observability stack**
 
 ## Architecture
 
-The stack architecture includes all three databases as independent installations
-and [vmauth](http://localhost:1313/victoriametrics/vmauth)
-as a single entrypoint that routes and loads balances requests:
+VictoriaStack runs the three databases as independent installations,
+with [vmauth](http://localhost:1313/victoriametrics/vmauth) as a single entrypoint that routes and load balances
+requests:
 
 ![readme-stack.webp](readme-stack.png)
 {width="700"}
 
-All three databases share the same component model. Each of them runs either as a single binary, or as a cluster
+All three databases share the same component model. Each of them runs either as a single binary or as a cluster
 of three component types:
 
 ```mermaid
@@ -92,17 +91,17 @@ flowchart LR
     VQ --> Clients
 ```
 
-* stateless **insert** - processes incoming data and shards it among storages;
-* stateful **storage** - efficiently stores and manages data;
-* stateless **select** - processes incoming read queries and returns results.
+* stateless **insert**: processes incoming data and shards it among storages;
+* stateful **storage**: efficiently stores and manages data;
+* stateless **select**: processes incoming read queries and returns results.
 
-**insert** and **select** components need to know only about **storages**, they don't know about each other.
-And **storages** don't know about each other, **inserts** or **selects**. This allows building flexible topologies
-with sub-clusters, where **inserts** or **selects** are connected only to a subset of **storages**.
+**insert** and **select** components need to know only about **storages**. They don't know about each other, and
+**storages** don't know about **inserts**, **selects**, or other **storages**. This design allows flexible topologies
+with sub-clusters, where **inserts** or **selects** connect only to a subset of **storages**.
 
-Cluster architecture doesn't require any additional services: no extra caches, databases, compactors, etc. We only
-recommend using [vmauth for load balancing](http://localhost:1313/victoriametrics/vmauth/#load-balancing) for stateless
-components, or any other load balancer of your choice.
+Cluster architecture doesn't require any additional services: no extra caches, databases, or compactors. For stateless
+components we recommend [vmauth as a load balancer](http://localhost:1313/victoriametrics/vmauth/#load-balancing),
+or any other load balancer of your choice.
 
 ## What's in the stack
 
@@ -115,7 +114,7 @@ components, or any other load balancer of your choice.
 | **[Visualization](http://localhost:1313/victoriastack/ui/)**                            | [Grafana](http://localhost:1313/victoriastack/ui/#grafana) and [Perses](http://localhost:1313/victoriastack/ui/#perses) for unified observability and dashboarding. Built-in [vmui](http://localhost:1313/victoriastack/ui/#vmui) for ad-hoc exploration.                          |
 | **[Alerting](http://localhost:1313/victoriastack/alerting/)**                           | [vmalert](https://docs.victoriametrics.com/victoriametrics/vmalert/) integrated with [Alertmanager](http://localhost:1313/victoriastack/alerting/#alertmanager) for rules evaluation and dispatching notifications                                                                 |
 | **[Anomaly detection]()**                                                               | [vmanomaly]() ...                                                                                                                                                                                                                                                                  |
-| **Extened support via [Enterprise]()**                                                  | [Long Term Support(LTS) releases](), consulting, architectural guidance, solutions engineering.                                                                                                                                                                                    |
+| **Extended support via [Enterprise]()**                                                  | [Long Term Support(LTS) releases](), consulting, architectural guidance, solutions engineering.                                                                                                                                                                                    |
 
 // TODO: add links to stack components
 
@@ -126,18 +125,17 @@ components, or any other load balancer of your choice.
 > and try publicly running installations fed
 > with [OpenTelemetry Astronomy Shop demo](https://github.com/open-telemetry/opentelemetry-demo) data.
 
-VictoriaStack can be deployed on bare metal as binaries, as docker containers, using helm charts, or Kubernetes
-operator.
-See more detailed [deployment docs](http://localhost:1313/victoriastack/deployment/).
+You can deploy VictoriaStack as binaries on bare metal, as docker containers, or in Kubernetes via Helm charts and the
+operator. See the [deployment docs](http://localhost:1313/victoriastack/deployment/) for details.
 
-In the sections below, we'll go through examples of deploying VictoriaStack via docker compose - makes it easy to run 
-and experiment with locally. You will need [Docker](https://docs.docker.com/get-started/get-docker/)
+The sections below deploy VictoriaStack with docker compose, the easiest way to run and experiment with it locally.
+You will need [Docker](https://docs.docker.com/get-started/get-docker/)
 with [Compose v2](https://docs.docker.com/compose/) and `git`.
 
 ### Single-node version
 
-The simplest version of the stack would be to run VictoriaMetrics, VictoriaLogs and VictoriaTraces as single-node
-deployments. Run the stack locally with [otel-single-node-compose.yml](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-single-node-compose.yml)
+The simplest setup runs VictoriaMetrics, VictoriaLogs, and VictoriaTraces as single-node deployments.
+Start it locally with the [otel-single-node-compose.yml](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-single-node-compose.yml)
 docker compose file:
 
 ```sh
@@ -145,20 +143,20 @@ git clone https://github.com/VictoriaMetrics/VictoriaStack.git && cd VictoriaSta
 make otel-single-up
 ```
 
-> Note: the Docker Compose environment is very much simplified for demonstration purposes -
-> it is **not intended for production use**.
+> Note: this Docker Compose environment is simplified for demonstration purposes.
+> It is **not intended for production use**.
 
-The compose command will start:
+The command starts:
 
-- Generator of telemetry + OpenTelemetry collector;
-- Single-node versions of VictoriaMetrics, VictoriaLogs, VictoriaTraces for storing and querying signals;
-- vmalert for executing alerting rules;
+- a telemetry generator with an OpenTelemetry collector;
+- single-node VictoriaMetrics, VictoriaLogs, and VictoriaTraces for storing and querying signals;
+- vmalert for evaluating alerting rules;
 - Grafana for visualizing signals;
-- vmauth as a single entrypoint, that will authorize and route requests to the appropriate VictoriaStack component.
+- vmauth as a single entrypoint that authorizes and routes requests to the appropriate component.
 
 ![readme-compose-single.webp](readme-compose-single.png)
 
-Once running for a few minutes, the following links will be available:
+After a few minutes, the following links are available:
 
 - Visit [VictoriaMetrics UI - http://localhost:8427/metrics/select/vmui](http://localhost:8427/metrics/select/vmui/?#/cardinality)
   to explore the stored metrics or [run a query to plot charts](http://localhost:8427/metrics/select/vmui/#/?g0.range_input=15m&g0.relative_time=last_15_minutes&g0.tab=0&g0.expr=sum%28rate%28vm_http_requests_total%29%29+by+%28path%29+%3E+0):
@@ -181,15 +179,15 @@ Once running for a few minutes, the following links will be available:
   ![readme-grafana-demo.webp](readme-grafana-demo.png)
   {width="500"}
 
-While running, the generator will continue pushing telemetry signals via OpenTelemetry collector to the stack, and
-vmalert will execute alerting rules. To stop the stack, run the following command:
+The generator keeps pushing telemetry signals to the stack through the OpenTelemetry collector, and vmalert keeps
+evaluating alerting rules. To stop the stack, run:
 
 ```sh
 make otel-single-down
 ```
 
-The single-node version of the stack is the best and simplest to start with, experiment and learn how components are
-interconnected. To see how to scale stack horizontally - see the [clustered version](#clustered-version) of the stack.
+The single-node version is the simplest way to start experimenting and to learn how the components fit together.
+To scale the stack horizontally, see the [clustered version](#clustered-version).
 
 ### Clustered version
 
@@ -201,17 +199,17 @@ git clone https://github.com/VictoriaMetrics/VictoriaStack.git && cd VictoriaSta
 make otel-cluster-up
 ```
 
-It runs the same setup as the [single-node version](#single-node-version), but each database is deployed in a clustered
-version, represented by three independently scalable types of components: insert, select and storage.
+It runs the same setup as the [single-node version](#single-node-version), but each database runs as a cluster of three
+independently scalable components: insert, select, and storage.
 In this topology, vmauth also balances requests among insert and select components.
 
 ![readme-compose-cluster.webp](readme-compose-cluster.png)
 
-vmauth routes the requests, so the UI links stay exactly
+vmauth routes the requests, so the UI links stay
 the [same as in the single-node version](#single-node-version).
 
-While running, the generator will continue pushing telemetry signals via OpenTelemetry collector to the stack, and
-vmalert will execute alerting rules. To stop the stack, run the following command:
+The generator keeps pushing telemetry signals to the stack through the OpenTelemetry collector, and vmalert keeps
+evaluating alerting rules. To stop the stack, run:
 
 ```sh
 make otel-cluster-down
@@ -219,7 +217,7 @@ make otel-cluster-down
 
 ## Scaling
 
-VictoriaMetrics, VictoriaLogs and VictoriaTraces are designed to be highly scalable and simple to operate:
+VictoriaMetrics, VictoriaLogs, and VictoriaTraces are highly scalable and simple to operate:
 
 - one VictoriaMetrics cluster can handle thousands of tenants, billions of time series, millions of samples per second,
   thousands of read requests per second;
@@ -230,9 +228,9 @@ VictoriaMetrics, VictoriaLogs and VictoriaTraces are designed to be highly scala
 [**inserts**, **selects** and **storages**](#architecture) can be scaled independently:
 
 * add more **insert** replicas to increase ingestion throughput;
-* add more **select** replicas to increase query throughput.
-* add more **storage** shards to increase overall performance and overcome physical hardware limitations like CPU, Mem,
-  IO limits, or filesystem capacity.
+* add more **select** replicas to increase query throughput;
+* add more **storage** shards to increase overall performance and overcome hardware limits like CPU, memory, IO,
+  or filesystem capacity.
 
 ## Retention and storage
 
@@ -247,7 +245,7 @@ configured retention:
 
 <br>
 
-Disk usage depends on your data and its entropy. Estimate it with the capacity planning docs
+Disk usage depends on your data and on how well it compresses. Estimate it with the capacity planning docs
 for [VictoriaMetrics](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#capacity-planning)
 and [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/#capacity-planning).
 
