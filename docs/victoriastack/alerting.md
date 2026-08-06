@@ -31,20 +31,23 @@ The following things are required to start using alerting:
 2. A datasource URL to execute the rules against.
 3. Alertmanager service URL to send notifications to.
 
-> TODO: Add a link to docker-compose example
-
 vmalert is a single binary service that can be started with the following command:
 ```sh
 ./path/to/vmalert \
     -rule=alert.rules \
     -datasource.url=http://victoriametrics:8428 \
-    -notifier.url=http://alertmanager:9093
+    -notifier.url=http://alertmanager:9093 \
+    -remoteWrite.url=http://victoriametrics:8428 \
+    -remoteRead.url=http://victoriametrics:8428
 ```
 
 * `-rule` - path to the file with rules configuration. Supports wildcards and HTTP URLs. S3 and GCS paths are available
   in Enterprise.
 * `-datasource.url` - URL to query for rules evaluation.
 * `-notifier.url` - Alertmanager URL to send notifications to.
+* `-remoteWrite.url` - URL to write the results of [recording rules](#rules) and the state of alerts to. Required for
+  recording rules, and for keeping the alert state across restarts.
+* `-remoteRead.url` - URL to restore the alert state from on startup.
 
 > See more detailed documentation in [vmalert Quick Start docs](https://docs.victoriametrics.com/victoriametrics/vmalert/#quickstart).
 
@@ -54,9 +57,12 @@ With the configuration above, vmalert will periodically evaluate rules read from
 The key features of vmalert are:
 * Supports Prometheus [alerting rules syntax](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#defining-alerting-rules),
   making it easier to migrate from a Prometheus stack.
-* Supports [recording rules](https://docs.victoriametrics.com/victoriametrics/vmalert/#recording-rules), allowing you to convert query results, logs and traces into metrics.
+* Supports [recording rules](https://docs.victoriametrics.com/victoriametrics/vmalert/#recording-rules), allowing you to
+  convert query results, logs and traces into metrics. Recording rules write their results to `-remoteWrite.url`.
 * [Hot reload](https://docs.victoriametrics.com/victoriametrics/vmalert/#hot-config-reload) of configuration rules from S3, URL, or local file system.
-* Persists [alert state across restarts](https://docs.victoriametrics.com/victoriametrics/vmalert/#alerts-state-on-restarts).
+* Persists [alert state across restarts](https://docs.victoriametrics.com/victoriametrics/vmalert/#alerts-state-on-restarts)
+  when `-remoteWrite.url` and `-remoteRead.url` are set. Without them vmalert keeps the state in memory only, and a
+  restart resets all active alerts.
 * Supports recording and alerting rules backfilling (`replay`). See [these docs](https://docs.victoriametrics.com/victoriametrics/vmalert/#rules-backfilling) to learn more.
 
 ## Rules
@@ -167,8 +173,8 @@ flowchart LR
 It means all of them will execute the same rules **doubling the resource usage on datasource**, and send alert notifications to multiple configured 
 Alertmanagers. See more details in [vmalert docs](https://docs.victoriametrics.com/victoriametrics/vmalert/#ha-vmalert).
 
-Please note, vmalert is stateless and its reload usually doesn't take more than a few seconds. Even if vmalert is restarted,
-it can [quickly restore its state](https://docs.victoriametrics.com/victoriametrics/vmalert/#alerts-state-on-restarts).
+Please note, vmalert is stateless and its reload usually doesn't take more than a few seconds. A restarted vmalert
+can also [restore the state of its alerts](https://docs.victoriametrics.com/victoriametrics/vmalert/#alerts-state-on-restarts).
 Deploying multiple vmalert instances doesn't usually justify extra resource usage on datasource.
 
 ## Scalability
