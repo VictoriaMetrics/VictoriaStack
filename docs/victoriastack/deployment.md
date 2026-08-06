@@ -68,9 +68,18 @@ VictoriaStack can be deployed on Kubernetes in two ways:
 With [VictoriaMetrics K8s Stack](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/) chart you can install
 and upgrade a complete VictoriaStack in Kubernetes via [Helm](https://helm.sh/).
 
-With this chart installed, you will get all required resources to collect metrics, logs and traces, run alerting,
-Grafana for visualization. In the chart settings you can configure every component separately, choosing what you 
-actually need.
+By default, the chart installs everything needed to collect metrics, evaluate alerting rules, and visualize the data in
+Grafana. Logs and traces storage are disabled by default and can be enabled it in the chart values:
+
+```yaml
+# single-node deployments; use vlcluster and vtcluster for the clustered versions
+vlsingle:
+  enabled: true
+vtsingle:
+  enabled: true
+```
+
+In the chart settings you can configure every component separately, choosing what you actually need.
 
 See the full list of [available charts](https://docs.victoriametrics.com/helm/) for the rest of components.
 
@@ -93,10 +102,13 @@ like S3 for storing backups:
 - [VictoriaLogs backup and restore](https://docs.victoriametrics.com/victorialogs/#backup-and-restore)
 - [VictoriaTraces backup and restore](https://docs.victoriametrics.com/victoriatraces/#backup-and-restore)
 
-Besides snapshots API, VictoriaMetrics has more advanced tools for backup management: [vmbackup](https://docs.victoriametrics.com/victoriametrics/vmbackup/),
-[vmrestore](https://docs.victoriametrics.com/victoriametrics/vmrestore/) and [vmbackupmanager](https://docs.victoriametrics.com/victoriametrics/vmbackupmanager/).
-With these tools, it is possible to schedule and automate backups management without additional tooling. These tools
-are also incorportated into helm charts and operator.
+Besides the snapshots API, VictoriaMetrics has more advanced tools for backup management:
+[vmbackup](https://docs.victoriametrics.com/victoriametrics/vmbackup/) creates backups and
+[vmrestore](https://docs.victoriametrics.com/victoriametrics/vmrestore/) restores them.
+[vmbackupmanager](https://docs.victoriametrics.com/victoriametrics/vmbackupmanager/) adds scheduling and backup
+retention, so backups need no additional tooling. It is a part of
+the [Enterprise package](https://docs.victoriametrics.com/victoriametrics/enterprise/), while vmbackup and vmrestore
+are Apache 2 licensed. All three tools are incorporated into Helm charts and the operator.
 
 The same tooling is only about to come to VictoriaLogs and VictoriaTraces - see progress in [issue #123](https://github.com/VictoriaMetrics/VictoriaLogs/issues/123) for more details. 
 
@@ -112,8 +124,8 @@ constantly updated and maintained by the VictoriaMetrics team.
 
 The same goes for the alerting. You can find the list of recommended alerting rules to run with the stack below:
 - [VictoriaMetrics rules](https://github.com/VictoriaMetrics/VictoriaMetrics/tree/master/deployment/docker/rules)
-- [VictoriaLogs rules](https://github.com/VictoriaMetrics/Victorialogs/tree/master/deployment/docker/rules)
-- [VictoriaTraces rules](https://github.com/VictoriaMetrics/Victoriatraces/tree/master/deployment/docker/rules)
+- [VictoriaLogs rules](https://github.com/VictoriaMetrics/VictoriaLogs/tree/master/deployment/docker/rules)
+- [VictoriaTraces rules](https://github.com/VictoriaMetrics/VictoriaTraces/tree/master/deployment/docker/rules)
 
 Alerting rules are closely interconnected with the Grafana dashboards, providing transparent monitoring experience for 
 the end-users. 
