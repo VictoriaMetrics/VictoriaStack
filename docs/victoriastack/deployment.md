@@ -189,6 +189,35 @@ The operator also documents high availability
 for [every individual resource](https://docs.victoriametrics.com/operator/resources/#high-availability) it manages,
 including vmagent, vlagent, vmauth, vmalert, and Alertmanager.
 
+## Upgrades
+
+Upgrades and downgrades are safe unless the release notes say otherwise. Skipping versions is safe too. Check the
+changelog before upgrading: [metrics](https://docs.victoriametrics.com/victoriametrics/changelog/),
+[logs](https://docs.victoriametrics.com/victorialogs/changelog/),
+[traces](https://docs.victoriametrics.com/victoriatraces/changelog/). The databases are released separately, so
+upgrade each of them on its own schedule.
+
+Upgrading a single-node database takes three steps:
+
+1. Send `SIGINT` to the process to stop it gracefully.
+2. Wait until the process exits. This can take a few seconds.
+3. Start the new version with the same data directory and flags.
+
+Most agents keep buffering data while a database restarts, so nothing is lost during the gap.
+See the detailed docs on upgrading
+[VictoriaMetrics](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#how-to-upgrade-victoriametrics),
+[VictoriaLogs](https://docs.victoriametrics.com/victorialogs/#upgrading), [VictoriaTraces](https://docs.victoriametrics.com/victoriatraces/#upgrading).
+
+In Kubernetes, the operator manages the restarts. Pin the version of every component
+via [`spec.image.tag`](https://docs.victoriametrics.com/operator/resources/#managing-versions-of-vm), and the operator
+rolls out the change. Multi-zone installations managed
+by [VMDistributed or VLDistributed](#high-availability-in-kubernetes) upgrade one zone at a time, so the remaining
+zones keep serving traffic.
+
+Teams that prefer rare, low-risk updates can follow the long-term support release lines instead of the latest release.
+LTS releases are published for VictoriaMetrics only and are part of the Enterprise package,
+see [Long-term support releases](http://localhost:1313/victoriastack/enterprise/#long-term-support-releases).
+
 ## Backups
 
 Backups in VictoriaStack are implemented using data snapshots - an instanteneous mechanism for making a copy of the data
@@ -203,7 +232,7 @@ Besides the snapshots API, VictoriaMetrics has more advanced tools for backup ma
 [vmrestore](https://docs.victoriametrics.com/victoriametrics/vmrestore/) restores them.
 [vmbackupmanager](https://docs.victoriametrics.com/victoriametrics/vmbackupmanager/) adds scheduling and backup
 retention, so backups need no additional tooling. It is a part of
-the [Enterprise package](https://docs.victoriametrics.com/victoriametrics/enterprise/), while vmbackup and vmrestore
+the [Enterprise package](http://localhost:1313/victoriastack/enterprise/), while vmbackup and vmrestore
 are Apache 2 licensed. All three tools are incorporated into Helm charts and the operator.
 
 The same tooling is only about to come to VictoriaLogs and VictoriaTraces - see progress in [issue #123](https://github.com/VictoriaMetrics/VictoriaLogs/issues/123) for more details. 
