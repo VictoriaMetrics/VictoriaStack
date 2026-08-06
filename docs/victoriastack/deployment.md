@@ -118,16 +118,26 @@ Docker Compose examples for running VictoriaStack components can be found on [Vi
 
 ## Kubernetes
 
-VictoriaStack can be deployed on Kubernetes in two ways:
+[VictoriaMetrics operator](#victoriametrics-operator) runs every component of the stack through Kubernetes custom resources,
+and the [k8s-stack chart](#helm-charts) installs the operator together with those resources. 
 
-- [Helm Charts](http://localhost:1313/victoriastack/deployment/#helm-charts): install and upgrade a complete VictoriaStack using [Helm](https://helm.sh/)
-- [VictoriaMetrics Kubernetes Operator](http://localhost:1313/victoriastack/deployment/#victoriametrics-operator): manage VictoriaStack components 
-  using Kubernetes-native custom resources.
+Pick the entry point that matches how you manage Kubernetes:
+
+- **[k8s-stack chart](#helm-charts)**: the fastest way to a complete stack. One Helm release brings the operator, the
+  databases, agents, alerting rules, Grafana, and the scrape configs for the cluster itself. Every component is still
+  configured through its custom resource, under the `spec` key in the chart values.
+- **[Operator](#victoriametrics-operator)**: install the operator alone and write the custom resources yourself. This
+  suits teams that keep manifests in Git and apply them with ArgoCD, Flux, or similar tooling, and installations that
+  need a layout the chart doesn't cover.
+- **Single-component charts**: use [one of the other charts](https://docs.victoriametrics.com/helm/), such as
+  `victoria-metrics-single` or `victoria-logs-single`, when you need one component rather than the whole stack.
 
 ### Helm Charts
 
 With [VictoriaMetrics K8s Stack](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/) chart you can install
-and upgrade a complete VictoriaStack in Kubernetes via [Helm](https://helm.sh/).
+and upgrade a complete VictoriaStack in Kubernetes via [Helm](https://helm.sh/). Alongside the VictoriaStack components
+the chart installs the operator, Grafana, kube-state-metrics, and node-exporter as dependency charts. Each of them can be
+disabled in the values, for example to reuse a Grafana or an operator you already run.
 
 By default, the chart installs everything needed to collect metrics, evaluate alerting rules, and visualize the data in
 Grafana. Logs and traces storage are disabled by default and can be enabled it in the chart values:
@@ -147,10 +157,15 @@ See the full list of [available charts](https://docs.victoriametrics.com/helm/) 
 
 ### VictoriaMetrics Operator
 
-[VictoriaMetrics Kubernetes Operator](https://docs.victoriametrics.com/operator/) makes running VictoriaMetrics 
-applications on top of Kubernetes as easy as possible while preserving Kubernetes-native configuration options.
-It allows you to manage Victoria Metrics components in Kubernetes or OpenShift clusters in a declarative style following
-[GitOps](https://www.redhat.com/en/topics/devops/what-is-gitops) and [IaC](https://en.wikipedia.org/wiki/Infrastructure_as_code) concepts.
+[VictoriaMetrics Kubernetes Operator](https://docs.victoriametrics.com/operator/) manages VictoriaStack components in
+Kubernetes and OpenShift clusters via custom resources. Describe the desired state via
+[resources](https://docs.victoriametrics.com/operator/resources/) such as `VMCluster`, `VLSingle`, or `VMAgent`, and the
+operator will create and update the installation behind it.
+
+For metrics, operator picks up scrape configuration on its own: it discovers `VMServiceScrape` and similar resources, and
+[converts existing prometheus-operator objects](https://docs.victoriametrics.com/operator/integrations/prometheus/#objects-conversion)
+such as `ServiceMonitor` into their VictoriaMetrics equivalents. Existing Prometheus setups keep working after the
+migration.
 
 See [Quick Start instructions](https://docs.victoriametrics.com/operator/quick-start/) for the operator.
 
