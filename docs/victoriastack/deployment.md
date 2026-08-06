@@ -18,6 +18,37 @@ in different environments:
 
 Choose what suits your needs best.
 
+## Single-node or cluster
+
+Every database has a single-node and a clustered version, and both are Apache 2 licensed. You can mix the modes: for example, run clustered
+VictoriaMetrics next to single-node VictoriaLogs.
+
+|                   | Single-node                                                | Cluster                                                                                                                                                                                                                  |
+|-------------------|------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **What runs**     | one binary per database                                    | separate insert, storage, and select components                                                                                                                                                                          |
+| **How to scale**  | vertically: add CPU, RAM, and disk                         | horizontally: add insert/select replicas and storage shards                                                                                                                                                              |
+| **Operations**    | one process to run, upgrade, and back up                   | more components, each scaled and upgraded independently                                                                                                                                                                  |
+| **Multitenancy**  | VictoriaLogs and VictoriaTraces only                       | all three databases                                                                                                                                                                                                      |
+| **Docs**          | [metrics](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/), [logs](https://docs.victoriametrics.com/victorialogs/), [traces](https://docs.victoriametrics.com/victoriatraces/) | [metrics](https://docs.victoriametrics.com/victoriametrics/cluster-victoriametrics/), [logs](https://docs.victoriametrics.com/victorialogs/cluster/), [traces](https://docs.victoriametrics.com/victoriatraces/cluster/) |
+
+<br>
+
+**Start with the single-node version.** It handles workloads far larger than most teams expect, and it keeps
+the setup simple. A single node scales vertically, so the first answer to growth is a bigger machine. High availability
+can be achieved by running multiple nodes, [replicating traffic](http://localhost:1313/victoriastack/ingestion/#native-ingestion)
+to each node and load balancing read requests between them.
+
+Switch a database to the clustered version when:
+
+- one machine can no longer keep up with ingestion or queries, or the data no longer fits its disk;
+- you need [multitenancy](http://localhost:1313/victoriastack/multitenancy/) in VictoriaMetrics, which the
+  single-node version doesn't support.
+
+The clustered versions use the same three component types in every database, named after their signal:
+`vminsert`, `vmselect`, and `vmstorage` for metrics, `vlinsert`, `vlselect`, and `vlstorage` for logs,
+`vtinsert`, `vtselect`, and `vtstorage` for traces.
+See [Architecture](http://localhost:1313/victoriastack/#architecture) for what each component does.
+
 ## Local / Bare Metal
 
 All VictoriaStack components have extensive Quick Start instructions for running in various environments:
