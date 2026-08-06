@@ -11,10 +11,9 @@ tags:
   - traces
 ---
 
-VictoriaStack consists of multiple components that can be deployed together or separately, in many different ways and
-in different environments:
-- [Local or bare metal](#local--bare-metal) deployments require more actions to compose components together but provide the most flexibility.
-- [Kubernetes deployments](#kubernetes) are easier to set up and run thanks to helm charts and operator.
+You can deploy the components of VictoriaStack together or separately, in many different ways and environments:
+- [Local or bare metal](#local--bare-metal) deployments take more work to compose, but give you the most flexibility.
+- [Kubernetes](#kubernetes) deployments are easier to set up and run thanks to Helm charts and the operator.
 
 Choose what suits your needs best.
 
@@ -79,27 +78,25 @@ See [high availability in Kubernetes](#high-availability-in-kubernetes).
 
 ## Local / Bare Metal
 
-All VictoriaStack components have extensive Quick Start instructions for running in various environments:
+Every VictoriaStack component has extensive Quick Start instructions for running in various environments:
 - [VictoriaMetrics Quick Start](https://docs.victoriametrics.com/victoriametrics/quick-start/) (metrics)
 - [VictoriaLogs Quick Start](https://docs.victoriametrics.com/victorialogs/quick-start/) (logs)
 - [VictoriaTraces Quick Start](https://docs.victoriametrics.com/victoriatraces/quick-start/) (traces)
 - [vmauth Quick Start](https://docs.victoriametrics.com/victoriametrics/vmauth/) (authentication, routing, load balancing)
 - [vmalert Quick Start](https://docs.victoriametrics.com/victoriametrics/vmalert/#quickstart) (alerting)
 
-See references to the specific documentation in sections below.
-
 ### Binary
 
-VictoriaStack components binaries can be downloaded from the GitHub releases page:
-- [VictoriaMetrics relases](https://github.com/VictoriaMetrics/VictoriaMetrics/releases)
-- [VictoriaLogs relases](https://github.com/VictoriaMetrics/VictoriaLogs/releases)
-- [VictoriaTraces relases](https://github.com/VictoriaMetrics/VictoriaTraces/releases)
+Download the binaries from the GitHub releases pages:
+- [VictoriaMetrics releases](https://github.com/VictoriaMetrics/VictoriaMetrics/releases)
+- [VictoriaLogs releases](https://github.com/VictoriaMetrics/VictoriaLogs/releases)
+- [VictoriaTraces releases](https://github.com/VictoriaMetrics/VictoriaTraces/releases)
 
-On releases page you can also find `vmutils` and `vlutils` packages that contain components like
+The releases pages also contain the `vmutils` and `vlutils` packages with components like
 [vmauth](https://docs.victoriametrics.com/vmauth/), [vmalert](https://docs.victoriametrics.com/vmalert/),
 [vmagent](https://docs.victoriametrics.com/vmagent/), [vlagent](https://docs.victoriametrics.com/victorialogs/vlagent/), etc.
 
-When downloading the archives with binaries, remember to choose architecture that matches your environment.
+Choose the archive that matches the operating system and CPU architecture of your machine.
 See detailed instructions on downloading and running binaries:
 - [VictoriaMetrics: try it locally](https://docs.victoriametrics.com/victoriametrics/quick-start/#try-it-locally)
 - [VictoriaLogs: try it locally](https://docs.victoriametrics.com/victorialogs/quickstart/#try-it-locally)
@@ -107,7 +104,7 @@ See detailed instructions on downloading and running binaries:
 
 ### Docker
 
-VictoriaStack components Docker images can be found on [Docker Hub](https://hub.docker.com/u/victoriametrics) and 
+VictoriaStack components Docker images are published on [Docker Hub](https://hub.docker.com/u/victoriametrics) and 
 [Quay](https://quay.io/organization/victoriametrics).
 
 Every database keeps its data in a directory inside the container, so mount a volume for it. Without a volume the data
@@ -130,7 +127,8 @@ pulling an image never turns into an unplanned [upgrade](#upgrades).
 
 ### Docker Compose
 
-Docker Compose examples for running VictoriaStack components can be found on [VictoriaStack/QuickStart page](http://localhost:1313/victoriastack/#quick-start).
+The [QuickStart page](http://localhost:1313/victoriastack/#quick-start) has Docker Compose examples for running the
+whole stack, in single-node and clustered versions.
 
 ## Kubernetes
 
@@ -142,9 +140,9 @@ Pick the entry point that matches how you manage Kubernetes:
 - **[k8s-stack chart](#helm-charts)**: the fastest way to a complete stack. One Helm release brings the operator, the
   databases, agents, alerting rules, Grafana, and the scrape configs for the cluster itself. Every component is still
   configured through its custom resource, under the `spec` key in the chart values.
-- **[Operator](#victoriametrics-operator)**: install only operator and write the custom resources yourself. The manifests
-  can be kept in Git and applied with ArgoCD, Flux, or similar tooling. It fits better for installations that need a layout
-  the chart doesn't cover.
+- **[Operator](#victoriametrics-operator)**: install only the operator and write the custom resources yourself. Keep the
+  manifests in Git and apply them with ArgoCD, Flux, or similar tooling. This option fits installations that need a
+  layout the chart doesn't cover.
 - **Single-component charts**: use [one of the other charts](https://docs.victoriametrics.com/helm/), such as
   `victoria-metrics-single` or `victoria-logs-single`, when you need one component rather than the whole stack.
 
@@ -156,7 +154,7 @@ the chart installs the operator, Grafana, kube-state-metrics, and node-exporter 
 disabled in the values, for example to reuse a Grafana or an operator you already run.
 
 By default, the chart installs everything needed to collect metrics, evaluate alerting rules, and visualize the data in
-Grafana. Logs and traces storage are disabled by default and can be enabled it in the chart values:
+Grafana. Logs and traces storage is disabled by default. Enable it in the chart values:
 
 ```yaml
 # single-node deployments; use vlcluster and vtcluster for the clustered versions
@@ -166,9 +164,9 @@ vtsingle:
   enabled: true
 ```
 
-In the chart settings you can configure every component separately, choosing what you actually need.
+The chart settings configure every component separately, so you can install only what you need.
 
-See the full list of [available charts](https://docs.victoriametrics.com/helm/) for the rest of components.
+See the full list of [available charts](https://docs.victoriametrics.com/helm/) for the rest of the components.
 
 
 ### VictoriaMetrics Operator
@@ -178,7 +176,7 @@ Kubernetes and OpenShift clusters via custom resources. Describe the desired sta
 [resources](https://docs.victoriametrics.com/operator/resources/) such as `VMCluster`, `VLSingle`, or `VMAgent`, and the
 operator will create and update the installation behind it.
 
-For metrics, operator picks up scrape configuration on its own: it discovers `VMServiceScrape` and similar resources, and
+For metrics, the operator picks up scrape configuration on its own: it discovers `VMServiceScrape` and similar resources, and
 [converts existing prometheus-operator objects](https://docs.victoriametrics.com/operator/integrations/prometheus/#objects-conversion)
 such as `ServiceMonitor` into their VictoriaMetrics equivalents. Existing Prometheus setups keep working after the
 migration.
@@ -229,7 +227,7 @@ See [Access control](http://localhost:1313/victoriastack/access-control/) for th
 
 Two more things to set up for every component:
 
-- **Protect the internal HTTP endpoints.** Stack components xpose sensitive endpoints for config hot reloading, 
+- **Protect the internal HTTP endpoints.** Stack components expose sensitive endpoints for config hot reloading,
   metrics scraping, profiling, etc. See more about [Sensitive endpoints](http://localhost:1313/victoriastack/access-control/#sensitive-endpoints).
 - **Enable TLS on components that serve traffic without a proxy in front** with the `-tls`, `-tlsCertFile`, and
   `-tlsKeyFile` flags. vmauth additionally supports mTLS and automatic issuing of TLS certificates.
@@ -268,9 +266,8 @@ see [Long-term support releases](http://localhost:1313/victoriastack/enterprise/
 
 ## Backups
 
-Backups in VictoriaStack are implemented using data snapshots - an instanteneous mechanism for making a copy of the data
-within a second and without any impact on the database. The snapshots then can be uploaded to any durable storage
-like S3 for storing backups:
+Backups in VictoriaStack are based on data snapshots. A snapshot copies the data within a second and puts no load on the
+database. Upload the snapshots to durable storage such as S3 to keep them as backups:
 - [VictoriaMetrics backups management: vmbackup, vmrestore, vmbackupmanager](https://docs.victoriametrics.com/victoriametrics/vmbackup/)
 - [VictoriaLogs backup and restore](https://docs.victoriametrics.com/victorialogs/#backup-and-restore)
 - [VictoriaTraces backup and restore](https://docs.victoriametrics.com/victoriatraces/#backup-and-restore)
@@ -283,25 +280,25 @@ retention, so backups need no additional tooling. It is a part of
 the [Enterprise package](http://localhost:1313/victoriastack/enterprise/), while vmbackup and vmrestore
 are Apache 2 licensed. All three tools are incorporated into Helm charts and the operator.
 
-The same tooling is only about to come to VictoriaLogs and VictoriaTraces - see progress in [issue #123](https://github.com/VictoriaMetrics/VictoriaLogs/issues/123) for more details. 
+The same tooling is not available for VictoriaLogs and VictoriaTraces yet. Follow the progress
+in [issue #123](https://github.com/VictoriaMetrics/VictoriaLogs/issues/123).
 
 
 ## Monitoring
 
-The whole VictoriaStack, every component in it was built with monitoring in mind. Every service exposes metrics in 
-Prometheus exposition format, produces descriptive logs for significant events, cares about transparency of internal processes.
+Every component of VictoriaStack was built with monitoring in mind. It exposes its own metrics in Prometheus exposition
+format and logs every significant event, so its internal processes stay transparent.
 
-VictoriaStack components are shipped together with descriptive, production-ready Grafana dashboards available at
-[grafana.com/victoriametrics/dashboards](https://grafana.com/orgs/victoriametrics/dashboards). The dashboards are
-constantly updated and maintained by the VictoriaMetrics team.
+VictoriaStack components ship with production-ready Grafana dashboards, available at
+[grafana.com/victoriametrics/dashboards](https://grafana.com/orgs/victoriametrics/dashboards). The VictoriaMetrics team
+maintains and updates them.
 
-The same goes for the alerting. You can find the list of recommended alerting rules to run with the stack below:
+Alerting rules come with the components too. Here are the rules recommended for running with the stack:
 - [VictoriaMetrics rules](https://github.com/VictoriaMetrics/VictoriaMetrics/tree/master/deployment/docker/rules)
 - [VictoriaLogs rules](https://github.com/VictoriaMetrics/VictoriaLogs/tree/master/deployment/docker/rules)
 - [VictoriaTraces rules](https://github.com/VictoriaMetrics/VictoriaTraces/tree/master/deployment/docker/rules)
 
-Alerting rules are closely interconnected with the Grafana dashboards, providing transparent monitoring experience for 
-the end-users. 
+The rules and the dashboards are closely interconnected: an alert points at the panel that explains it.
 
-The alerting rules and Grafana dashboards bring high value and are always up to date because VictoriaMetrics team is 
-dogfooding the whole stack internally, in cloud and for Enterprise customers.
+The VictoriaMetrics team runs the same stack internally, in VictoriaMetrics Cloud, and for Enterprise customers, so the
+rules and the dashboards keep up with the components they monitor.
