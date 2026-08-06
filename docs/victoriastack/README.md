@@ -15,6 +15,8 @@ The stack has no bundled all-in-one UI. Use [Grafana](http://localhost:1313/vict
 or [Perses](http://localhost:1313/victoriastack/ui/#perses) to build dashboards and correlate all three signals.
 Every database also ships with a built-in [vmui](http://localhost:1313/victoriastack/ui/#vmui) for ad-hoc exploration.
 
+// TODO: READINESS: visum to become all-in-one
+
 ## Why VictoriaStack?
 
 VictoriaStack is built on three core principles: **simplicity, reliability, and efficiency**.
@@ -252,6 +254,8 @@ and [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/#capacity-plann
 VictoriaStack has no object storage tiering: databases keep all data on local disks, and S3 or GCS is used
 for [backups](http://localhost:1313/victoriastack/deployment/#backups) only. Support for historical data in object
 storage is in progress, see [this issue](https://github.com/VictoriaMetrics/VictoriaLogs/issues/48).
+
+// TODO: READINESS: backups for logs and traces
 
 To store metrics longer without paying for full resolution,
 Enterprise adds [downsampling](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#downsampling)

@@ -34,9 +34,10 @@ VictoriaMetrics next to single-node VictoriaLogs.
 <br>
 
 **Start with the single-node version.** It handles workloads far larger than most teams expect, and it keeps
-the setup simple. A single node scales vertically, so the first answer to growth is a bigger machine. High availability
-can be achieved by running multiple nodes, [replicating traffic](http://localhost:1313/victoriastack/ingestion/#native-ingestion)
-to each node and load balancing read requests between them.
+the setup simple. A single node scales vertically, so the first answer to growth is a bigger machine.
+[High availability](#high-availability) can be achieved by running multiple nodes,
+[replicating traffic](http://localhost:1313/victoriastack/ingestion/#native-ingestion) to each node and load balancing
+read requests between them.
 
 Switch a database to the clustered version when:
 
@@ -48,6 +49,35 @@ The clustered versions use the same three component types in every database, nam
 `vminsert`, `vmselect`, and `vmstorage` for metrics, `vlinsert`, `vlselect`, and `vlstorage` for logs,
 `vtinsert`, `vtselect`, and `vtstorage` for traces.
 See [Architecture](http://localhost:1313/victoriastack/#architecture) for what each component does.
+
+## High availability
+
+All three databases achieve high availability the same way: run two or more independent installations and replicate
+every record to each of them. An agent in front of the databases sends the copies and buffers the data for
+installations that are temporarily unavailable, while
+[vmauth](https://docs.victoriametrics.com/victoriametrics/vmauth/#load-balancing) balances read requests among the
+healthy ones. There is no consensus protocol and no coordination between the installations, which keeps the scheme
+simple to run and to troubleshoot.
+
+| Signal      | HA docs                                                                                                             | What replicates the data                                                                               |
+|-------------|---------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
+| **Metrics** | [VictoriaMetrics](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#high-availability) | [vmagent](https://docs.victoriametrics.com/victoriametrics/vmagent/#replication-and-high-availability) |
+| **Logs**    | [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/#high-availability)                                    | [vlagent](https://docs.victoriametrics.com/victorialogs/vlagent/#replication-and-high-availability)    |
+| **Traces**  | [VictoriaTraces](https://docs.victoriametrics.com/victoriatraces/#high-availability)                                | OpenTelemetry collector, or any shipper that writes to multiple destinations    // TODO: READINESS: vtagent for replication|
+
+<br>
+
+
+
+The scheme works the same way for single-node and for clustered installations, within one availability zone or across
+several. Run the stateless components in more than one replica as well: vmagent, vlagent, vmauth, vmalert, and
+Alertmanager.
+
+Replication protects against losing a node or a zone. It does not protect against a bad config, a wrong upgrade, or an
+accidental deletion, since those reach every replica. Keep [backups](#backups) as well.
+
+On Kubernetes, the operator can manage this whole topology as a single resource.
+See [high availability in Kubernetes](#high-availability-in-kubernetes).
 
 ## Local / Bare Metal
 
@@ -123,6 +153,41 @@ It allows you to manage Victoria Metrics components in Kubernetes or OpenShift c
 [GitOps](https://www.redhat.com/en/topics/devops/what-is-gitops) and [IaC](https://en.wikipedia.org/wiki/Infrastructure_as_code) concepts.
 
 See [Quick Start instructions](https://docs.victoriametrics.com/operator/quick-start/) for the operator.
+
+### High availability in Kubernetes
+
+// TODO: READINESS: VTDistributed
+
+// TODO: READINESS: VLDistributed/VMDistributed are marked as experimental
+
+The operator describes a multi-zone installation as a single resource:
+[VMDistributed](https://docs.victoriametrics.com/operator/resources/vmdistributed/) for metrics
+and [VLDistributed](https://docs.victoriametrics.com/operator/resources/vldistributed/) for logs. Each of them takes a
+list of zones and creates, for every zone, the database plus an agent that replicates writes into it. All zones use the
+same backend type: either the clustered or the single-node version of the database. A shared vmauth in front of the
+zones acts as the global read and write entrypoint, so producers and Grafana keep using one address no matter how many
+zones exist.
+
+The operator applies changes to the zones sequentially, and each zone can be switched between serving reads, writes,
+both, or nothing at all. An upgrade or a maintenance window therefore takes one zone out of rotation at a time, while
+the remaining zones keep ingesting and answering queries.
+
+The [k8s-stack chart](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/) creates these resources from
+its values:
+
+```yaml
+# metrics: mutually exclusive with vmsingle and vmcluster
+vmdistributed:
+  enabled: true
+
+# logs: mutually exclusive with vlsingle and vlcluster; needs chart v0.90.0 or newer
+vldistributed:
+  enabled: true
+```
+
+The operator also documents high availability
+for [every individual resource](https://docs.victoriametrics.com/operator/resources/#high-availability) it manages,
+including vmagent, vlagent, vmauth, vmalert, and Alertmanager.
 
 ## Backups
 
