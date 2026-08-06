@@ -13,7 +13,7 @@ tags:
 
 Alerting evaluates rules against metrics, logs, or traces and sends notifications when conditions are met. Common examples include service outages, error messages in log entries, spikes in HTTP request rate, or slow traces.
 
-In VictoriaStack, [vmalert](https://docs.victoriametrics.com/vmalert/) component acts as an alerting engine and
+In VictoriaStack, [vmalert](https://docs.victoriametrics.com/victoriametrics/vmalert/) component acts as an alerting engine and
 integrates with [Alertmanager](https://github.com/prometheus/alertmanager) for dispatching alerting notifications
 to various destinations like [email, Slack, PagerDuty, MS Teams, etc](https://prometheus.io/docs/alerting/latest/integrations/#available-integrations).
 
@@ -35,12 +35,18 @@ The following things are required to start using alerting:
 
 vmalert is a single binary service that can be started with the following command:
 ```sh
-./path/to/vmalert -rule=alert.rules \              # Path to the file with rules configuration. Supports wildcard and HTTP URL (S3/GCS are available in Enterprise).
-    -datasource.url=http://victoriametrics:8428 \  # Datasource URL to query for rules evaluation
-    -notifier.url=http://alertmanager:9093 \       # AlertManager URL
+./path/to/vmalert \
+    -rule=alert.rules \
+    -datasource.url=http://victoriametrics:8428 \
+    -notifier.url=http://alertmanager:9093
 ```
 
-> See more detailed documentation in [vmalert Quick Start docs](https://docs.victoriametrics.com/vmalert/#quickstart).
+* `-rule` - path to the file with rules configuration. Supports wildcards and HTTP URLs. S3 and GCS paths are available
+  in Enterprise.
+* `-datasource.url` - URL to query for rules evaluation.
+* `-notifier.url` - Alertmanager URL to send notifications to.
+
+> See more detailed documentation in [vmalert Quick Start docs](https://docs.victoriametrics.com/victoriametrics/vmalert/#quickstart).
 
 With the configuration above, vmalert will periodically evaluate rules read from the `alert.rules` file by querying the specified
 `-datasource.url` and sending notifications to `-notifier.url` if conditions are met.
@@ -48,14 +54,14 @@ With the configuration above, vmalert will periodically evaluate rules read from
 The key features of vmalert are:
 * Supports Prometheus [alerting rules syntax](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#defining-alerting-rules),
   making it easier to migrate from a Prometheus stack.
-* Supports [recording rules](https://docs.victoriametrics.com/vmalert/#recording-rules), allowing you to convert query results, logs and traces into metrics.
-* [Hot reload](https://docs.victoriametrics.com//victoriametrics/vmalert/#hot-config-reload) of configuration rules from S3, URL, or local file system.
-* Persists [alert state across restarts](https://docs.victoriametrics.com/#alerts-state-on-restarts).
-* Supports recording and alerting rules backfilling (`replay`). See [these docs](https://docs.victoriametrics.com/#rules-backfilling) to learn more.
+* Supports [recording rules](https://docs.victoriametrics.com/victoriametrics/vmalert/#recording-rules), allowing you to convert query results, logs and traces into metrics.
+* [Hot reload](https://docs.victoriametrics.com/victoriametrics/vmalert/#hot-config-reload) of configuration rules from S3, URL, or local file system.
+* Persists [alert state across restarts](https://docs.victoriametrics.com/victoriametrics/vmalert/#alerts-state-on-restarts).
+* Supports recording and alerting rules backfilling (`replay`). See [these docs](https://docs.victoriametrics.com/victoriametrics/vmalert/#rules-backfilling) to learn more.
 
 ## Rules
 
-vmalert is configured with [rules in yaml format](https://docs.victoriametrics.com/vmalert.html#groups) that it can
+vmalert is configured with [rules in yaml format](https://docs.victoriametrics.com/victoriametrics/vmalert/#groups) that it can
 fetch from the local file system, remote URL, or object storage. Rules are configured using regular query expressions
 in the corresponding language. For example, the following alerting rule for VictoriaLogs triggers if the number of `error`
 or `warn` logs on a single pod in `env=prod` exceeds 10 during the last 5 minutes:
@@ -76,7 +82,7 @@ See production-ready examples of alerting rules for VictoriaMetrics monitoring [
 ## Datasource
 
 Datasource is specified by the `-datasource.url` flag. It is a URL where vmalert can send queries for rules evaluation.
-It could be a VictoriaMetrics URL, VictoriaLogs URL or VictoriaTraces URL, depending on the [type of integration](https://docs.victoriametrics.com/vmalert.html#integrations).
+It could be a VictoriaMetrics URL, VictoriaLogs URL or VictoriaTraces URL, depending on the [type of integration](https://docs.victoriametrics.com/victoriametrics/vmalert/#integrations).
 
 ```mermaid
 flowchart LR
@@ -131,7 +137,7 @@ flowchart LR
 `-notifier.url` flag separated by comma.
 
 Alertmanager can be discovered by vmalert via Consul or DNS service discovery. 
-See more details in [vmalert docs](https://docs.victoriametrics.com/vmalert.html#notifier-configuration-file).
+See more details in [vmalert docs](https://docs.victoriametrics.com/victoriametrics/vmalert/#notifier-configuration-file).
 
 ## High Availability
 
@@ -159,10 +165,10 @@ flowchart LR
  ```
 
 It means all of them will execute the same rules **doubling the resource usage on datasource**, and send alert notifications to multiple configured 
-Alertmanagers. See more details in [vmalert docs](https://docs.victoriametrics.com/vmalert.html#high-availability).
+Alertmanagers. See more details in [vmalert docs](https://docs.victoriametrics.com/victoriametrics/vmalert/#ha-vmalert).
 
 Please note, vmalert is stateless and its reload usually doesn't take more than a few seconds. Even if vmalert is restarted,
-it can [quickly restore its state](https://docs.victoriametrics.com/vmalert.html#alerts-state-on-restarts).
+it can [quickly restore its state](https://docs.victoriametrics.com/victoriametrics/vmalert/#alerts-state-on-restarts).
 Deploying multiple vmalert instances doesn't usually justify extra resource usage on datasource.
 
 ## Scalability
