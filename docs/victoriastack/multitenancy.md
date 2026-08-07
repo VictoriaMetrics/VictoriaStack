@@ -80,7 +80,8 @@ users:
         - "ProjectID: 0"
 ```
 
-> See more about tenants access control [here](https://docs.victoriametrics.com/victoriastack/access-control/#tenants-filtering).
+> See more about per-tenant access control, including [separate writes and reads](http://localhost:1313/victoriastack/access-control/#separate-writes-and-reads),
+> in [Access control](http://localhost:1313/victoriastack/access-control/#multitenancy).
 
 With the configuration above, all requests with Basic Auth credentials of `team-prod` will get access to logs and traces
 of the tenant `AccountID=42, ProjectID=0` only. This example also shows how to associate a string username with a
