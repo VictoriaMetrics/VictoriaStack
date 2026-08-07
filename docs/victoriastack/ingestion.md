@@ -16,7 +16,7 @@ There are three ways to deliver data to VictoriaStack - pick the one that matche
 | Path                                      | Use it when                                                                                                                                    |
 |-------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
 | [OpenTelemetry Collector](#opentelemetry) | you already collect telemetry with OpenTelemetry, or you start from scratch and want a single pipeline for all three signals                   |
-| [Agents you already run](#integrations)   | Prometheus, Vector, Grafana Alloy, Fluent Bit, Telegraf and others can push to VictoriaStack directly                                          |
+| [Agents you already run](#agents-and-protocols) | Prometheus, Vector, Grafana Alloy, Fluent Bit, Telegraf and others can push to VictoriaStack directly                                    |
 | [vmagent and vlagent](#native-ingestion)  | you want reliable and cost-efficient delivery: high throughput, on-disk buffering, replication between installations, and traffic compression. |
 
 <br>
@@ -69,14 +69,18 @@ to each integration. See the following docs for more details:
 > See integration examples OpenTelemetry Collector for [single-node](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otelcol-single-node.yml)
 > and [clustered](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otelcol-cluster.yml) VictoriaStack.
 
-## Integrations
+## Agents and protocols
 
-Just like with [OpenTelemetry Collector](#opentelemetry), the easiest way to start ingesting data is to integrate with
-telemetry agents that you already have in place. Prometheus and Grafana Alloy for metrics, Vector or Filebeat for logs -
-all these agents can push directly to VictoriaStack:
+The agent you already run most likely speaks a protocol that VictoriaStack accepts. Point it at the right endpoint, and
+the rest of the collection setup stays as it is:
 
-* VictoriaMetrics: [Prometheus, Vector, Grafana Alloy, Telegraf...](https://docs.victoriametrics.com/victoriametrics/data-ingestion/)
-* VictoriaLogs: [Filebeat, Logstash, Vector, Promtail, Elasticsearch, Telegraf...](https://docs.victoriametrics.com/victorialogs/data-ingestion/)
+| Signal      | Ingestion protocols                                                                                       | Agents                                           | Links                                                                    |
+|-------------|-----------------------------------------------------------------------------------------------------------|--------------------------------------------------|--------------------------------------------------------------------------|
+| **Metrics** | Prometheus `remote_write`, OpenTelemetry, InfluxDB line, Graphite, DataDog, OpenTSDB, JSON and CSV import | Prometheus, Grafana Alloy, Vector, Telegraf      | [docs](https://docs.victoriametrics.com/victoriametrics/data-ingestion/) |
+| **Logs**    | OpenTelemetry, Elasticsearch bulk, Loki JSON, syslog, journald, DataDog, JSON stream                      | Fluent Bit, Filebeat, Logstash, Vector, Promtail | [docs](https://docs.victoriametrics.com/victorialogs/data-ingestion/)    |
+| **Traces**  | OpenTelemetry                                                                                             | OpenTelemetry Collector                          | [docs](https://docs.victoriametrics.com/victoriatraces/data-ingestion/)  |
+
+<br>
 
 If you already run Prometheus, adding VictoriaMetrics as
 a [`remote_write`](https://docs.victoriametrics.com/victoriametrics/integrations/prometheus/) target is a two-line change
@@ -90,22 +94,11 @@ remote_write:
 Prometheus keeps scraping and evaluating rules as before, while VictoriaMetrics stores the data for the long term.
 The same endpoint accepts data from anything else that speaks the Prometheus remote write protocol.
 
-VictoriaTraces only supports integration with [OpenTelemetry](https://docs.victoriametrics.com/victoriatraces/data-ingestion/).
-
-## Ingestion protocols
-
-Each database has its own list of supported ingestion protocols. These are the most suitable for each type of signal:
-
-* VictoriaMetrics: [InfluxDB line, CSV, JSON...](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#how-to-import-time-series-data)
-* VictoriaLogs: [JSON, Loki, Journald](https://docs.victoriametrics.com/victorialogs/data-ingestion/#http-apis)
-
-VictoriaTraces only supports integration with [OpenTelemetry](https://docs.victoriametrics.com/victoriatraces/data-ingestion/).
-
 ## Cluster and multitenancy
 
 The examples above target single-node databases and the default tenant. Two things change the endpoint.
 
-**Clustered databases accept data on their insert components:** `vminsert`, `vlinsert`, and `vtinsert`. Only the address
+**Clustered databases accept data on their insert co  mponents:** `vminsert`, `vlinsert`, and `vtinsert`. Only the address
 changes, the paths stay the same:
 
 | Signal      | Single-node                                                   | Clustered                                              |
