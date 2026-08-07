@@ -67,13 +67,12 @@ See the following docs for more details:
 * [VictoriaLogs OpenTelemetry Setup](https://docs.victoriametrics.com/victorialogs/data-ingestion/opentelemetry/)
 * [VictoriaTraces OpenTelemetry Setup](https://docs.victoriametrics.com/victoriatraces/data-ingestion/opentelemetry/)
 
-> See the OpenTelemetry Collector examples for [single-node](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otelcol-single-node.yml)
+> See the OpenTelemetry Collector configuration examples for [single-node](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otelcol-single-node.yml)
 > and [clustered](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otelcol-cluster.yml) VictoriaStack.
 
 ## Agents and protocols
 
-The agent you already run most likely speaks a protocol that VictoriaStack accepts. Point it at the right endpoint, and
-the rest of the collection setup stays as it is:
+The agent you already run most likely speaks a protocol that VictoriaStack accepts:
 
 | Signal      | Ingestion protocols                                                                                       | Agents                                           | Links                                                                    |
 |-------------|-----------------------------------------------------------------------------------------------------------|--------------------------------------------------|--------------------------------------------------------------------------|
@@ -83,25 +82,21 @@ the rest of the collection setup stays as it is:
 
 <br>
 
-If you already run Prometheus, adding VictoriaMetrics as
-a [`remote_write`](https://docs.victoriametrics.com/victoriametrics/integrations/prometheus/) target is a two-line change
-to make Prometheus forward collected metrics to VictoriaStack:
+Keeping the agents you already run is the simplest way to start: nothing changes in how telemetry is collected, only
+where it is sent. Follow the docs linked above when reconfiguring them, since some agents can have their own recommended
+settings for endpoints, batching, compression, and retries.
 
-```yaml
-remote_write:
-  - url: http://victoriametrics:8428/api/v1/write
-```
-
-Prometheus keeps scraping and evaluating rules as before, while VictoriaMetrics stores the data for the long term.
-The same endpoint accepts data from anything else that speaks the Prometheus remote write protocol.
+For better delivery guarantees and ingestion pipeline control put a [native agent](#native-ingestion) between them and 
+the databases: vmagent and vlagent accept the same protocols, buffer the data on disk while a database is unavailable, 
+and replicate it to several installations.
 
 ## Native ingestion
 
 // TODO: READINESS: add VTagent for optimized ingestion path
 
-The protocols above make it easy to integrate VictoriaStack with existing installations. For cost-efficiency, high
-throughput, reliable on-disk buffering, replication, and traffic compression we recommend the agents that VictoriaStack
-provides for this purpose:
+Support of various protocols and agents makes it easy to integrate VictoriaStack with existing installations. 
+For improving cost-efficiency, high throughput, reliable on-disk buffering, replication, and traffic compression we 
+recommend using VictoriaStack agents instead or together with existing agents:
 - [vmagent](#vmagent) for metrics
 - [vlagent](#vlagent) for logs
 
@@ -110,9 +105,9 @@ provides for this purpose:
 [vmagent](https://docs.victoriametrics.com/victoriametrics/vmagent/) is an agent for collecting, receiving and forwarding
 metrics to the specified destinations. Its core features are the following:
 - [drop-in replacement for Prometheus](https://prometheus.io/): vmagent supports [Prometheus service discovery](https://docs.victoriametrics.com/victoriametrics/sd_configs/),
-  [scraping configs](https://docs.victoriametrics.com/victoriametrics/scrape_config_examples/), [relabeling](https://docs.victoriametrics.com/victoriametrics/relabeling/).
+  [scraping configs](https://docs.victoriametrics.com/victoriametrics/scrape_config_examples/), [relabeling](https://docs.victoriametrics.com/victoriametrics/relabeling/)
 - [on-disk buffering](https://docs.victoriametrics.com/victoriametrics/vmagent/#on-disk-persistence): stores unsent metrics
-  in the local disk until the remote destination is available.
+  on the local disk until the remote destination is available
 - [replication](https://docs.victoriametrics.com/victoriametrics/vmagent/#replication-and-high-availability) and
   [sharding](https://docs.victoriametrics.com/victoriametrics/vmagent/#sharding-among-remote-storages): allows building
   highly available and horizontally scalable pipelines for metrics delivery
