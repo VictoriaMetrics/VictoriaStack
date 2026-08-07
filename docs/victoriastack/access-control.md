@@ -85,7 +85,7 @@ responses on another backend.
 > long-lived connections, so a few of them can pin most of the load to a couple of replicas while the rest stay idle.
 > Route the traffic through vmauth instead and let it balance the requests, see [Service discovery](#service-discovery).
 
-### Service discovery
+## Service discovery
 
 In Kubernetes and other dynamic environments the replicas usually hide behind a service name, and their addresses change 
 as replicas come and go. A hostname in `url_prefix` gives vmauth one address, so the load isn't spread among the replicas 
@@ -113,7 +113,7 @@ with the hostnames. Prefix the hostname with `srv+`:
 
 ```yaml
 unauthorized_user:
-  url_prefix: "http://srv+vmselect/select/0/prometheus"
+  url_prefix: "http://srv+vmselect/select/prometheus"
   discover_backend_ips: true
 ```
 
@@ -153,7 +153,7 @@ users:
     url_map:
       - src_paths: [ "/logs/.*" ]
         url_prefix: "http://victorialogs:9428/"
-        drop_src_path_prefix_parts: 1 # drops the /metrics prefix before forwarding the request
+        drop_src_path_prefix_parts: 1 # drops the /logs prefix before forwarding the request
         headers:
           - "AccountID: 2"
           - "ProjectID: 4"
@@ -237,6 +237,7 @@ modified to allow access only to specific paths:
       - "/metrics/api/v1/labels"
       - "/metrics/api/v1/label/.+/values"
     url_prefix: "http://victoriametrics:8428/"
+    drop_src_path_prefix_parts: 1.
 ```
 
 With this configuration, authorized users can query metrics and use Grafana as usual, but they cannot ingest data or
@@ -258,8 +259,8 @@ users:
     # log all requests of this user
     access_log:
       filters:
-      # except requests with HTTP status codes below
-      skip_status_codes: [200, 202]
+        # except requests with HTTP status codes below
+        skip_status_codes: [200, 202]
     url_map:
     - src_paths: [ "/metrics/.*" ]
       url_prefix: "http://victoriametrics:8428/"
