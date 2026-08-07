@@ -81,6 +81,45 @@ vmauth detects temporarily unavailable backends and spreads requests among the r
 restarted or upgraded without removing them from the config. With `retry_status_codes` it also retries the listed
 responses on another backend.
 
+> In Kubernetes, requests sent to a Service are balanced per connection, not per request. Observability clients keep
+> long-lived connections, so a few of them can pin most of the load to a couple of replicas while the rest stay idle.
+> Route the traffic through vmauth instead and let it balance the requests, see [Service discovery](#service-discovery).
+
+### Service discovery
+
+In Kubernetes and other dynamic environments the replicas usually hide behind a service name, and their addresses change 
+as replicas come and go. A hostname in `url_prefix` gives vmauth one address, so the load isn't spread among the replicas 
+behind it.
+
+Set [`discover_backend_ips`](https://docs.victoriametrics.com/victoriametrics/vmauth/#discovering-backend-ips) to make
+vmauth resolve the hostname and balance requests among the discovered IPs:
+
+```yaml
+unauthorized_user:
+  url_prefix: "http://vmselect-service:8481/"
+  discover_backend_ips: true
+```
+
+The config then needs no updates when replicas are added, removed, or restarted. The option can be set per user, per
+`url_map` entry, or globally with the `-discoverBackendIPs` command-line flag.
+
+Discovering the addresses behind a service name is what makes vmauth balance better than the service itself: it sees
+every replica and picks the least loaded one for every request, instead of pinning a whole connection to whichever
+replica the service happened to choose.
+
+When the backends listen on different ports, resolve them via
+a [DNS SRV](https://docs.victoriametrics.com/victoriametrics/vmauth/#srv-urls) record, which carries the ports along
+with the hostnames. Prefix the hostname with `srv+`:
+
+```yaml
+unauthorized_user:
+  url_prefix: "http://srv+vmselect/select/0/prometheus"
+  discover_backend_ips: true
+```
+
+On its own, the `srv+` prefix makes vmauth pick a random resolved address for every new connection. Together with
+`discover_backend_ips` it balances the requests among all the addresses in the record.
+
 ## Authentication
 
 The following vmauth configuration allows access to metrics and logs backends only to users with `admin` credentials:
