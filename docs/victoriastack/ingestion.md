@@ -172,7 +172,6 @@ we recommend using VictoriaStack agents that were specifically designed for this
 VictoriaStack provides the following native agents:
 - [vmagent](#vmagent) for metrics
 - [vlagent](#vlagent) for logs
-// TODO: replace relative links with absolute
 
 ### vmagent
 
