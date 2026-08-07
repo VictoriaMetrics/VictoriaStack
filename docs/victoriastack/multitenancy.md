@@ -56,7 +56,7 @@ supplied metrics.
 
 To query the results, run the following command:
 ```sh
-curl 'http://<vmstack>:8427/select/prometheus/api/v1/query' \
+curl 'http://<vmstack>:8427/metrics/select/prometheus/api/v1/query' \
  -d 'query=up' \
  --header "AccountID: 42" \
  --header "ProjectID: 0" 
