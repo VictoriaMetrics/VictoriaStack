@@ -13,15 +13,15 @@ tags:
 
 There are three ways to deliver data to VictoriaStack - pick the one that matches the pipeline you already have:
 
-| Path                                      | Use it when                                                                                                                                   |
-|-------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
-| [OpenTelemetry Collector](#opentelemetry) | you already collect telemetry with OpenTelemetry, or you start from scratch and want a single pipeline for all three signals                  |
-| [Agents you already run](#integrations)   | Prometheus, Vector, Grafana Alloy, Fluent Bit, Telegraf and others can push to VictoriaStack directly                                         |
-| [vmagent and vlagent](#native-ingestion)  | you want reliable and cost-efficient delivery: high throughput, on-disk buffering, replication between installations, and traffic compression |
+| Path                                      | Use it when                                                                                                                                    |
+|-------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| [OpenTelemetry Collector](#opentelemetry) | you already collect telemetry with OpenTelemetry, or you start from scratch and want a single pipeline for all three signals                   |
+| [Agents you already run](#integrations)   | Prometheus, Vector, Grafana Alloy, Fluent Bit, Telegraf and others can push to VictoriaStack directly                                          |
+| [vmagent and vlagent](#native-ingestion)  | you want reliable and cost-efficient delivery: high throughput, on-disk buffering, replication between installations, and traffic compression. |
 
 <br>
 
-The paths combine: OpenTelemetry Collector or a third-party agent can push to vmagent or vlagent, which buffer the
+**The paths combine**: OpenTelemetry Collector or a third-party agent can push to vmagent or vlagent, which buffer the
 data and forward it to the databases. That keeps the existing collection setup and still gets the delivery guarantees of
 the native agents.
 
@@ -47,7 +47,7 @@ service:
     metrics: { receivers: [ otlp ], exporters: [ otlp_http/vm-metrics ] }
 ```
 
-In the example above, OpenTelemetry Collector receives signals via the gRPC protocol,
+Here, OpenTelemetry Collector receives signals via the gRPC protocol,
 and then forwards data to VictoriaStack via HTTP endpoints:
 * `http://victoriametrics:8428/opentelemetry/v1/metrics` for metrics
 * `http://victorialogs:9428/insert/opentelemetry/v1/logs` for logs
@@ -79,8 +79,8 @@ all these agents can push directly to VictoriaStack:
 * VictoriaLogs: [Filebeat, Logstash, Vector, Promtail, Elasticsearch, Telegraf...](https://docs.victoriametrics.com/victorialogs/data-ingestion/)
 
 If you already run Prometheus, adding VictoriaMetrics as
-a [`remote_write`](https://docs.victoriametrics.com/victoriametrics/integrations/prometheus/) target is a two-line change,
-and it needs no changes to the scrape configs:
+a [`remote_write`](https://docs.victoriametrics.com/victoriametrics/integrations/prometheus/) target is a two-line change
+to make Prometheus forward collected metrics to VictoriaStack:
 
 ```yaml
 remote_write:
@@ -101,9 +101,76 @@ Each database has its own list of supported ingestion protocols. These are the m
 
 VictoriaTraces only supports integration with [OpenTelemetry](https://docs.victoriametrics.com/victoriatraces/data-ingestion/).
 
+## Cluster and multitenancy
+
+The examples above target single-node databases and the default tenant. Two things change the endpoint.
+
+**Clustered databases accept data on their insert components:** `vminsert`, `vlinsert`, and `vtinsert`. Only the address
+changes, the paths stay the same:
+
+| Signal      | Single-node                                                   | Clustered                                              |
+|-------------|---------------------------------------------------------------|--------------------------------------------------------|
+| **Metrics** | `http://victoriametrics:8428/api/v1/write`                     | `http://vminsert:8480/insert/prometheus/api/v1/write`  |
+| **Logs**    | `http://victorialogs:9428/insert/opentelemetry/v1/logs`        | `http://vlinsert:9428/insert/opentelemetry/v1/logs`    |
+| **Traces**  | `http://victoriatraces:10428/insert/opentelemetry/v1/traces`   | `http://vtinsert:10428/insert/opentelemetry/v1/traces` |
+
+<br>
+
+In clustered mode you will have multiple replicas for insert components. Put [vmauth](http://localhost:1313/victoriastack/access-control/)
+in front of them to control access, balance load, and have a single ingestion endpoint:
+```yaml
+unauthorized_user:
+  url_map:
+    # VictoriaMetrics writes
+    - src_paths: ["/metrics/insert/.*"]
+      drop_src_path_prefix_parts: 1
+      url_prefix:
+        - "http://vminsert-1:8480"
+        - "http://vminsert-2:8480"
+
+    # VictoriaLogs writes
+    - src_paths: ["/logs/insert/.*"]
+      drop_src_path_prefix_parts: 1
+      url_prefix:
+        - "http://vlinsert-1:9428"
+        - "http://vlinsert-2:9428"
+
+    # VictoriaTraces writes
+    - src_paths: [ "/traces/insert/.*" ]
+      drop_src_path_prefix_parts: 1
+      url_prefix:
+        - "http://vtinsert-1:10428"
+        - "http://vtinsert-2:10428"
+```
+
+With the configuration above, vmauth will provide a single endpoint for accepting write requests and balancing them across
+the replicas:
+* `http://vmauth:8427/metrics/insert/*` for metrics,
+* `http://vmauth:8427/logs/insert/*` for logs,
+* `http://vmauth:8427/traces/insert/*` for traces.
+
+The [clustered demo](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/vmauth-cluster.yml) runs
+exactly this vmauth configuration, and its
+[OpenTelemetry Collector](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otelcol-cluster.yml)
+writes to these endpoints.
+
+**Tenants are specified with HTTP headers** in the same way in all three databases. Set `AccountID` and `ProjectID` on the
+write request, for example in an OpenTelemetry Collector exporter:
+
+```yaml
+exporters:
+  otlp_http/vm-logs: { logs_endpoint: http://vmauth:8427/logs/insert/opentelemetry/v1/logs, headers: { AccountID: "0", ProjectID: "0" } }
+```
+
+Requests without these headers write to the default tenant `0:0`.
+
+> Note: VictoriaMetrics supports [multitenancy](http://localhost:1313/victoriastack/multitenancy/) only in the cluster mode.
+
+// TODO: READINESS: enable headers multitenancy by default https://github.com/VictoriaMetrics/VictoriaMetrics/issues/11365
+
 ## Native Ingestion
 
-// TODO: READINESS: VTagent
+// TODO: READINESS: add VTagent form optimized ingestion path
 
 VictoriaStack supports variety of ingestion protocols, that makes it easy to integrate with existing installations.
 But for achieving cost-efficiency, high throughput, reliable on-disk buffering, replication and traffic compression
