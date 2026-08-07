@@ -242,6 +242,31 @@ modified to allow access only to specific paths:
 With this configuration, authorized users can query metrics and use Grafana as usual, but they cannot ingest data or
 access [sensitive endpoints](#sensitive-endpoints), like `/api/v1/admin/tsdb/delete_series`.
 
+## Access logs
+
+vmauth can log the requests it proxies, which answers who queried what and when. Enable
+[access logs](https://docs.victoriametrics.com/victoriametrics/vmauth/#access-log) per user:
+
+```yaml
+# log all requests with missing or invalid credentials
+unauthorized_user:
+  access_log: {}
+  
+users:
+  - username: team-prod
+    password: "***"
+    # log all requests of this user
+    access_log:
+      filters:
+      # except requests with HTTP status codes below
+      skip_status_codes: [200, 202]
+    url_map:
+    - src_paths: [ "/metrics/.*" ]
+      url_prefix: "http://victoriametrics:8428/"
+```
+
+Access logs can be turned on and off per user with a [config reload](https://docs.victoriametrics.com/victoriametrics/vmauth/#config-reload).
+
 ## Sensitive endpoints
 
 VictoriaStack components, including vmauth, expose sensitive endpoints for config hot reloading, metrics scraping,
