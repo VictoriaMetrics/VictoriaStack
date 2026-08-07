@@ -112,9 +112,11 @@ Since tenants appear on first write, the list of existing tenants is a property 
 
 - **Metrics**: `http://<vmselect>:8481/admin/tenants`
 - **Logs**: [`http://<victorialogs>:9428/select/tenant_ids?start=<start>&end=<end>`](https://docs.victoriametrics.com/victorialogs/querying/#querying-tenants)
-  returns the tenants that received logs in the given time range. It must be called with an empty `AccountID` header, so
-  that clients with access to one tenant cannot enumerate the others.
+  returns the tenants that received logs in the given time range. 
+- **Traces**: [`http://<victoriatraces>:10428/select/tenant_ids?start=<start>&end=<end>`](...)
+  returns the tenants that received logs in the given time range.
 
 // TODO: READINESS: Assigning tenants via fields in VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/686
+// TODO: READINESS: Add #querying-tenants docs to https://docs.victoriametrics.com/victoriatraces/querying -  https://github.com/VictoriaMetrics/VictoriaLogs/issues/686
 
-// TODO: make a unified usage dashboards for all signals per-tenant
+// TODO: make a unified usage dashboards for all signals per-tenant  https://github.com/VictoriaMetrics/VictoriaStack/issues/7 
