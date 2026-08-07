@@ -94,11 +94,98 @@ remote_write:
 Prometheus keeps scraping and evaluating rules as before, while VictoriaMetrics stores the data for the long term.
 The same endpoint accepts data from anything else that speaks the Prometheus remote write protocol.
 
+## Native Ingestion
+
+// TODO: READINESS: add VTagent for optimized ingestion path
+
+VictoriaStack supports variety of ingestion protocols, that makes it easy to integrate with existing installations.
+But for achieving cost-efficiency, high throughput, reliable on-disk buffering, replication and traffic compression
+we recommend using VictoriaStack agents that were specifically designed for this purpose.
+
+VictoriaStack provides the following native agents:
+- [vmagent](#vmagent) for metrics
+- [vlagent](#vlagent) for logs
+
+### vmagent
+
+[vmagent](https://docs.victoriametrics.com/victoriametrics/vmagent/) is an agent for collecting, receiving and forwarding
+metrics to the specified destinations. Its core features are the following:
+- [drop-in replacement for Prometheus](https://prometheus.io/): vmagent supports [Prometheus service discovery](https://docs.victoriametrics.com/victoriametrics/sd_configs/),
+  [scraping configs](https://docs.victoriametrics.com/victoriametrics/scrape_config_examples/), [relabeling](https://docs.victoriametrics.com/victoriametrics/relabeling/).
+- [on-disk buffering](https://docs.victoriametrics.com/victoriametrics/vmagent/#on-disk-persistence): stores unsent metrics
+  in the local disk until the remote destination is available.
+- [replication](https://docs.victoriametrics.com/victoriametrics/vmagent/#replication-and-high-availability) and 
+  [sharding](https://docs.victoriametrics.com/victoriametrics/vmagent/#sharding-among-remote-storages): allows building 
+  High Available and horizontally scalable pipelines for metrics delivery
+- [uses fewer resources](https://victoriametrics.com/blog/opentelemetry-prometheus-and-more/) than other agents for
+  collecting and forwarding metrics. In a benchmark scraping 1200 node exporters, vmagent needed 3.2x less CPU and 2.7x
+  less memory than the OpenTelemetry Collector, and 1.6x less CPU and 3.0x less memory than Prometheus 3.x
+
+Additionally to features above, vmagent supports all the same ingestion protocols for metrics as VictoriaMetrics. 
+Which makes it a perfect entry point in delivery pipeline for metrics:
+```mermaid
+flowchart LR
+    PRW["Prometheus<br/>Remote Write"]
+    OTel["OpenTelemetry"]
+
+    PRW -->|"metrics"| V
+    OTel -->|"metrics"| V
+
+    V["vmagent<br/><hr/>Buffer • Transform • Shard • Replicate"]
+
+    subgraph Destinations
+        direction TB
+        VM["VictoriaMetrics × N"]
+    end
+
+    V -->|"replicated to N destinations"| VM
+```
+
+As an entry point, vmagent can filter, [deduplicate](https://docs.victoriametrics.com/victoriametrics/vmagent/#flexible-deduplication),
+[pre-aggregate](https://docs.victoriametrics.com/victoriametrics/stream-aggregation/), rate-limit ingested samples and 
+[limit cardinality](https://docs.victoriametrics.com/victoriametrics/vmagent/#cardinality-limiter).
+
+The forwarded traffic is [additionally compressed](https://docs.victoriametrics.com/victoriametrics/vmagent/#victoriametrics-remote-write-protocol) 
+resulting into 2x-5x network bandwidth reduction. See blogpost [Save network costs with VictoriaMetrics remote write protocol](https://victoriametrics.com/blog/victoriametrics-remote-write/).
+
+### vlagent
+
+[vlagent](https://docs.victoriametrics.com/victorialogs/vlagent/) is an agent for collection logs from various sources
+and forwarding them to the specified destinations. Its core features are the following:
+- [collecting logs from K8s pods](https://docs.victoriametrics.com/victorialogs/vlagent/#collect-kubernetes-pod-logs):
+  native support for collecting logs from Kubernetes Pods
+- [on-disk buffering and replication](https://docs.victoriametrics.com/victorialogs/vlagent/#replication-and-high-availability):
+  allows building High Available scalable pipelines for logs delivery
+- [outstanding performance](https://victoriametrics.com/blog/log-collectors-benchmark-2026/): significant
+  savings on compute for collecting and delivering logs
+
+Additionally to features above, vlagent supports all the same ingestion protocols for logs as VictoriaLogs.
+Which makes it a perfect entry point in delivery pipeline for reliability:
+```mermaid
+flowchart LR
+    FB["Fluent Bit"]
+    OTel["OpenTelemetry"]
+
+    FB -->|"logs"| V
+    OTel -->|"logs"| V
+
+    V["vlagent<br/><hr/>Buffer • Replicate"]
+
+    subgraph Destinations
+        direction TB
+        VL["VictoriaLogs × N"]
+    end
+
+    V -->|"replicate to N destinations"| VL
+```
+
+vlagent is recommended to use for achieving [high availability in VictoriaLogs](https://docs.victoriametrics.com/victorialogs/#high-availability).
+
 ## Cluster and multitenancy
 
 The examples above target single-node databases and the default tenant. Two things change the endpoint.
 
-**Clustered databases accept data on their insert co  mponents:** `vminsert`, `vlinsert`, and `vtinsert`. Only the address
+**Clustered databases accept data on their insert components:** `vminsert`, `vlinsert`, and `vtinsert`. Only the address
 changes, the paths stay the same:
 
 | Signal      | Single-node                                                   | Clustered                                              |
@@ -161,87 +248,3 @@ Requests without these headers write to the default tenant `0:0`.
 
 // TODO: READINESS: enable headers multitenancy by default https://github.com/VictoriaMetrics/VictoriaMetrics/issues/11365
 
-## Native Ingestion
-
-// TODO: READINESS: add VTagent form optimized ingestion path
-
-VictoriaStack supports variety of ingestion protocols, that makes it easy to integrate with existing installations.
-But for achieving cost-efficiency, high throughput, reliable on-disk buffering, replication and traffic compression
-we recommend using VictoriaStack agents that were specifically designed for this purpose.
-
-VictoriaStack provides the following native agents:
-- [vmagent](#vmagent) for metrics
-- [vlagent](#vlagent) for logs
-
-### vmagent
-
-[vmagent](https://docs.victoriametrics.com/victoriametrics/vmagent/) is an agent for collecting, receiving and forwarding
-metrics to the specified destinations. Its core features are the following:
-- [drop-in replacement for Prometheus](https://prometheus.io/): vmagent supports [Prometheus service discovery](https://docs.victoriametrics.com/victoriametrics/sd_configs/),
-  [scraping configs](https://docs.victoriametrics.com/victoriametrics/scrape_config_examples/), [relabeling](https://docs.victoriametrics.com/victoriametrics/relabeling/).
-- [on-disk buffering](https://docs.victoriametrics.com/victoriametrics/vmagent/#on-disk-persistence): stores unsent metrics
-  in the local disk until the remote destination is available.
-- [replication](https://docs.victoriametrics.com/victoriametrics/vmagent/#replication-and-high-availability) and 
-  [sharding](https://docs.victoriametrics.com/victoriametrics/vmagent/#sharding-among-remote-storages): allows building 
-  High Available and horizontally scalable pipelines for metrics delivery
-- is way more compute efficient than Prometheus or OpenTelemetry Collector for collection and forwarding metrics
-
-Additionally to features above, vmagent supports all the same ingestion protocols for metrics as VictoriaMetrics. 
-Which makes it a perfect entry point in delivery pipeline for metrics:
-```mermaid
-flowchart LR
-    PRW["Prometheus<br/>Remote Write"]
-    OTel["OpenTelemetry"]
-
-    PRW -->|"metrics"| V
-    OTel -->|"metrics"| V
-
-    V["vmagent<br/><hr/>Buffer • Transform • Shard • Replicate"]
-
-    subgraph Destinations
-        direction TB
-        VM["VictoriaMetrics × N"]
-    end
-
-    V -->|"replicated to N destinations"| VM
-```
-
-As an entry point, vmagent can filter, [deduplicate](https://docs.victoriametrics.com/victoriametrics/vmagent/#flexible-deduplication),
-[pre-aggregate](https://docs.victoriametrics.com/victoriametrics/stream-aggregation/), rate-limit ingested samples and 
-[limit cardinality](https://docs.victoriametrics.com/victoriametrics/vmagent/#cardinality-limiter).
-
-The forwarded traffic is [additionally compressed](https://docs.victoriametrics.com/victoriametrics/vmagent/#victoriametrics-remote-write-protocol) 
-resulting into 2x-5x network bandwidth reduction. See blogpost [Save network costs with VictoriaMetrics remote write protocol](https://victoriametrics.com/blog/victoriametrics-remote-write/).
-
-### vlagent
-
-[vlagent](https://docs.victoriametrics.com/victorialogs/vlagent/) is an agent for collection logs from various sources
-and forwarding them to the specified destinations. Its core features are the following:
-- [collecting logs from K8s pods](https://docs.victoriametrics.com/victorialogs/vlagent/#collect-kubernetes-pod-logs):
-  native support for collecting logs from Kubernetes Pods
-- [on-disk buffering and replication](https://docs.victoriametrics.com/victorialogs/vlagent/#replication-and-high-availability):
-  allows building High Available scalable pipelines for logs delivery
-- [outstanding performance](https://victoriametrics.com/blog/log-collectors-benchmark-2026/): significant
-  savings on compute for collecting and delivering logs
-
-Additionally to features above, vlagent supports all the same ingestion protocols for logs as VictoriaLogs.
-Which makes it a perfect entry point in delivery pipeline for reliability:
-```mermaid
-flowchart LR
-    FB["Fluent Bit"]
-    OTel["OpenTelemetry"]
-
-    FB -->|"logs"| V
-    OTel -->|"logs"| V
-
-    V["vlagent<br/><hr/>Buffer • Replicate"]
-
-    subgraph Destinations
-        direction TB
-        VL["VictoriaLogs × N"]
-    end
-
-    V -->|"replicate to N destinations"| VL
-```
-
-vlagent is recommended to use for achieving [high availability in VictoriaLogs](https://docs.victoriametrics.com/victorialogs/#high-availability).
