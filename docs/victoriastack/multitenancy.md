@@ -100,7 +100,7 @@ Or by setting HTTP headers:
 
 ## Assigning tenants via fields
 
-// TODO: add once https://github.com/VictoriaMetrics/VictoriaLogs/issues/686 is ready
+// TODO: READINESS: Assigning tenants via fields in VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/686
 
 
 // TODO: make a unified usage dashboards for all signals per-tenant
