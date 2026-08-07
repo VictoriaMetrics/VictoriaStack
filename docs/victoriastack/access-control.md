@@ -185,6 +185,45 @@ See [Multitenancy](http://localhost:1313/victoriastack/multitenancy/) for the te
 [per-tenant authorization docs](https://docs.victoriametrics.com/victoriametrics/vmauth/#per-tenant-authorization) for
 more vmauth examples.
 
+## Enforcing filters
+
+Tenants isolate whole datasets from each other. To limit what a user sees **inside** a single tenant, configure vmauth
+to [enforce query filters](https://docs.victoriametrics.com/victoriametrics/vmauth/#enforcing-query-args) to every
+proxied request. The database applies them to the query it receives, and the user cannot drop or override them.
+
+For metrics, [`extra_label`](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#prometheus-querying-api-enhancements)
+adds a label filter to every query:
+
+```yaml
+users:
+  - username: team-dev
+    password: "***"
+    url_map:
+      - src_paths: [ "/metrics/.*" ]
+        url_prefix: "http://victoriametrics:8428/?extra_label=team=dev"
+        drop_src_path_prefix_parts: 1
+```
+
+Queries from `team-dev` return only the series that carry the `team="dev"` label, whatever the user query is.
+
+For logs, [`extra_stream_filters`](https://docs.victoriametrics.com/victorialogs/security-and-lb/#access-control-inside-a-single-tenant)
+restricts the [log streams](https://docs.victoriametrics.com/victorialogs/keyconcepts/#stream-fields) a user can read:
+
+```yaml
+users:
+  - username: frontend-logs-viewer
+    password: "***"
+    url_map:
+      - src_paths: [ "/logs/select/.*" ]
+        # the value is the percent-encoded LogsQL filter `_stream:{service=frontend}`
+        url_prefix: "http://victorialogs:9428/?extra_stream_filters=_stream%3A%7Bservice%3Dfrontend%7D"
+        drop_src_path_prefix_parts: 1
+```
+
+The `extra_filters` arg works the same way for any other LogsQL filter. For example,
+`?extra_filters=password:''` requires the `password` field to be empty or missing, which hides log entries where a
+secret has leaked.
+
 ## Endpoints filtering
 
 The `src_paths` in [vmauth config](https://docs.victoriametrics.com/victoriametrics/vmauth/#auth-config) can be further
