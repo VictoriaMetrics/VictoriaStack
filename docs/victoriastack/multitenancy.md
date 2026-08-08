@@ -11,7 +11,7 @@ tags:
   - traces
 ---
 
-Multitenancy supports a single VictoriaStack installation store data for many isolated data groups, such as teams,
+Multitenancy allows a single VictoriaStack installation to store data for many isolated data groups, such as teams,
 environments, or customers. Each group is a **tenant**, and every tenant sees only its own metrics, logs, and traces.
 
 VictoriaMetrics, VictoriaLogs, and VictoriaTraces share the same tenant model, and a request selects its tenant the same
@@ -38,7 +38,7 @@ The same rules apply to all three databases:
 - **Tenant IDs are numeric.** Map human-readable names to tenant IDs in the authorization layer in front of the stack,
   such as vmauth.
 
-See how to [control per-tenant access via vmauth](http://localhost:1313/victoriastack/access-control/#multitenancy). 
+See how to [control per-tenant access via vmauth](http://localhost:1313/victoriastack/access-control/#multitenancy).
 
 ## Ingestion path
 
@@ -62,7 +62,7 @@ curl -X POST http://<vmstack>:8427/logs/insert/jsonline \
  --header "ProjectID: 0"
 ```
 
-In practice the headers are set once in the agent or collector that delivers the data. For example, set tenant in 
+In practice the headers are set once in the agent or collector that delivers the data. For example, set tenant in
 OpenTelemetry Collector exporter configuration:
 
 ```yaml
@@ -106,17 +106,55 @@ access. See [Access control](http://localhost:1313/victoriastack/access-control/
 configuration, and for restricting a user to a subset of data
 [within a tenant](http://localhost:1313/victoriastack/access-control/#enforcing-filters).
 
+## Querying multiple tenants
+
+VictoriaLogs and VictoriaTraces do not support querying multiple tenants within one request. 
+Follow [this issue](https://github.com/VictoriaMetrics/VictoriaLogs/issues/91) for adding support of this feature.
+
+VictoriaMetrics supports querying multiple tenants in a single request when using header `AccountID: multitenant`:
+```sh
+curl 'http://<vmstack>:8427/metrics/select/prometheus/api/v1/query' \
+ -d 'query=up' \
+ --header "AccountID: multitenant"
+```
+
+The return result will contain `vm_account_id` and `vm_project_id` labels, so it stays visible which tenant every series
+came from. 
+
+Multitenant queries are usually slower than requests to a single tenant. Use multitenant queries only when a cross-tenant
+view is really needed.
+
+## Per-tenant retention
+
+By default, [retention](http://localhost:1313/victoriastack/#retention-and-storage) applies to all data in an
+installation. VictoriaMetrics can also keep different retentions per tenant
+via [retention filters](https://docs.victoriametrics.com/victoriametrics/cluster-victoriametrics/#retention-filters),
+which are part of the [Enterprise](http://localhost:1313/victoriastack/enterprise/) package. Pass the filters to
+`vmstorage` nodes:
+
+```sh
+# data for tenant AccountID=42 will be kept for 6 months, all the rest will be kept for 12 months
+-retentionFilter='{vm_account_id="42"}:6M' -retentionPeriod=12M
+```
+
+Tenants that match no filter use the global `-retentionPeriod`.
+
+// TODO: READINESS: per-tenant retention in VL/VT
+
 ## Discovering tenants
 
 Since tenants appear on first write, the list of existing tenants is a property of the stored data:
 
 - **Metrics**: `http://<vmselect>:8481/admin/tenants`
 - **Logs**: [`http://<victorialogs>:9428/select/tenant_ids?start=<start>&end=<end>`](https://docs.victoriametrics.com/victorialogs/querying/#querying-tenants)
-  returns the tenants that received logs in the given time range. 
-- **Traces**: [`http://<victoriatraces>:10428/select/tenant_ids?start=<start>&end=<end>`](...)
   returns the tenants that received logs in the given time range.
+- **Traces**: `http://<victoriatraces>:10428/select/tenant_ids?start=<start>&end=<end>`
+  returns the tenants that received spans in the given time range.
+
+Call the `/select/tenant_ids` endpoints with an empty `AccountID` header. This prevents clients that have access to one
+tenant from enumerating the others.
 
 // TODO: READINESS: Assigning tenants via fields in VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/686
 // TODO: READINESS: Add #querying-tenants docs to https://docs.victoriametrics.com/victoriatraces/querying -  https://github.com/VictoriaMetrics/VictoriaLogs/issues/686
 
-// TODO: make a unified usage dashboards for all signals per-tenant  https://github.com/VictoriaMetrics/VictoriaStack/issues/7 
+// TODO: make a unified usage dashboards for all signals per-tenant  https://github.com/VictoriaMetrics/VictoriaStack/issues/7
