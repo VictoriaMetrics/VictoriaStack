@@ -2,16 +2,16 @@ services:
   otelcol:
     image: otel/opentelemetry-collector-contrib:latest
     command: [ "--config=/etc/otelcol/config.yml" ]
-    volumes: [ "./otelcol-single-node.yml:/etc/otelcol/config.yml" ]
+    volumes: [ "./config/otelcollector/config.yml:/etc/otelcol/config.yml" ]
 
   victoriametrics:
-    image: victoriametrics/victoria-metrics:latest
+    image: victoriametrics/victoria-metrics:v1.150.0-cluster
     command: [ "-vmalert.proxyURL=http://rules-metrics:8880" ]
     ports: [ "8428:8428" ]
     volumes: [ "vm-data:/victoria-metrics-data" ]
 
   victorialogs:
-    image: victoriametrics/victoria-logs:v1.51.0
+    image: victoriametrics/victoria-logs:v1.52.0
     ports: [ "9428:9428" ]
     volumes: [ "vl-data:/victoria-logs-data" ]
 
@@ -37,7 +37,7 @@ services:
   # Entry point into VictoriaStack: authorizes and routes requests to VictoriaMetrics, VictoriaTraces, and VictoriaLogs.
   vmstack:
     image: victoriametrics/vmauth:latest
-    volumes: [ "./vmauth-single-node.yml:/etc/auth.yml" ]
+    volumes: [ "./config/vmauth/single-node.yml:/etc/auth.yml" ]
     command: [ "--auth.config=/etc/auth.yml" ]
     ports: [ "8427:8427" ]
 
@@ -50,26 +50,5 @@ services:
       # Replace "-notifier.blackhole" with actual "-notifier.url=<alertmanager_url>" for sending alerts
       - "-notifier.blackhole"
     volumes: [ "./rules:/etc/vmalert" ]
-
-  # Define telemetry generators for logs and traces.
-  # Metrics are scraped by OTEL collector from deployed services.
-  generate-traces:
-    image: ghcr.io/krzko/otelgen:latest
-    command:
-      - --otel-exporter-otlp-endpoint=otelcol:4317
-      - --insecure
-      - --d=9999
-      - traces
-      - multi
-
-
-  generate-logs:
-    image: ghcr.io/krzko/otelgen:latest
-    command:
-      - --otel-exporter-otlp-endpoint=otelcol:4317
-      - --insecure
-      - --d=9999
-      - logs
-      - multi
 
 volumes: { vm-data: {}, vt-data: {}, vl-data: {}, grafanadata: {} }

@@ -37,15 +37,15 @@ receivers:
         endpoint: 0.0.0.0:4317
 
 exporters:
-  otlp_http/vm-metrics: { metrics_endpoint: http://victoriametrics:8428/opentelemetry/v1/metrics }
-  otlp_http/vm-logs:    { logs_endpoint: http://victorialogs:9428/insert/opentelemetry/v1/logs }
-  otlp_http/vm-traces:  { traces_endpoint: http://victoriatraces:10428/insert/opentelemetry/v1/traces }
+  otlp_http/vmetrics: { metrics_endpoint: http://victoriametrics:8428/opentelemetry/v1/metrics }
+  otlp_http/vlogs:    { logs_endpoint: http://victorialogs:9428/insert/opentelemetry/v1/logs }
+  otlp_http/vtraces:  { traces_endpoint: http://victoriatraces:10428/insert/opentelemetry/v1/traces }
 
 service:
   pipelines:
-    logs:    { receivers: [ otlp ], exporters: [ otlp_http/vm-logs ] }
-    traces:  { receivers: [ otlp ], exporters: [ otlp_http/vm-traces ] }
-    metrics: { receivers: [ otlp ], exporters: [ otlp_http/vm-metrics ] }
+    logs:    { receivers: [ otlp ], exporters: [ otlp_http/vlogs ] }
+    traces:  { receivers: [ otlp ], exporters: [ otlp_http/vtraces ] }
+    metrics: { receivers: [ otlp ], exporters: [ otlp_http/vmetrics ] }
 ```
 
 Here, OpenTelemetry Collector receives signals via the gRPC protocol,
@@ -67,8 +67,7 @@ See the following docs for more details:
 * [VictoriaLogs OpenTelemetry Setup](https://docs.victoriametrics.com/victorialogs/data-ingestion/opentelemetry/)
 * [VictoriaTraces OpenTelemetry Setup](https://docs.victoriametrics.com/victoriatraces/data-ingestion/opentelemetry/)
 
-> See the OpenTelemetry Collector configuration examples for [single-node](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otelcol-single-node.yml)
-> and [clustered](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otelcol-cluster.yml) VictoriaStack.
+> See the OpenTelemetry Collector [configuration example](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/config/otelcollector/config.yml)
 
 ## Agents and protocols
 
@@ -222,9 +221,9 @@ With the configuration above, vmauth accepts write requests on a single endpoint
 * `http://vmauth:8427/logs/insert/*` for logs,
 * `http://vmauth:8427/traces/insert/*` for traces.
 
-The [clustered demo](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/vmauth-cluster.yml) runs
+The [clustered demo](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/config/vmauth/cluster.yml) runs
 exactly this vmauth configuration, and its
-[OpenTelemetry Collector](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otelcol-cluster.yml)
+[OpenTelemetry Collector](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/confog/otelcollector/config.yml)
 writes to these endpoints.
 
 **Tenants are specified with HTTP headers** in the same way in all three databases. Set `AccountID` and `ProjectID` on the
@@ -232,12 +231,9 @@ write request, for example in an OpenTelemetry Collector exporter:
 
 ```yaml
 exporters:
-  otlp_http/vm-logs: { logs_endpoint: http://vmauth:8427/logs/insert/opentelemetry/v1/logs, headers: { AccountID: "0", ProjectID: "0" } }
+  otlp_http/vlogs: { logs_endpoint: http://vmauth:8427/logs/insert/opentelemetry/v1/logs, headers: { AccountID: "0", ProjectID: "0" } }
 ```
 
 Requests without these headers write to the default tenant `0:0`.
 
 > Note: VictoriaMetrics supports [multitenancy](http://localhost:1313/victoriastack/multitenancy/) only in the cluster mode.
-
-// TODO: READINESS: enable headers multitenancy by default https://github.com/VictoriaMetrics/VictoriaMetrics/issues/11365
-

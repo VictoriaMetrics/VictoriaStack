@@ -137,7 +137,7 @@ with [Compose v2](https://docs.docker.com/compose/) and `git`.
 ### Single-node version
 
 The simplest setup runs VictoriaMetrics, VictoriaLogs, and VictoriaTraces as single-node deployments.
-Start it locally with the [otel-single-node-compose.yml](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-single-node-compose.yml)
+Start it locally with the [otel-single-node.yml](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-single-node.yml)
 docker compose file:
 
 ```sh
@@ -150,7 +150,7 @@ make otel-single-up
 
 The command starts:
 
-- a telemetry generator with an OpenTelemetry collector;
+- a minimized version of [OpenTelemetry Demo](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-demo-mini.yml) with an OpenTelemetry collector;
 - single-node VictoriaMetrics, VictoriaLogs, and VictoriaTraces for storing and querying signals;
 - vmalert for evaluating alerting rules;
 - Grafana for visualizing signals;
@@ -161,12 +161,12 @@ The command starts:
 After a few minutes, the following links are available:
 
 - Visit [VictoriaMetrics UI - http://localhost:8427/metrics/select/vmui](http://localhost:8427/metrics/select/vmui/?#/cardinality)
-  to explore the stored metrics or [run a query to plot charts](http://localhost:8427/metrics/select/vmui/#/?g0.range_input=15m&g0.relative_time=last_15_minutes&g0.tab=0&g0.expr=sum%28rate%28vm_http_requests_total%29%29+by+%28path%29+%3E+0):
+  to explore the stored metrics or [run a query to plot charts](http://localhost:8427/metrics/select/vmui/#/?g0.range_input=15m&g0.end_input=2026-08-17T18%3A14%3A42&g0.relative_time=last_15_minutes&g0.tab=0&g0.expr=sum%28rate%28%7B__name__%3D%22http.server.request.body.size_bucket%22%7D%5B5m%5D%29%29&g0.step_input=3s):
   ![readme-metrics-vmui-demo.webp](readme-metrics-vmui-demo.png)
   {width="500"}
 
 - Visit [VictoriaLogs UI - http://localhost:8427/logs/select/vmui](http://localhost:8427/logs/select/vmui) to see
-  recently ingested logs or [run a query to plot charts](http://localhost:8427/logs/select/vmui/?#/?g0.range_input=5m&g0.relative_time=last_5_minutes&step=5s&query=Error+%7C+by%28http.method%29+count%28%29&group_hits=http.method):
+  recently ingested logs or [run a query to plot charts](http://localhost:8427/logs/select/vmui/?#/?g0.range_input=15m&g0.relative_time=last_15_minutes&step=5s&query=*+%7C+by%28service.name%29+count%28%29&group_hits=service.name&g0.end_input=2026-08-17T18%3A17%3A27.768Z):
   ![readme-logs-vmui-demo.webp](readme-logs-vmui-demo.png)
   {width="500"}
 
@@ -193,7 +193,7 @@ To scale the stack horizontally, see the [clustered version](#clustered-version)
 
 ### Clustered version
 
-Run the stack locally with [otel-cluster-compose.yml](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-cluster-compose.yml)
+Run the stack locally with [otel-cluster.yml](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-cluster.yml)
 docker compose file:
 
 ```sh

@@ -67,7 +67,7 @@ OpenTelemetry Collector exporter configuration:
 
 ```yaml
 exporters:
-  otlp_http/vm-logs:
+  otlp_http/vlogs:
     logs_endpoint: http://vmstack:8427/logs/insert/opentelemetry/v1/logs
     headers: { AccountID: "42", ProjectID: "0" }
 ```
