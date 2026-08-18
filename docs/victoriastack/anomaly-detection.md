@@ -11,192 +11,136 @@ tags:
   - traces
 ---
 
-Alerting rules answer the question "is this value above the threshold?". Anomaly detection answers a different one: "is
-this behaviour unusual for this time series?". Static thresholds need constant tuning and break on data that grows,
-scales, or follows daily and weekly cycles, where a value that is normal on Monday morning is an incident on Sunday
-night.
+// TODO: Replace root-relative documentation links with absolute `https://docs.victoriametrics.com` URLs before the VictoriaStack docs section is released.
 
-[vmanomaly](https://docs.victoriametrics.com/anomaly-detection/) is the VictoriaStack component that answers the second
-question. It applies machine learning models to the data stored in the stack and turns every data point into one
-number: an **anomaly score**. Values up to `1` are normal, values above `1` are anomalous, so alerting rules become
-as simple as `anomaly_score > 1` and stay valid while the data underneath keeps changing.
+Static alerts are the right choice when a value is always unacceptable or an invariant must never be broken. Anomaly detection complements them when expected behavior depends on time, workload, trend, seasonality, scale, or relationships between signals.
 
-> vmanomaly is a part of the [Enterprise](http://localhost:1313/victoriastack/enterprise/) package and requires a
-> license key to run. The databases it reads from can be either community or Enterprise edition, single-node or
-> clustered. A [trial license](https://victoriametrics.com/products/enterprise/trial/) is available for evaluation.
+[vmanomaly](/anomaly-detection/) learns expected data behavior and writes a [unified anomaly score](/anomaly-detection/faq/#what-is-anomaly-score) to VictoriaMetrics for contextual alerting and investigation. This reduces the engineering effort spent maintaining raw-value thresholds and gives [vmalert](/victoriastack/alerting/) a stable, explicit decision boundary for contextual anomalies.
 
-## How it works
+`vmanomaly` helps teams:
 
-vmanomaly runs as a service next to the databases and periodically repeats two steps:
+- reduce alert engineering and review effort across differently scaled signals;
+- detect meaningful deviations in trending, seasonal, changing, or interconnected data;
+- learn incrementally with [online models](/anomaly-detection/components/models/#online-models) from a stream instead of repeatedly reading and refitting large history windows;
+- quickly progress from a query to a validated configuration and starting alerting rules with the [UI](/anomaly-detection/ui/) and available AI assistance.
 
-- **fit**: train a model on a window of historical data, for example the last 3 days;
-- **infer**: score the newly arrived data points with that model.
+> `vmanomaly` is part of [VictoriaMetrics Enterprise](/victoriastack/enterprise/) and requires a license key. The VictoriaMetrics, VictoriaLogs, or VictoriaTraces data source can use either the Community or Enterprise edition and a single-node or clustered deployment. A [trial license](https://victoriametrics.com/products/enterprise/trial/) is available for evaluation.
 
-The results are written back into VictoriaMetrics as ordinary metrics, which means the rest of the stack consumes them
-with no special support: [vmalert](http://localhost:1313/victoriastack/alerting/) evaluates rules on them, and Grafana
-plots them next to the raw data.
+## How it fits into VictoriaStack
+
+`vmanomaly` runs alongside the VictoriaStack databases:
 
 ```mermaid
 flowchart LR
     subgraph Sources
-        direction TB
+        direction LR
         VM["VictoriaMetrics"]
         VL["VictoriaLogs"]
         VT["VictoriaTraces"]
     end
 
-    A["vmanomaly<br/><hr/>fit • infer"]
+    A["vmanomaly<br/><hr/>learn • score • update"]
 
-    VM -->|"queries"| A
-    VL -->|"stats queries"| A
-    VT -->|"stats queries"| A
+    VM -->|"MetricsQL queries"| A
+    VL -->|"LogsQL stats queries"| A
+    VT -->|"LogsQL stats queries"| A
 
-    A -->|"anomaly_score as metrics"| W["VictoriaMetrics"]
-
+    A -->|"anomaly scores as metrics"| W["VictoriaMetrics"]
+    A -.->|"optional predictions for context"| W
     W --> AL["vmalert"]
     W --> G["Grafana"]
 ```
 
-All three signals can be analyzed. Metrics are read from VictoriaMetrics directly, while logs and traces reach
-vmanomaly as metrics produced by their [stats queries](https://docs.victoriametrics.com/victorialogs/vmalert/index.html), so anomalies in
-error rates or span durations are detected the same way as anomalies in CPU usage.
+Metrics are queried directly from VictoriaMetrics. Logs and traces are analyzed as numeric time series returned by [LogsQL `stats` queries](/victorialogs/logsql/#stats-pipe), such as error rates or span-duration aggregates.
 
-## The anomaly score
+[The results](/anomaly-detection/components/models/#vmanomaly-output) are ordinary metrics in VictoriaMetrics, preserving all input labels and values. Existing tools can therefore evaluate alerting rules and visualize the observed values, expected behavior, and anomaly scores without a separate anomaly-specific backend.
 
-`anomaly_score` is a single metric that models produce for every input series:
+## One operational signal
 
-- **0 to 1** means the observed value matches the expected behaviour;
-- **above 1** means the value deviates from it, and the score grows with the size of the deviation.
+[`anomaly_score`](/anomaly-detection/faq/#what-is-anomaly-score) provides a consistent operational signal across [models](/anomaly-detection/components/models/):
 
-The cut-off at `1` is deliberate and identical for every model, so one threshold works across all of them and stays
-stable over time. Models also return the expected value and its confidence interval as `yhat`, `yhat_lower`, and
-`yhat_upper`, which makes an anomaly easy to inspect on a graph: the raw series leaves the shaded band.
+- `0` means the observation matches the model expectation;
+- values up to `1` remain within the expected range;
+- values above `1` cross the default anomaly boundary.
 
-The output keeps the labels of the input series and adds a few of its own, so it stays clear which query, model, and
-schedule produced the score:
+The score is a continuous, de-scaled, de-trended and de-seasonalized value with an interpretable decision boundary at `1`.
 
-```promtextmetric
-anomaly_score{for="cpu_seconds_total", instance="node-exporter:9100", mode="idle", model_alias="mad", scheduler_alias="1d_1m"} 4.23
-anomaly_score{for="read_latency", instance="node-exporter:9100", model_alias="mad", scheduler_alias="1d_1m"} 0.27
-```
+A rule such as `anomaly_score > 1` can therefore be reused across CPU, latency, traffic, and business signals rather than maintaining a different raw-value threshold for each one.
 
-## Quick start with presets
+The boundary at `1` is a stable starting point, not a substitute for operational validation. Teams can raise the alert threshold, require a duration, or aggregate scores to match the sensitivity and notification policy of a service.
 
-[Presets](https://docs.victoriametrics.com/anomaly-detection/presets/) configure anomaly detection for well-known sets
-of metrics, so the only thing left to specify is where to read data from and where to write results to. Every preset
-comes with alerting rules and a Grafana dashboard.
+[Univariate models](/anomaly-detection/components/models/#univariate-models) produce scores for individual input series. [Multivariate models](/anomaly-detection/components/models/#multivariate-models) can instead produce one joint score for a group of related series. Depending on the selected model and [output configuration](/anomaly-detection/components/models/#provide-series), outputs can include the actual observed value (`y`), expected value (`yhat`), and prediction interval (`yhat_lower` and `yhat_upper`) for easier investigation and visualization.
 
-```yaml
-preset: "node-exporter"
-reader:
-  datasource_url: "http://victoriametrics:8428/"  # where to read metrics from
-  # tenant_id: '0:0'  # specify for the cluster version
-writer:
-  datasource_url: "http://victoriametrics:8428/"  # where to write anomaly scores to
-  # tenant_id: '0:0'  # specify for the cluster version
-```
+## Online-first learning
 
-Three presets are available:
+Most built-in models support online learning. Their operating cycle is:
 
-| Preset                                                                                | What it does                                                                                |
-|---------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
-| [`ui`](https://docs.victoriametrics.com/anomaly-detection/presets/#ui)                 | starts the [built-in UI](https://docs.victoriametrics.com/anomaly-detection/ui/) for experimenting with models and backtesting configurations |
-| [`node-exporter`](https://docs.victoriametrics.com/anomaly-detection/presets/#node-exporter) | detects anomalies in CPU usage, network errors, disk latency, and other node metrics         |
-| [`default`](https://docs.victoriametrics.com/anomaly-detection/presets/#default)        | your own configuration, with a prebuilt dashboard for drilling down into the produced scores |
+1. **Bootstrap** from enough historical behavior to establish an initial profile.
+2. **Score and update** incrementally as new samples arrive.
+3. **Persist and restore** the learned state so a restart does not require repeatedly querying and refitting the same history.
 
-## Configuration
+This spreads computation and data transfer over time and lets models adapt to new patterns without retraining from scratch. See the [online model lifecycle](/anomaly-detection/components/models/#online-models) and [state restoration](/anomaly-detection/components/settings/#state-restoration) for configuration details.
 
-Outside of presets, a configuration file describes four required sections:
+## Add domain knowledge
 
-| Section                                                                                   | What it defines                                                        |
-|-------------------------------------------------------------------------------------------|------------------------------------------------------------------------|
-| [`reader`](https://docs.victoriametrics.com/anomaly-detection/components/reader/)          | where to read data from, and the queries to analyze                    |
-| [`schedulers`](https://docs.victoriametrics.com/anomaly-detection/components/scheduler/)   | how often to fit models and to score new data                          |
-| [`models`](https://docs.victoriametrics.com/anomaly-detection/components/models/)          | which models to run, and on which queries                              |
-| [`writer`](https://docs.victoriametrics.com/anomaly-detection/components/writer/)          | where to write the produced scores                                     |
+A statistically unusual value is not always operationally important. Stable business policies can be attached to each input query so they apply consistently when models change:
 
-<br>
+| Policy | Use it to |
+|---|---|
+| [`detection_direction`](/anomaly-detection/components/models/#detection-direction) | Detect only values above expected, below expected, or in both directions. |
+| [`data_range`](/anomaly-detection/components/reader/#per-query-parameters) | Define values that are impossible or unacceptable for the signal. |
+| [`min_dev_from_expected`](/anomaly-detection/components/models/#minimal-deviation-from-expected) | Ignore deviations that are too small in absolute units to matter. |
+| [`min_rel_dev_from_expected`](/anomaly-detection/components/models/#minimal-relative-deviation-from-expected) | Ignore deviations that are too small relative to expected behavior. |
+| [Multivariate grouping](/anomaly-detection/components/models/#multivariate-models) | Detect changes in meaningful relationships between signals. |
 
-A minimal configuration that scores one query looks like this:
+For example, an error-rate query can reject negative values, detect only upward deviations, and ignore small percentage changes before they become anomaly alerts:
 
 ```yaml
 reader:
-  class: 'vm'
-  datasource_url: "http://victoriametrics:8428/"
-  sampling_period: '1m'
+  class: vm
+  datasource_url: http://victoriametrics:8428
+  sampling_period: 1m
   queries:
-    requests_rate:
-      expr: 'sum(rate(http_requests_total)) by (path)'
-      data_range: [0, 'inf']  # requests rate can never be negative
-
-schedulers:
-  periodic:
-    class: 'periodic'
-    fit_window: '3d'    # how much history to train on
-    fit_every: '1h'     # how often to retrain
-    infer_every: '1m'   # how often to score new data points
-
-models:
-  zscore:
-    class: 'zscore_online'
-    provide_series: ['anomaly_score', 'yhat', 'yhat_lower', 'yhat_upper']
-    queries: ['requests_rate']
-    schedulers: ['periodic']
-
-writer:
-  datasource_url: "http://victoriametrics:8428/"
+    error_rate:
+      expr: 'sum(rate(http_requests_total{status=~"5.."}[5m]))'
+      data_range: [0, 'inf']
+      detection_direction: above_expected
+      min_rel_dev_from_expected: [0, 20]
 ```
 
-vmanomaly ships [built-in models](https://docs.victoriametrics.com/anomaly-detection/components/models/#built-in-models)
-ranging from simple z-score to seasonal ones, and accepts
-[custom models](https://docs.victoriametrics.com/anomaly-detection/components/models/#custom-model-guide) too. Models
-are either **univariate**, scoring every series on its own, or
-[**multivariate**](https://docs.victoriametrics.com/anomaly-detection/components/models/#multivariate-models), scoring
-related series together, which catches patterns that isolated series don't reveal.
+These controls encode the difference between mathematical deviation and business impact, reducing false positives and keeping detected profiles aligned with operational expectations. See all [per-query parameters](/anomaly-detection/components/reader/#per-query-parameters).
 
-> Choosing models and tuning them is the hard part of anomaly detection. The
-> [built-in UI](https://docs.victoriametrics.com/anomaly-detection/ui/) backtests a configuration against historical
-> data before it goes live, and the [AI tools](https://docs.victoriametrics.com/ai-tools/) can inspect the data and
-> generate a validated configuration.
+## Get started
 
-## Alerting on anomalies
-
-Since scores are stored as metrics, alerting on them needs no new tooling. A rule for
-[vmalert](http://localhost:1313/victoriastack/alerting/) is a threshold on one metric:
+For predefined metric sets, [presets](/anomaly-detection/presets/) provide a configuration, Grafana dashboard, and starting alerting rules. A minimal node-exporter setup specifies only the reader and writer endpoints:
 
 ```yaml
-groups:
-  - name: AnomalyExample
-    rules:
-      - alert: HighAnomalyScore
-        expr: 'anomaly_score > 1.0'
-        labels:
-          severity: warning
-        annotations:
-          summary: "Anomalous behaviour detected for {{ $labels.for }} on {{ $labels.instance }}"
+preset: node-exporter
+reader:
+  datasource_url: http://victoriametrics:8428
+writer:
+  datasource_url: http://victoriametrics:8428
 ```
 
-This rule stays as it is while the monitored data changes, which is the practical benefit over thresholds on raw values.
-Presets bring their own rules, so with a preset there is nothing to write at all.
+For a custom signal, use the [built-in UI](/anomaly-detection/ui/) to explore historical behavior, compare models, and backtest the resulting configuration. [AI Copilot](/anomaly-detection/ui/#ai-assistance), [vmanomaly MCP server](https://github.com/VictoriaMetrics/mcp-vmanomaly), and [VictoriaMetrics agent skills](https://github.com/VictoriaMetrics/skills) can profile a query, suggest and fine-tune suitable models, and help produce a validated configuration plus starting alerting rules.
 
-## Deployment
+Then use the standard VictoriaStack workflow:
 
-vmanomaly is deployed the same ways as the rest of the
-stack, see [Deployment](http://localhost:1313/victoriastack/deployment/) for the general picture:
+1. Write `anomaly_score` and optional prediction outputs to VictoriaMetrics.
+2. Alert on the unified signal, starting with `anomaly_score > 1`.
+3. Investigate alerts using [generic anomaly score dashboard](/anomaly-detection/presets/#grafana-dashboard).
+4. Tune duration, grouping, business filters, and routing as needed.
 
-- **Docker**: the [`victoriametrics/vmanomaly`](https://docs.victoriametrics.com/anomaly-detection/quickstart/#docker)
-  image, with the license key and the config file mounted into the container.
-- **Helm**: the [victoria-metrics-anomaly](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-anomaly) chart.
-- **Kubernetes operator**: the [VMAnomaly](https://docs.victoriametrics.com/operator/resources/vmanomaly/) custom resource.
+Follow the [quick start](/anomaly-detection/quickstart/) for installation and the [vmalert integration guide](/anomaly-detection/guides/guide-vmanomaly-vmalert/) for a complete example.
 
-Two operational topics have their own docs:
-[scaling and high availability](https://docs.victoriametrics.com/anomaly-detection/scaling-vmanomaly/) covers sharding
-the workload across instances, and
-[self-monitoring](https://docs.victoriametrics.com/anomaly-detection/self-monitoring/) ships the dashboards and alerting
-rules for the service itself.
+## Deployment and operations
 
-## Multitenancy
+`vmanomaly` supports the same deployment paths as other VictoriaStack components:
 
-The `reader` and `writer` sections accept a `tenant_id`, so vmanomaly reads from one
-[tenant](http://localhost:1313/victoriastack/multitenancy/) and writes the scores to another, or to the same one. Running
-an instance per tenant keeps the models and the produced scores isolated together with the data.
+- [Docker](/anomaly-detection/quickstart/#docker);
+- [VictoriaMetrics Anomaly Helm chart](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-anomaly);
+- [VMAnomaly custom resource](/operator/resources/vmanomaly/) in VictoriaMetrics Operator.
+
+For larger workloads, `vmanomaly` supports [horizontal scalability through sharding](/anomaly-detection/scaling-vmanomaly/#horizontal-scalability) and [high availability through replication](/anomaly-detection/scaling-vmanomaly/#high-availability) of validated sub-configurations across instances.
+
+See [Deployment](/victoriastack/deployment/) for the overall stack architecture. For production operation, see [scaling and high availability](/anomaly-detection/scaling-vmanomaly/), [self-monitoring](/anomaly-detection/self-monitoring/), and [multitenancy](/anomaly-detection/components/writer/#multitenancy-support).
