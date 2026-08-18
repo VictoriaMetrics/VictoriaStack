@@ -82,6 +82,8 @@ in a log entry to correlate traces and logs, or the same service name present in
 Correlation is the reason to put all three databases into one UI, and Grafana is the recommended place for it thanks to its
 [correlations](https://grafana.com/docs/grafana/latest/administration/correlations/) and derived fields features.
 
+![ui-correlations.png](ui-correlations.png)
+
 Depending on the Grafana datasource plugin, there could be multiple correlations available:
 
 1. Trace to logs, log to trace, log to metrics - see [correlations via VictoriaLogs plugin](https://docs.victoriametrics.com/victorialogs/integrations/grafana/#correlations).
@@ -89,6 +91,8 @@ Depending on the Grafana datasource plugin, there could be multiple correlations
 1. Metrics to logs or traces correlations are possible via the Prometheus datasource as well.
 1. Plugins Tempo, Jaeger, and Zipkin can correlate with logs or metrics using [Trace to logs](https://grafana.com/docs/grafana/latest/explore/trace-integration/#trace-to-logs)
    and [Trace to metrics](https://grafana.com/docs/grafana/latest/visualizations/explore/trace-integration/#trace-to-metrics) feature.
+
+> See examples of correlation settings configured for each datasource plugin in the [VictoriaStack provisioning](https://github.com/VictoriaMetrics/VictoriaStack/tree/main/deployment/provisioning/datasources) demo. 
 
 Logs and traces can also be turned into metrics
 with [recording rules](http://localhost:1313/victoriastack/alerting/#rules), which makes them available on the same

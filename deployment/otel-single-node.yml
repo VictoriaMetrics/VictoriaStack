@@ -5,7 +5,7 @@ services:
     volumes: [ "./config/otelcollector/config.yml:/etc/otelcol/config.yml" ]
 
   victoriametrics:
-    image: victoriametrics/victoria-metrics:v1.150.0-cluster
+    image: victoriametrics/victoria-metrics:v1.150.0
     command: [ "-vmalert.proxyURL=http://rules-metrics:8880" ]
     ports: [ "8428:8428" ]
     volumes: [ "vm-data:/victoria-metrics-data" ]
@@ -16,7 +16,7 @@ services:
     volumes: [ "vl-data:/victoria-logs-data" ]
 
   victoriatraces:
-    image: victoriametrics/victoria-traces:latest
+    image: victoriametrics/victoria-traces:v0.11.0
     ports: [ "10428:10428" ]
     volumes: [ "vt-data:/victoria-traces-data" ]
 

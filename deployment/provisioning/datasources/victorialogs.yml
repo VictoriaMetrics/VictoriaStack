@@ -6,15 +6,15 @@ datasources:
       access: proxy
       url: http://vmstack:8427/logs/
       isDefault: false
+      # is needed to link correlation from Jaeger datasource
+      uid: "victorialogs-ds"
       jsonData:
+        # https://docs.victoriametrics.com/victorialogs/#multitenancy
         multitenancyHeaders:
           AccountID: 0
           ProjectID: 0
         otelPreset:
           enabled: true
-          # `uid` of a Jaeger datasource the generated trace ID derived field
-          # links to (currently only Jaeger is supported).
-          # Omit to skip trace linking.
           tracesDatasourceUid: victoriatraces-jaeger-ds
           detection:
             # Log field holding the trace ID, e.g. trace_id, traceId or TraceId.
