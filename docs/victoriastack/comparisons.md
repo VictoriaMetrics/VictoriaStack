@@ -75,7 +75,7 @@ and both use Grafana as the primary visualization UI.
   logs, the VictoriaMetrics team develops and publishes its own Grafana datasource. Grafana treats it as a third-party
   plugin, so it doesn't support some features, such as Grafana Drilldown.
 * **License.** LGTM projects use the AGPLv3 license. VictoriaStack uses Apache 2.0.
-  For most end users there is no practical difference between the licenses. 
+  For most end users there is no practical difference between the licenses.
   For teams that embed the databases into distributed products, Apache 2.0 is simpler to adopt.
 
 **Prefer LGTM when:**
@@ -165,7 +165,7 @@ metrics.
 **Prefer Elastic when:** search is your primary use case (security analytics, business documents, complex full-text
 queries over logs), or you already run Elastic for search and want observability to piggyback on it.
 
-**Prefer VictoriaStack when:** 
+**Prefer VictoriaStack when:**
 * You value cost-efficiency and flexibility. The savings could reach x30.
 * You are migrating an existing Prometheus setup.
 * You operate at a scale where per-signal efficiency dominates costs.
