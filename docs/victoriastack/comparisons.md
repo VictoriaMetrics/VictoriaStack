@@ -99,7 +99,7 @@ unified UI with Lucene-style search, SQL support, dashboards, alerting, and sess
 * ClickStack is built on top of [ClickHouse](http://github.com/clickHouse/clickhouse), a general-purpose analytical database.
   All signals can be stored in the same installation and can be quireied via SQL. The trade-off: a general-purpose database
   needs tuning for each workload (schemas, codecs, TTLs, merges). VictoriaStack databases apply those optimizations by design.
-  There are no schemas to manage for metrics, logs, or traces.
+  There are no schemas to manage for metrics, logs, or traces. There are no public benchmarks comparing the performance of ClickStack and VictoriaStack.
 * ClickStack has bundled HyperDX UI: one interface for everything.
   VictoriaStack is relying on [Grafana or Perses](http://localhost:1313/victoriastack/ui/),
   plus per-database [vmui](http://localhost:1313/victoriastack/ui/#vmui).
@@ -109,6 +109,8 @@ unified UI with Lucene-style search, SQL support, dashboards, alerting, and sess
 * ClickHouse-based metrics lack a PromQL-compatible engine, while VictoriaMetrics is
   a [drop-in Prometheus remote_write target](https://docs.victoriametrics.com/victoriametrics/#prometheus-setup)
   with a PromQL-compatible query API, alerting, scraping and service discovery.
+* ClickStack heavily relies on OTLP protocols for ingestion. Besides OTLP, VictoriaStack supports many different ingestion protocols
+  and integrations with other observability tools, exporters, UIs, telemetry agents. 
 
 **Prefer ClickStack when:**
 
@@ -118,6 +120,7 @@ unified UI with Lucene-style search, SQL support, dashboards, alerting, and sess
 **Prefer VictoriaStack when:**
 
 * You come from the Prometheus/Grafana ecosystem and want your dashboards, alerts, and exporters to keep working.
+* You need additional integraion pipleines besides OTLP
 * You want databases that need no schema design or engine tuning per signal.
 
 ## VictoriaStack vs SigNoz
@@ -130,12 +133,9 @@ unified UI with Lucene-style search, SQL support, dashboards, alerting, and sess
 * SigNoz optimizes for the **APM experience out of the box**: service maps, latency percentiles per endpoint,
   and exceptions. It is closer to a self-hosted Datadog than to a set of databases.
   VictoriaStack is optimized for building an observability platform with high flexibility and control options.
-* SigNoz is built on top of ClickHouse, a general-purpose analytical database.
-  Putting all signals in it gives you SQL over everything. The trade-off: a general-purpose engine needs tuning
-  for each workload (schemas, codecs, TTLs, merges). VictoriaStack databases apply those optimizations by design.
-  There are no schemas to manage for metrics, logs, or traces.
+* SigNoz is built on top of ClickHouse, and shares the [same trade-offs as ClickStack](#victoriastack-vs-clickstack).
 * SigNoz metrics support PromQL queries, but the primary interface is SigNoz's query builder.
-  VictoriaMetrics is a more natural fit for the Prometheus ecosystem, especially for recording rules, remote_write from existing Prometheus fleets, and Grafana dashboards.
+  VictoriaMetrics is a more natural fit for the Prometheus ecosystem, especially for recording rules and Grafana dashboards.
 * Multitenancy is built into every VictoriaStack database. Self-hosted SigNoz is single-tenant, with multitenancy available in the Cloud offering.
 
 **Prefer SigNoz when:** a small team wants a Datadog-like APM experience, self-hosted, with minimal composition work.
@@ -143,7 +143,7 @@ unified UI with Lucene-style search, SQL support, dashboards, alerting, and sess
 **Prefer VictoriaStack when:**
 
 * You are building a platform for many teams and need multitenancy, access control, and per-tenant limits.
-* You are migrating an existing Prometheus setup.
+* You come from the Prometheus/Grafana ecosystem and want your dashboards, alerts, and exporters to keep working.
 * You operate at a scale where per-signal efficiency dominates costs.
 
 ## VictoriaStack vs Elastic Stack
@@ -155,8 +155,8 @@ metrics.
 
 * Elasticsearch builds full-text indexes over everything. Indexing gives unmatched search flexibility, but it costs
   significant RAM, CPU, and disk. VictoriaLogs indexes stream fields and runs fast full scans over compressed data
-  for the rest. For observability log workloads, VictoriaLogs typically needs an order of magnitude less hardware
-  (see the [VictoriaLogs vs Elasticsearch benchmarks](https://docs.victoriametrics.com/victorialogs/faq/#what-is-the-difference-between-victorialogs-and-elasticsearch-opensearch)).
+  for the rest. For observability log workloads, VictoriaLogs typically [needs an order of magnitude less hardware](https://itnext.io/how-do-open-source-solutions-for-logs-work-elasticsearch-loki-and-victorialogs-9f7097ecbc2f).
+  See [What is the difference between VictoriaLogs and Elasticsearch?](https://docs.victoriametrics.com/victorialogs/faq/#what-is-the-difference-between-victorialogs-and-elasticsearch-opensearch).
 * Metrics are not Elasticsearch's native workload. There is no PromQL support, and TSDB-style compression is newer
   and less space-efficient than dedicated time series databases.
 * Elasticsearch offers three licenses (Elastic License 2.0, SSPL, and AGPLv3 since 2024). VictoriaStack is Apache 2.0.
@@ -169,13 +169,12 @@ queries over logs), or you already run Elastic for search and want observability
 * You are migrating an existing Prometheus setup.
 * You operate at a scale where per-signal efficiency dominates costs.
 
-## VictoriaStack vs Prometheus + Thanos (and friends)
+## VictoriaStack vs Prometheus + Thanos
 
 Many teams run Prometheus with [Thanos](https://thanos.io/) for long-term storage, plus a separate log and trace stack.
-Prometheus is the standard VictoriaMetrics is compatible with, not an adversary. VictoriaMetrics accepts
-[remote_write](https://docs.victoriametrics.com/victoriametrics/#prometheus-setup), serves a PromQL-compatible API,
-and [vmagent](https://docs.victoriametrics.com/victoriametrics/vmagent/) supports the full Prometheus scrape config
-and service discovery.
+Prometheus is the standard VictoriaMetrics is compatible with: accepts
+[remote_write](https://docs.victoriametrics.com/victoriametrics/#prometheus-setup) writes, PromQL-compatible API,
+service discovery, scrape and rules configuration formats.
 
 * **A healthy, stable Prometheus setup needs no migration.** If it fits in one node and works, keep it.
 * Teams usually evaluate VictoriaMetrics when they hit scale pain: high cardinality, RAM pressure, slow queries over
@@ -188,13 +187,13 @@ and service discovery.
 
 ## How to choose
 
-| If                                                                                                         | Choose                                    |
-|------------------------------------------------------------------------------------------------------------|-------------------------------------------|
-| You live in the Prometheus/Grafana ecosystem and want logs and traces with the same operational simplicity | **VictoriaStack**                         |
-| You need one bundled UI with session replay, and your team thinks in SQL                                   | **ClickStack**                            |
-| You want a self-hosted, Datadog-like APM for one team                                                      | **SigNoz**                                |
-| You require strict PromQL compatibility and native integration with Grafana                                | **Grafana LGTM**                          |
-| You mostly focused on Logs search,  and cost efficiency is not a priority                                                 | **Elastic**                               |
+| If                                                                                                         | Choose            |
+|------------------------------------------------------------------------------------------------------------|-------------------|
+| You live in the Prometheus/Grafana ecosystem and want logs and traces with the same operational simplicity | **VictoriaStack** |
+| You need one bundled UI with session replay, and your team thinks in SQL                                   | **ClickStack**    |
+| You want a self-hosted, Datadog-like APM for one team                                                      | **SigNoz**        |
+| You require strict PromQL compatibility and native integration with Grafana                                | **Grafana LGTM**  |
+| You mostly focused on Logs search,  and cost efficiency is not a priority                                  | **Elastic**       |
 
 > Found a mistake on this page, or a comparison dimension we should add?
 > [Open an issue](https://github.com/VictoriaMetrics/VictoriaStack/issues). We welcome corrections and apply them.
