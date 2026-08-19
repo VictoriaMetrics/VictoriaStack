@@ -43,25 +43,25 @@ See features that are missing in the products to make the stack aligned.
 
 ## UI 
 
-// TODO: READINESS: visum to become all-in-one
+- // TODO: READINESS: visum to become all-in-one
 
 ## VictoriaTraces
 
-// TODO: READINESS: https://github.com/VictoriaMetrics/VictoriaTraces/pull/242 vtagent documentation for HA
-// TODO: READINESS: per-tenant retention in VL/VT
-// TODO: READINESS: backups VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/123
-// TODO: READINESS: VTDistributed https://github.com/VictoriaMetrics/operator/issues/2515
-// TODO: READINESS: VLDistributed/VMDistributed are marked as experimental https://github.com/VictoriaMetrics/operator/issues/2329
-// TODO: READINESS: LTS releases for VT and VL
-// TODO: READINESS: Assigning tenants via fields in VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/686
-// TODO: READINESS: Add #querying-tenants docs to https://docs.victoriametrics.com/victoriatraces/querying -  https://github.com/VictoriaMetrics/VictoriaLogs/issues/686
+- // TODO: READINESS: https://github.com/VictoriaMetrics/VictoriaTraces/pull/242 vtagent documentation for HA
+- // TODO: READINESS: per-tenant retention in VL/VT
+- // TODO: READINESS: backups VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/123
+- // TODO: READINESS: VTDistributed https://github.com/VictoriaMetrics/operator/issues/2515
+- // TODO: READINESS: VLDistributed/VMDistributed are marked as experimental https://github.com/VictoriaMetrics/operator/issues/2329
+- // TODO: READINESS: LTS releases for VT and VL
+- // TODO: READINESS: Assigning tenants via fields in VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/686
+- // TODO: READINESS: Add #querying-tenants docs to https://docs.victoriametrics.com/victoriatraces/querying -  https://github.com/VictoriaMetrics/VictoriaLogs/issues/686
 
 
 ## VictoriaLogs
 
-// TODO: READINESS: per-tenant retention in VL/VT
-// TODO: READINESS: backups VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/123
-// TODO: READINESS: VLDistributed/VMDistributed are marked as experimental https://github.com/VictoriaMetrics/operator/issues/2329
-// TODO: READINESS: LTS releases for VT and VL
-// TODO: READINESS: Assigning tenants via fields in VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/686
-// TODO: READINESS: Add #querying-tenants docs to https://docs.victoriametrics.com/victoriatraces/querying -  https://github.com/VictoriaMetrics/VictoriaLogs/issues/686
+- // TODO: READINESS: per-tenant retention in VL/VT
+- // TODO: READINESS: backups VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/123
+- // TODO: READINESS: VLDistributed/VMDistributed are marked as experimental https://github.com/VictoriaMetrics/operator/issues/2329
+- // TODO: READINESS: LTS releases for VT and VL
+- // TODO: READINESS: Assigning tenants via fields in VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/686
+- // TODO: READINESS: Add #querying-tenants docs to https://docs.victoriametrics.com/victoriatraces/querying -  https://github.com/VictoriaMetrics/VictoriaLogs/issues/686
