@@ -45,8 +45,6 @@ See features that are missing in the products to make the stack aligned.
 
 The traces side lacks the agent and orchestration pieces that metrics and logs already have.
 
-- vtagent for optimized ingestion path
-- vtagent for replication
 - VTDistributed
 
 ## 2. Logs and traces parity with metrics

@@ -3,8 +3,8 @@
 | Signal      | Product                                                              | Query language                                                                                                                                                                                                                                  | Scalability                                                                 |
 |-------------|----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
 | **Metrics** | [VictoriaMetrics](https://docs.victoriametrics.com/victoriametrics/) | [MetricsQL](https://docs.victoriametrics.com/metricsql/) (PromQL-compatible)                                                                                                                                                                    | Billions of [active time series](), Millions of samples ingested per second |
-| **Logs**    | [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/)       | [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/)                                                                                                                                                                                 | Hundreds of TBs a day, with avg compression ratio of x15                    |
-| **Traces**  | [VictoriaTraces](https://docs.victoriametrics.com/victoriatraces/)   | [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/), [Jaeger API](https://docs.victoriametrics.com/victoriatraces/querying/#jaeger-http-api), [Tempo API](https://docs.victoriametrics.com/victoriatraces/querying/#tempo-http-api) | Billions of spans per day with avg compression ratio of x15                 |
+| **Logs**    | [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/)       | [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/)                                                                                                                                                                                 | Hundreds of TBs a day, with avg post-compression ratio of x15               |
+| **Traces**  | [VictoriaTraces](https://docs.victoriametrics.com/victoriatraces/)   | [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/), [Jaeger API](https://docs.victoriametrics.com/victoriatraces/querying/#jaeger-http-api), [Tempo API](https://docs.victoriametrics.com/victoriatraces/querying/#tempo-http-api) | Billions of spans per day with avg post-compression ratio of x15            |
 
 <br>
 
@@ -40,11 +40,11 @@ Existing Grafana dashboards, alerting rules, and recording rules keep working.
 The stack supports multitenancy, alerting, out-of-order backfilling, efficient compression, and sane defaults
 that simplify the setup.
 
-Choose VictoriaStack to **own your observability stack** and build a **reliable**,
+Choose VictoriaStack to **own your observability** and build a **reliable**,
 **cost-efficient multitenant platform** ready for future growth.
 
 > Already running another observability stack? See [Comparisons](http://localhost:1313/victoriastack/comparisons/)
-> to learn how VictoriaStack differs from Grafana LGTM, ClickStack, SigNoz, Elastic Stack, and Prometheus with Thanos,
+> to learn how VictoriaStack differs from Grafana LGTM, ClickStack, SigNoz, Elastic Stack, and Prometheus+Thanos,
 > and when each alternative is the better fit.
 
 ## Architecture
@@ -66,7 +66,7 @@ flowchart LR
 
     Sources --> VI
 
-    subgraph Cluster
+    subgraph Victoria* Cluster
 
         subgraph Ingestion
             direction TB
@@ -99,7 +99,7 @@ flowchart LR
 
 **insert** and **select** components need to know only about **storages**. They don't know about each other, and
 **storages** don't know about **inserts**, **selects**, or other **storages**. This design allows flexible topologies
-with sub-clusters, where **inserts** or **selects** connect only to a subset of **storages**.
+with sub-clusters, where **inserts** or **selects** connect to all or to a subset of **storages**.
 
 Cluster architecture doesn't require any additional services: no extra caches, databases, or compactors. For stateless
 components we recommend [vmauth as a load balancer](http://localhost:1313/victoriametrics/vmauth/#load-balancing),
@@ -111,7 +111,7 @@ or any other load balancer of your choice.
 |-----------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **[Deployment](http://localhost:1313/victoriastack/deployment/)**                       | [Kubernetes Operator](http://localhost:1313/victoriastack/deployment/#victoriametrics-operator), [Helm charts](http://localhost:1313/victoriastack/deployment/#helm-charts), [Binaries](http://localhost:1313/victoriastack/deployment/#binary)                                                                                                                |
 | **[Ingestion integrations](http://localhost:1313/victoriastack/ingestion/)**            | [OpenTelemetry](http://localhost:1313/victoriastack/ingestion/#opentelemetry), [Vector, Grafana Alloy, 10+ additional integrations](http://localhost:1313/victoriastack/ingestion/#integrations)                                                                                                                                                               |
-| **[Native ingestion](http://localhost:1313/victoriastack/ingestion/#native-ingestion)** | **High throughput, reliable on-disk buffering, replication, traffic compression** via [vmagent](http://localhost:1313/victoriastack/ingestion/#vmagent) for metrics and [vlagent](http://localhost:1313/victoriastack/ingestion/#vlagent) for logs.                                                                                                            |
+| **[Native ingestion](http://localhost:1313/victoriastack/ingestion/#native-ingestion)** | **High throughput, reliable on-disk buffering, replication, traffic compression** via [vmagent](http://localhost:1313/victoriastack/ingestion/#vmagent) for metrics, [vlagent](http://localhost:1313/victoriastack/ingestion/#vlagent) for logs, [vtagent](http://localhost:1313/victoriastack/ingestion/#vtagent) for traces.                                 |
 | **[Access control](http://localhost:1313/victoriastack/access-control/)**               | [vmauth](https://docs.victoriametrics.com/victoriametrics/vmauth/) for [user's authentication](http://localhost:1313/victoriastack/access-control/#authentication), [requests routing](http://localhost:1313/victoriastack/access-control/#routing-and-load-balancing), [per-tenant access](http://localhost:1313/victoriastack/access-control/#multitenancy). |
 | **[Visualization](http://localhost:1313/victoriastack/ui/)**                            | [Grafana](http://localhost:1313/victoriastack/ui/#grafana) and [Perses](http://localhost:1313/victoriastack/ui/#perses) for unified observability and dashboarding. Built-in [vmui](http://localhost:1313/victoriastack/ui/#vmui) for ad-hoc exploration.                                                                                                      |
 | **[Alerting](http://localhost:1313/victoriastack/alerting/)**                           | vmalert integrated with [Alertmanager](http://localhost:1313/victoriastack/alerting/#alertmanager) for rules evaluation and dispatching notifications                                                                                                                                                                                                          |

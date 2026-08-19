@@ -13,11 +13,11 @@ tags:
 
 There are three ways to deliver data to VictoriaStack - pick the one that matches the pipeline you already have:
 
-| Path                                      | Use it when                                                                                                                                    |
-|-------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
-| [OpenTelemetry Collector](#opentelemetry) | you already collect telemetry with OpenTelemetry, or you start from scratch and want a single pipeline for all three signals                   |
+| Path                                            | Use it when                                                                                                                                    |
+|-------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| [OpenTelemetry Collector](#opentelemetry)       | you already collect telemetry with OpenTelemetry, or you start from scratch and want a single pipeline for all three signals                   |
 | [Agents you already run](#agents-and-protocols) | Prometheus, Vector, Grafana Alloy, Fluent Bit, Telegraf and others can push to VictoriaStack directly                                    |
-| [vmagent and vlagent](#native-ingestion)  | you want reliable and cost-efficient delivery: high throughput, on-disk buffering, replication between installations, and traffic compression. |
+| [vmagent, vlagent, vtagent](#native-ingestion)  | you want reliable and cost-efficient delivery: high throughput, on-disk buffering, replication between installations, and traffic compression. |
 
 <br>
 
@@ -91,13 +91,12 @@ and replicate it to several installations.
 
 ## Native ingestion
 
-// TODO: READINESS: add VTagent for optimized ingestion path
-
 Support of various protocols and agents makes it easy to integrate VictoriaStack with existing installations. 
 For improving cost-efficiency, high throughput, reliable on-disk buffering, replication, and traffic compression we 
 recommend using VictoriaStack agents instead or together with existing agents:
 - [vmagent](#vmagent) for metrics
 - [vlagent](#vlagent) for logs
+- [vtagent](#vtagent) for logs
 
 ### vmagent
 
@@ -173,6 +172,34 @@ flowchart LR
 ```
 
 Use vlagent to make log delivery [highly available](https://docs.victoriametrics.com/victorialogs/#high-availability).
+
+### vtagent
+
+[vtagent](https://docs.victoriametrics.com/victoriatraces/vtagent/) is an agent for accepting trace spans from OTLP exporters
+and forwarding them to the specified destinations. Its core feature is 
+[on-disk buffering and replication](https://docs.victoriametrics.com/victorialogs/vlagent/#replication-and-high-availability):
+that allows building highly available and scalable pipelines for spans delivery.
+
+```mermaid
+flowchart LR
+    OTel1["OpenTelemetry collector"]
+    OTel2["OpenTelemetry exporter"]
+
+    OTel1 -->|"spans"| V
+    OTel2 -->|"spans"| V
+
+    V["vtagent<br/><hr/>Buffer • Replicate"]
+
+    subgraph Destinations
+        direction TB
+        VT["VictoriaTraces × N"]
+    end
+
+    V -->|"replicate to N destinations"| VT
+```
+
+// TODO: READINESS: https://github.com/VictoriaMetrics/VictoriaTraces/pull/242 vtagent documentation for HA
+
 
 ## Cluster and multitenancy
 
