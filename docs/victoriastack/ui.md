@@ -120,3 +120,7 @@ vmui complements Grafana rather than replacing it. It is focused on the signal s
 are applicable to the signal. vmui for VictoriaMetrics is focused on visualizing time series, exploring metrics cardinality,
 its usage across all requests, most expensive queries, query performance tracing, etc. While vmui for VictoriaLogs is
 focused on exploring logs, analytics and drilling down into log context.
+
+## vmanomaly UI
+
+The [vmanomaly UI](/anomaly-detection/ui/) provides a vmui-like interface for exploring queries, comparing anomaly detection models, and backtesting configurations. Although `vmanomaly` is an Enterprise component, you can explore its UI in the public playground with [Metrics](https://play-vmanomaly.victoriametrics.com/metrics/), [Logs](https://play-vmanomaly.victoriametrics.com/logs/), or [Traces](https://play-vmanomaly.victoriametrics.com/traces/) data sources.
