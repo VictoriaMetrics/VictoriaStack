@@ -33,13 +33,13 @@ services:
     command:
       - "--storageNode=vmstorage-1:8401"
       - "--storageNode=vmstorage-2:8401"
-      - "--vmalert.proxyURL=http://vmalert:8880"
+      - "--vmalert.proxyURL=http://rules-metrics:8880"
   vmselect-2:
     image: victoriametrics/vmselect:v1.150.0-cluster
     command:
       - "--storageNode=vmstorage-1:8401"
       - "--storageNode=vmstorage-2:8401"
-      - "--vmalert.proxyURL=http://vmalert:8880"
+      - "--vmalert.proxyURL=http://rules-metrics:8880"
 
 # VictoriaLogs cluster definition
 
@@ -132,18 +132,29 @@ services:
     ports: [ "8427:8427" ]
 
   rules-metrics:
-    image: victoriametrics/vmalert:latest
+    image: victoriametrics/vmalert:v1.150.0
     command:
-      - "-datasource.url=http://victoriametrics:8428"
-      - "-remoteWrite.url=http://victoriametrics:8428"
-      - "-rule=/etc/vmalert/*.yml"
+      - "-datasource.url=http://vmstack:8427/metrics/select/prometheus"
+      # persist as metrics to VictoriaMetrics tenant 0 - see https://docs.victoriametrics.com/victoriametrics/vmalert/#multitenancy
+      - "-remoteWrite.url=http://vmstack:8427/metrics/insert/0/prometheus"
+      - "-rule=/etc/vmalert/alerts-demo.yml"
       # Replace "-notifier.blackhole" with actual "-notifier.url=<alertmanager_url>" for sending alerts
       - "-notifier.blackhole"
     volumes: [ "./rules:/etc/vmalert" ]
 
+  rules-logs:
+    image: victoriametrics/vmalert:v1.150.0
+    command:
+      # run rules against VictoriaLogs datasource
+      - "-datasource.url=http://vmstack:8427/logs/"
+      # persist as metrics to VictoriaMetrics tenant 0 - see https://docs.victoriametrics.com/victorialogs/vmalert/#how-to-use-multitenancy-in-rules
+      - "-remoteWrite.url=http://vmstack:8427/metrics/insert/0/prometheus"
+      - "-rule=/etc/vmalert/logs-to-metrics.yml"
+    volumes: [ "./rules:/etc/vmalert" ]
+
 volumes: {
-  vmdata-1: {}, vmdata-2: {},
-  vldata-1: {}, vldata-2: {},
-  vtdata-1: {}, vtdata-2: {},
-  grafanadata: {}
+  vmdata-1: { }, vmdata-2: { },
+  vldata-1: { }, vldata-2: { },
+  vtdata-1: { }, vtdata-2: { },
+  grafanadata: { }
 }

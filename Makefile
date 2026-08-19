@@ -25,5 +25,5 @@ otel-cluster-up:
 otel-cluster-down:
 	$(DOCKER_COMPOSE) \
 	-f deployment/otel-cluster.yml \
-	-f deployment/otel-demo-mini.yml \
-	down -v
+ 	-f deployment/otel-demo-mini.yml \
+ 	down -v

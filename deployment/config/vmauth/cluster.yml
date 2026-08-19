@@ -4,8 +4,8 @@ unauthorized_user:
     - src_paths: ["/metrics/select/.*"]
       drop_src_path_prefix_parts: 1
       url_prefix:
-       - "http://vmselect-1:8481/"
-       - "http://vmselect-2:8481/"
+       - "http://vmselect-1:8481"
+       - "http://vmselect-2:8481"
     - src_paths: ["/metrics/insert/.*"]
       drop_src_path_prefix_parts: 1
       url_prefix:
@@ -16,8 +16,8 @@ unauthorized_user:
     - src_paths: ["/logs/select/.*"]
       drop_src_path_prefix_parts: 1
       url_prefix:
-        - "http://vlselect-1:9428/"
-        - "http://vlselect-2:9428/"
+        - "http://vlselect-1:9428"
+        - "http://vlselect-2:9428"
     - src_paths: ["/logs/insert/.*"]
       drop_src_path_prefix_parts: 1
       url_prefix:
@@ -28,8 +28,8 @@ unauthorized_user:
     - src_paths: [ "/traces/select/.*" ]
       drop_src_path_prefix_parts: 1
       url_prefix:
-        - "http://vtselect-1:10428/"
-        - "http://vtselect-2:10428/"
+        - "http://vtselect-1:10428"
+        - "http://vtselect-2:10428"
     - src_paths: [ "/traces/insert/.*" ]
       drop_src_path_prefix_parts: 1
       url_prefix:
