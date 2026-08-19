@@ -254,6 +254,8 @@ See the detailed docs on upgrading
 [VictoriaMetrics](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#how-to-upgrade-victoriametrics),
 [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/#upgrading), [VictoriaTraces](https://docs.victoriametrics.com/victoriatraces/#upgrading).
 
+// TODO: READINESS: add #Upgrading docs https://github.com/VictoriaMetrics/VictoriaTraces/issues/244
+
 In Kubernetes, the operator manages the restarts. Pin the version of every component
 via [`spec.image.tag`](https://docs.victoriametrics.com/operator/resources/#managing-versions-of-vm), and the operator
 rolls out the change. Multi-zone installations managed

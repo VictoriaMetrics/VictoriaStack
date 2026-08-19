@@ -45,7 +45,7 @@ On top of PromQL, MetricsQL adds conveniences that shorten everyday queries:
   the lookbehind window based on the real interval between samples and query step;
 * series selectors accept multiple `or` filters, such as `{env="prod",job="a" or env="dev",job="b"}`;
 * MetricsQL doesn't extrapolate rate and increase function results. For example, it returns integer results from `increase()` over slow-changing integer counters;
-* [`WITH` expressions](https://docs.victoriametrics.com/victoriametrics/metricsql/#with-expressions) extract repeating
+* [`WITH` expressions](https://play.victoriametrics.com/select/0/prometheus/graph/#/expand-with-exprs) extract repeating
   parts of a query into named templates.
 * About 100+ additional functions are supported. See [MetricsQL functions](https://docs.victoriametrics.com/victoriametrics/metricsql/#metricsql-functions).
 
