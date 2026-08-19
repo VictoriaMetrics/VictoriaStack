@@ -41,31 +41,27 @@ make otel-cluster-down
 
 See features that are missing in the products to make the stack aligned.
 
-## 1. VictoriaTraces component parity
+## UI 
 
-The traces side lacks the agent and orchestration pieces that metrics and logs already have.
+// TODO: READINESS: visum to become all-in-one
 
-- VTDistributed
+## VictoriaTraces
 
-## 2. Logs and traces parity with metrics
+// TODO: READINESS: https://github.com/VictoriaMetrics/VictoriaTraces/pull/242 vtagent documentation for HA
+// TODO: READINESS: per-tenant retention in VL/VT
+// TODO: READINESS: backups VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/123
+// TODO: READINESS: VTDistributed https://github.com/VictoriaMetrics/operator/issues/2515
+// TODO: READINESS: VLDistributed/VMDistributed are marked as experimental https://github.com/VictoriaMetrics/operator/issues/2329
+// TODO: READINESS: LTS releases for VT and VL
+// TODO: READINESS: Assigning tenants via fields in VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/686
+// TODO: READINESS: Add #querying-tenants docs to https://docs.victoriametrics.com/victoriatraces/querying -  https://github.com/VictoriaMetrics/VictoriaLogs/issues/686
 
-Features that exist for VictoriaMetrics only, each already documented as metrics-only on the page.
 
-- Cross-tenant queries in VL/VT
-- Per-tenant retention in VL/VT
-- LTS releases for VL/VT
-- [VictoriaLogs#686: ingestion: support specifying tenant id in logs instead of headers](https://github.com/VictoriaMetrics/VictoriaLogs/issues/686)
-- [VictoriaLogs#123: vmbackup/vmrestore/vmbackupmanager for VMLogs](https://github.com/VictoriaMetrics/VictoriaLogs/issues/123)
+## VictoriaLogs
 
-## 3. VictoriaMetrics defaults and maturity
-
-- VLDistributed/VMDistributed marked experimental
-- [VictoriaMetrics#11365: cluster: consider enabling -enableMultitenanhttps://github.com/VictoriaMetrics/VictoriaMetrics/issues/11365)
-
-## 4. UI
-
-- visum to become all-in-one UI solution 
-
-## 5. Upstream docs gaps
-
-- Add `#querying-tenants` docs to `victoriatraces/querying`
+// TODO: READINESS: per-tenant retention in VL/VT
+// TODO: READINESS: backups VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/123
+// TODO: READINESS: VLDistributed/VMDistributed are marked as experimental https://github.com/VictoriaMetrics/operator/issues/2329
+// TODO: READINESS: LTS releases for VT and VL
+// TODO: READINESS: Assigning tenants via fields in VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/686
+// TODO: READINESS: Add #querying-tenants docs to https://docs.victoriametrics.com/victoriatraces/querying -  https://github.com/VictoriaMetrics/VictoriaLogs/issues/686

@@ -139,7 +139,7 @@ which are part of the [Enterprise](http://localhost:1313/victoriastack/enterpris
 
 Tenants that match no filter use the global `-retentionPeriod`.
 
-// TODO: READINESS: per-tenant retention in VL/VT
+// TODO: READINESS: backups VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/123
 
 ## Discovering tenants
 

@@ -58,11 +58,11 @@ installations that are temporarily unavailable, while
 healthy ones. There is no consensus protocol and no coordination between the installations, which keeps the scheme
 simple to run and to troubleshoot.
 
-| Signal      | HA docs                                                                                                             | What replicates the data                                                                               |
-|-------------|---------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
-| **Metrics** | [VictoriaMetrics](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#high-availability) | [vmagent](https://docs.victoriametrics.com/victoriametrics/vmagent/#replication-and-high-availability) |
-| **Logs**    | [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/#high-availability)                                    | [vlagent](https://docs.victoriametrics.com/victorialogs/vlagent/#replication-and-high-availability)    |
-| **Traces**  | [VictoriaTraces](https://docs.victoriametrics.com/victoriatraces/#high-availability)                                | OpenTelemetry collector, or any shipper that writes to multiple destinations    // TODO: READINESS: vtagent for replication|
+| Signal      | HA docs                                                                                                              | What replicates the data                                                                                                                                                                                           |
+|-------------|----------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Metrics** | [VictoriaMetrics](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#high-availability) | [vmagent](https://docs.victoriametrics.com/victoriametrics/vmagent/#replication-and-high-availability)                                                                                                             |
+| **Logs**    | [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/#high-availability)                                     | [vlagent](https://docs.victoriametrics.com/victorialogs/vlagent/#replication-and-high-availability)                                                                                                                |
+| **Traces**  | [VictoriaTraces](https://docs.victoriametrics.com/victoriatraces/#high-availability)                                 | [vtagent](https://docs.victoriametrics.com/victorialogs/vtagent/#replication-and-high-availability)    // TODO: READINESS: https://github.com/VictoriaMetrics/VictoriaTraces/pull/242 vtagent documentation for HA |
 
 <br>
 
@@ -185,9 +185,9 @@ See [Quick Start instructions](https://docs.victoriametrics.com/operator/quick-s
 
 ### High availability in Kubernetes
 
-// TODO: READINESS: VTDistributed
+// TODO: READINESS: VTDistributed https://github.com/VictoriaMetrics/operator/issues/2515
 
-// TODO: READINESS: VLDistributed/VMDistributed are marked as experimental
+// TODO: READINESS: VLDistributed/VMDistributed are marked as experimental https://github.com/VictoriaMetrics/operator/issues/2329
 
 The operator describes a multi-zone installation as a single resource:
 [VMDistributed](https://docs.victoriametrics.com/operator/resources/vmdistributed/) for metrics

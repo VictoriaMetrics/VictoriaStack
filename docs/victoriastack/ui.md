@@ -19,7 +19,7 @@ that keep dashboards as code.
 Every database also goes with a built-in UI called [vmui](#vmui). It is available out of the box and is great for ad-hoc
 data exploration, but it doesn't allow building dashboards, correlate different signal types or manage access.
 
-// TODO: READINESS: visum
+// TODO: READINESS: visum to become all-in-one
 
 |                                 | [Grafana](#grafana) or [Perses](#perses)   | [vmui](#vmui)                                             |
 |---------------------------------|--------------------------------------------|-----------------------------------------------------------|
