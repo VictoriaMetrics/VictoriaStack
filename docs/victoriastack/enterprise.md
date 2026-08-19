@@ -2,7 +2,7 @@
 title: Enterprise
 menu:
   docs:
-    weight: 8
+    weight: 10
     identifier: victoriastack-enterprise
     parent: victoriastack
 tags:

@@ -2,7 +2,7 @@
 title: Comparisons
 menu:
   docs:
-    weight: 7
+    weight: 9
     identifier: victoriastack-comparisons
     parent: victoriastack
 tags:

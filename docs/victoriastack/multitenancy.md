@@ -2,7 +2,7 @@
 title: Multitenancy
 menu:
   docs:
-    weight: 6
+    weight: 8
     identifier: victoriastack-multitenancy
     parent: victoriastack
 tags:

@@ -2,7 +2,7 @@
 title: UI integrations
 menu:
   docs:
-    weight: 2
+    weight: 3
     identifier: victoriastack-ui-integrations
     parent: victoriastack
 tags:

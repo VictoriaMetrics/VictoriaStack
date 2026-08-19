@@ -2,7 +2,7 @@
 title: Anomaly detection
 menu:
   docs:
-    weight: 9
+    weight: 7
     identifier: victoriastack-anomaly-detection
     parent: victoriastack
 tags:
