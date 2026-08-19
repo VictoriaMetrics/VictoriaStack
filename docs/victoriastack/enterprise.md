@@ -43,7 +43,7 @@ low-risk updates instead: every LTS line receives bugfixes and security fixes fo
 6 months, and two lines are supported at any moment. That leaves up to 6 months to migrate between lines.
 
 Every fix that lands in an LTS release also lands in the latest release, so users of the community edition get the same
-fixes by [upgrading](http://localhost:1313/victoriastack/deployment/#upgrades) to the latest version.
+fixes by [upgrading](/victoriastack/deployment/#upgrades) to the latest version.
 
 ## Additional features
 
@@ -52,9 +52,9 @@ Enterprise adds the following capabilities, most of them to VictoriaMetrics:
 | Feature                                                                                                                | What it gives you                                                                        |
 |------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
 | [Downsampling](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#downsampling)             | keeps long retention affordable by storing older data at lower resolution                |
-| [Retention filters](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#retention-filters)   | different retention per team, environment, or [tenant](http://localhost:1313/victoriastack/multitenancy/#per-tenant-retention) |
-| [Anomaly detection](http://localhost:1313/victoriastack/anomaly-detection/)                                             | vmanomaly, which scores data with ML models instead of static thresholds                  |
-| [vmbackupmanager](https://docs.victoriametrics.com/victoriametrics/vmbackupmanager/)                                    | scheduled [backups](http://localhost:1313/victoriastack/deployment/#backups) with their own retention, to S3, GCS, or Azure Blob Storage |
+| [Retention filters](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#retention-filters)   | different retention per team, environment, or [tenant](/victoriastack/multitenancy/#per-tenant-retention) |
+| [Anomaly detection](/victoriastack/anomaly-detection/)                                                                | [vmanomaly](/anomaly-detection/) learns expected data behavior and writes a [unified anomaly score](/anomaly-detection/faq/#what-is-anomaly-score) to VictoriaMetrics for contextual alerting and investigation. |
+| [vmbackupmanager](https://docs.victoriametrics.com/victoriametrics/vmbackupmanager/)                                    | scheduled [backups](/victoriastack/deployment/#backups) with their own retention, to S3, GCS, or Azure Blob Storage |
 | [mTLS](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#mtls-protection) and [automatic TLS certificates](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#automatic-issuing-of-tls-certificates) | mutual TLS between components and clients, including [mTLS-based routing](https://docs.victoriametrics.com/victoriametrics/vmauth/#mtls-based-request-routing) and IP filters in vmauth |
 | [Kafka](https://docs.victoriametrics.com/victoriametrics/integrations/kafka/) and [Google PubSub](https://docs.victoriametrics.com/victoriametrics/integrations/pubsub/) | ingestion from and to message queues                                                     |
 
@@ -72,9 +72,7 @@ Nothing has to be planned in advance to keep the Enterprise path open:
 - **Switching is a change of image and a license key.** Enterprise executables and Docker images carry the `enterprise`
   suffix in their names and tags, and the license is passed via the `-license` or `-licenseFile` flag. The data stays
   where it is: no migration, no re-ingestion.
-- **Editions mix per component.** Only the components that use Enterprise features need an Enterprise license. For
-  example, [vmanomaly](http://localhost:1313/victoriastack/anomaly-detection/) requires a license itself, while the
-  databases it reads from and writes to can be community edition, single-node or clustered.
+- **Editions mix per component.** Only the components that use Enterprise features need an Enterprise license. For example, [`vmanomaly`](/victoriastack/anomaly-detection/) requires a license itself, while it can read from Community or Enterprise single-node or clustered VictoriaMetrics, VictoriaLogs, or VictoriaTraces and write results to VictoriaMetrics.
 - **Enterprise components are free to evaluate.** They can be used in non-production setups with
   a [trial license](https://victoriametrics.com/products/enterprise/trial/); production use requires an Enterprise
   contract.
