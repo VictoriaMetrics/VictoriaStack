@@ -156,5 +156,4 @@ tenant from enumerating the others.
 
 // TODO: READINESS: Assigning tenants via fields in VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/686
 // TODO: READINESS: Add #querying-tenants docs to https://docs.victoriametrics.com/victoriatraces/querying -  https://github.com/VictoriaMetrics/VictoriaLogs/issues/686
-
-// TODO: make a unified usage dashboards for all signals per-tenant  https://github.com/VictoriaMetrics/VictoriaStack/issues/7
+// TODO: READINESS: make a unified usage dashboards for all signals per-tenant  https://github.com/VictoriaMetrics/VictoriaStack/issues/7

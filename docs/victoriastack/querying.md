@@ -28,6 +28,7 @@ query built in a UI can be turned into a rule as it is.
 
 Queries run from [Grafana or Perses](http://localhost:1313/victoriastack/ui/#grafana), from the built-in
 [vmui](http://localhost:1313/victoriastack/ui/#vmui), or from any HTTP client, see [Query APIs](#query-apis).
+If there is no data to query yet, start with [Ingestion](http://localhost:1313/victoriastack/ingestion/).
 
 ## Querying metrics
 
@@ -101,7 +102,8 @@ To get the basic concepts of LogsQL, please read [LogsQL tutorial](https://docs.
 > and [Grafana](https://docs.victoriametrics.com/playgrounds/#grafana-playground) playgrounds.
 
 Coming from another log database? See [SQL to LogsQL](https://docs.victoriametrics.com/victorialogs/sql-to-logsql/) and
-[How To Convert Loki Queries to VictoriaLogs Queries](https://docs.victoriametrics.com/victorialogs/logql-to-logsql/).
+[How To Convert Loki Queries to VictoriaLogs Queries](https://docs.victoriametrics.com/victorialogs/logql-to-logsql/),
+and [Comparisons](http://localhost:1313/victoriastack/comparisons/) for how the stacks differ beyond the query language.
 
 ## Querying traces
 

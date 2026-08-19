@@ -57,6 +57,8 @@ datasources:
 ```
 
 > See practical [Grafana provisioning examples](https://github.com/VictoriaMetrics/VictoriaStack/tree/main/deployment/provisioning/datasources) for VictoriaStack.
+> The [QuickStart](http://localhost:1313/victoriastack/#quick-start) runs Grafana with these datasources and a demo
+> dashboard already provisioned.
 
 With the datasources in place, Grafana covers everything a team does with the stack day to day: the query builders in the
 plugins provide a queryless experience for exploring every signal, dashboards and

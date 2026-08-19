@@ -44,6 +44,7 @@ See features that are missing in the products to make the stack aligned.
 ## UI 
 
 - // TODO: READINESS: visum to become all-in-one
+- // TODO: READINESS: make a unified usage dashboards for all signals per-tenant  https://github.com/VictoriaMetrics/VictoriaStack/issues/7
 
 ## VictoriaTraces
 

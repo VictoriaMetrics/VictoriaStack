@@ -263,3 +263,6 @@ exporters:
 Requests without these headers write to the default tenant `0:0`.
 
 > Note: VictoriaMetrics supports [multitenancy](http://localhost:1313/victoriastack/multitenancy/) only in the cluster mode.
+
+Once the data arrives, see [Querying](http://localhost:1313/victoriastack/querying/) for the query languages and APIs of
+every signal, and [UI integrations](http://localhost:1313/victoriastack/ui/) for building dashboards on top of them.
