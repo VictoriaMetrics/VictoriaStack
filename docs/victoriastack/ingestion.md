@@ -249,7 +249,7 @@ With the configuration above, vmauth accepts write requests on a single endpoint
 
 The [clustered demo](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/config/vmauth/cluster.yml) runs
 exactly this vmauth configuration, and its
-[OpenTelemetry Collector](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/confog/otelcollector/config.yml)
+[OpenTelemetry Collector](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/config/otelcollector/config.yml)
 writes to these endpoints.
 
 **Tenants are specified with HTTP headers** in the same way in all three databases. Set `AccountID` and `ProjectID` on the
