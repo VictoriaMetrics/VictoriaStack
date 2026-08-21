@@ -96,7 +96,7 @@ For improving cost-efficiency, high throughput, reliable on-disk buffering, repl
 recommend using VictoriaStack agents instead or together with existing agents:
 - [vmagent](#vmagent) for metrics
 - [vlagent](#vlagent) for logs
-- [vtagent](#vtagent) for logs
+- [vtagent](#vtagent) for traces
 
 ### vmagent
 
