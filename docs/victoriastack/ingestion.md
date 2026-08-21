@@ -177,7 +177,7 @@ Use vlagent to make log delivery [highly available](https://docs.victoriametrics
 
 [vtagent](https://docs.victoriametrics.com/victoriatraces/vtagent/) is an agent for accepting trace spans from OTLP exporters
 and forwarding them to the specified destinations. Its core feature is 
-[on-disk buffering and replication](https://docs.victoriametrics.com/victorialogs/vtagent/#replication-and-high-availability):
+[on-disk buffering and replication](https://docs.victoriametrics.com/victoriatraces/vtagent/#replication-and-high-availability):
 that allows building highly available and scalable pipelines for spans delivery.
 
 ```mermaid
