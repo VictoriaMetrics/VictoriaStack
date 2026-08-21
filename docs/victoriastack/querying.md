@@ -23,12 +23,12 @@ languages and integrations, so each database can optimize for the data it stores
 <br>
 
 Two languages cover all three signals, since VictoriaTraces stores spans as wide events and queries them with LogsQL.
-The same languages are used by [alerting and recording rules](http://localhost:1313/victoriastack/alerting/#rules), so a
+The same languages are used by [alerting and recording rules](https://docs.victoriametrics.com/victoriastack/alerting/#rules), so a
 query built in a UI can be turned into a rule as it is.
 
-Queries run from [Grafana or Perses](http://localhost:1313/victoriastack/ui/#grafana), from the built-in
-[vmui](http://localhost:1313/victoriastack/ui/#vmui), or from any HTTP client, see [Query APIs](#query-apis).
-If there is no data to query yet, start with [Ingestion](http://localhost:1313/victoriastack/ingestion/).
+Queries run from [Grafana or Perses](https://docs.victoriametrics.com/victoriastack/ui/#grafana), from the built-in
+[vmui](https://docs.victoriametrics.com/victoriastack/ui/#vmui), or from any HTTP client, see [Query APIs](#query-apis).
+If there is no data to query yet, start with [Ingestion](https://docs.victoriametrics.com/victoriastack/ingestion/).
 
 ## Querying metrics
 
@@ -103,7 +103,7 @@ To get the basic concepts of LogsQL, please read [LogsQL tutorial](https://docs.
 
 Coming from another log database? See [SQL to LogsQL](https://docs.victoriametrics.com/victorialogs/sql-to-logsql/) and
 [How To Convert Loki Queries to VictoriaLogs Queries](https://docs.victoriametrics.com/victorialogs/logql-to-logsql/),
-and [Comparisons](http://localhost:1313/victoriastack/comparisons/) for how the stacks differ beyond the query language.
+and [Comparisons](https://docs.victoriametrics.com/victoriastack/comparisons/) for how the stacks differ beyond the query language.
 
 ## Querying traces
 
@@ -114,14 +114,14 @@ matching spans.
 
 For reading traces, VictoriaTraces also serves [Jaeger](https://docs.victoriametrics.com/victoriatraces/querying/#jaeger-http-api)
 and [Tempo](https://docs.victoriametrics.com/victoriatraces/querying/#tempo-http-api) compatible APIs. Explore traces
-through [Grafana or Perses](http://localhost:1313/victoriastack/ui/#grafana) connected via these APIs: they render the
+through [Grafana or Perses](https://docs.victoriametrics.com/victoriastack/ui/#grafana) connected via these APIs: they render the
 waterfall view of a trace, which no LogsQL query can replace. Use LogsQL for filtering, analysis,
 and [alerting on traces](https://docs.victoriametrics.com/victoriatraces/vmalert/).
 
 ## Query APIs
 
-Every database answers queries over HTTP, which is what the [UIs integrations](http://localhost:1313/victoriastack/ui/),
-[alerting](http://localhost:1313/victoriastack/alerting/), and any script or exporter use:
+Every database answers queries over HTTP, which is what the [UIs integrations](https://docs.victoriametrics.com/victoriastack/ui/),
+[alerting](https://docs.victoriametrics.com/victoriastack/alerting/), and any script or exporter use:
 
 * **Metrics**: [`/api/v1/query`, `/api/v1/query_range`](https://docs.victoriametrics.com/victoriametrics/#prometheus-querying-api-usage)
   and other handlers from Prometheus querying API. Additionally, see [Graphite API](https://docs.victoriametrics.com/victoriametrics/integrations/graphite/#graphite-api-usage).
@@ -129,5 +129,5 @@ Every database answers queries over HTTP, which is what the [UIs integrations](h
   from VictoriaLogs HTTP API, including tailing, statistics calculation, fileds exploration, etc. 
 * **Traces**: the same LogsQL endpoints as for logs, plus the Jaeger and Tempo APIs.
 
-Read requests select their [tenant](http://localhost:1313/victoriastack/multitenancy/#query-path) with the `AccountID`
+Read requests select their [tenant](https://docs.victoriametrics.com/victoriastack/multitenancy/#query-path) with the `AccountID`
 and `ProjectID` HTTP headers, the same way in all three databases.

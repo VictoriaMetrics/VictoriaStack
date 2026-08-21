@@ -38,7 +38,7 @@ The same rules apply to all three databases:
 - **Tenant IDs are numeric.** Map human-readable names to tenant IDs in the authorization layer in front of the stack,
   such as vmauth.
 
-See how to [control per-tenant access via vmauth](http://localhost:1313/victoriastack/access-control/#multitenancy).
+See how to [control per-tenant access via vmauth](https://docs.victoriametrics.com/victoriastack/access-control/#multitenancy).
 
 ## Ingestion path
 
@@ -102,9 +102,9 @@ Or let vmauth derive the tenant from the credentials, so the datasource only car
 {width="500"}
 
 The second option is the safer one: clients cannot pick a tenant themselves, and revoking a credential revokes the
-access. See [Access control](http://localhost:1313/victoriastack/access-control/#multitenancy) for the vmauth
+access. See [Access control](https://docs.victoriametrics.com/victoriastack/access-control/#multitenancy) for the vmauth
 configuration, and for restricting a user to a subset of data
-[within a tenant](http://localhost:1313/victoriastack/access-control/#enforcing-filters).
+[within a tenant](https://docs.victoriametrics.com/victoriastack/access-control/#enforcing-filters).
 
 ## Querying multiple tenants
 
@@ -126,10 +126,10 @@ view is really needed.
 
 ## Per-tenant retention
 
-By default, [retention](http://localhost:1313/victoriastack/#retention-and-storage) applies to all data in an
+By default, [retention](https://docs.victoriametrics.com/victoriastack/#retention-and-storage) applies to all data in an
 installation. VictoriaMetrics can also keep different retentions per tenant
 via [retention filters](https://docs.victoriametrics.com/victoriametrics/cluster-victoriametrics/#retention-filters),
-which are part of the [Enterprise](http://localhost:1313/victoriastack/enterprise/) package. Pass the filters to
+which are part of the [Enterprise](https://docs.victoriametrics.com/victoriastack/enterprise/) package. Pass the filters to
 `vmstorage` nodes:
 
 ```sh

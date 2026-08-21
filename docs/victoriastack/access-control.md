@@ -30,8 +30,8 @@ vmauth can perform the following actions:
 - [TLS termination](https://docs.victoriametrics.com/victoriametrics/vmauth/#tls-termination-proxy)
 - [Access logging](https://docs.victoriametrics.com/victoriametrics/vmauth/#access-log)
 - [Automatic issuing of TLS certificates](https://docs.victoriametrics.com/victoriametrics/vmauth/#automatic-issuing-of-tls-certificates),
-  [mTLS protection](https://docs.victoriametrics.com/victoriametrics/vmauth/#mtls-protection) and [mTLS routing](http://localhost:1313/victoriametrics/vmauth/#mtls-based-request-routing),
-  [IP filtering](https://docs.victoriametrics.com/victoriametrics/vmauth/#ip-filters) in the [Enterprise](http://localhost:1313/victoriastack/enterprise/) version
+  [mTLS protection](https://docs.victoriametrics.com/victoriametrics/vmauth/#mtls-protection) and [mTLS routing](https://docs.victoriametrics.com/victoriametrics/vmauth/#mtls-based-request-routing),
+  [IP filtering](https://docs.victoriametrics.com/victoriametrics/vmauth/#ip-filters) in the [Enterprise](https://docs.victoriametrics.com/victoriastack/enterprise/) version
 
 The sections below cover the common setups: routing requests to the databases, authenticating users, giving every user
 its own tenant, and restricting the endpoints they can reach.
@@ -143,7 +143,7 @@ or how to [Setup multitenant access with Grafana & OIDC](https://docs.victoriame
 
 ## Multitenancy
 
-All three databases identify a [tenant](http://localhost:1313/victoriastack/multitenancy/) by the `AccountID` and
+All three databases identify a [tenant](https://docs.victoriametrics.com/victoriastack/multitenancy/) by the `AccountID` and
 `ProjectID` HTTP headers. vmauth sets these headers per user, so the credentials decide to which tenant to route the requests:
 
 ```yaml
@@ -181,7 +181,7 @@ In the config above:
  
 Since tenant IDs are numeric, configration like above shows how a string username maps to a numeric tenant.
 
-See [Multitenancy](http://localhost:1313/victoriastack/multitenancy/) for the tenant model itself, and the
+See [Multitenancy](https://docs.victoriametrics.com/victoriastack/multitenancy/) for the tenant model itself, and the
 [per-tenant authorization docs](https://docs.victoriametrics.com/victoriametrics/vmauth/#per-tenant-authorization) for
 more vmauth examples.
 

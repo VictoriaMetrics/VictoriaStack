@@ -91,7 +91,7 @@ See rule examples for [logs](https://docs.victoriametrics.com/victorialogs/vmale
 and [traces](https://docs.victoriametrics.com/victoriatraces/vmalert/).
 
 Every database ships production-ready rules for monitoring itself, so you don't have to write the rules for the stack
-from scratch: see [Monitoring](http://localhost:1313/victoriastack/deployment/#monitoring) for the recommended rules
+from scratch: see [Monitoring](https://docs.victoriametrics.com/victoriastack/deployment/#monitoring) for the recommended rules
 and the Grafana dashboards that go with them.
 
 ## Datasource

@@ -177,7 +177,7 @@ Use vlagent to make log delivery [highly available](https://docs.victoriametrics
 
 [vtagent](https://docs.victoriametrics.com/victoriatraces/vtagent/) is an agent for accepting trace spans from OTLP exporters
 and forwarding them to the specified destinations. Its core feature is 
-[on-disk buffering and replication](https://docs.victoriametrics.com/victorialogs/vtagent/#replication-and-high-availability):
+[on-disk buffering and replication](https://docs.victoriametrics.com/victoriatraces/vtagent/#replication-and-high-availability):
 that allows building highly available and scalable pipelines for spans delivery.
 
 ```mermaid
@@ -215,7 +215,7 @@ changes, the paths stay the same:
 
 <br>
 
-A clustered installation runs multiple replicas of every insert component. Put [vmauth](http://localhost:1313/victoriastack/access-control/)
+A clustered installation runs multiple replicas of every insert component. Put [vmauth](https://docs.victoriametrics.com/victoriastack/access-control/)
 in front of them to control access, balance the load, and expose a single ingestion endpoint:
 ```yaml
 unauthorized_user:
@@ -249,7 +249,7 @@ With the configuration above, vmauth accepts write requests on a single endpoint
 
 The [clustered demo](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/config/vmauth/cluster.yml) runs
 exactly this vmauth configuration, and its
-[OpenTelemetry Collector](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/confog/otelcollector/config.yml)
+[OpenTelemetry Collector](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/config/otelcollector/config.yml)
 writes to these endpoints.
 
 **Tenants are specified with HTTP headers** in the same way in all three databases. Set `AccountID` and `ProjectID` on the
@@ -262,7 +262,7 @@ exporters:
 
 Requests without these headers write to the default tenant `0:0`.
 
-> Note: VictoriaMetrics supports [multitenancy](http://localhost:1313/victoriastack/multitenancy/) only in the cluster mode.
+> Note: VictoriaMetrics supports [multitenancy](https://docs.victoriametrics.com/victoriastack/multitenancy/) only in the cluster mode.
 
-Once the data arrives, see [Querying](http://localhost:1313/victoriastack/querying/) for the query languages and APIs of
-every signal, and [UI integrations](http://localhost:1313/victoriastack/ui/) for building dashboards on top of them.
+Once the data arrives, see [Querying](https://docs.victoriametrics.com/victoriastack/querying/) for the query languages and APIs of
+every signal, and [UI integrations](https://docs.victoriametrics.com/victoriastack/ui/) for building dashboards on top of them.

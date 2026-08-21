@@ -11,9 +11,9 @@
 Each database is a separate application, specialized for its own signal. All three share the same design philosophy,
 operational model, and ecosystem.
 
-The stack has no bundled all-in-one UI. Use [Grafana](http://localhost:1313/victoriastack/ui/#grafana)
-or [Perses](http://localhost:1313/victoriastack/ui/#perses) to build dashboards and correlate all three signals.
-Every database also ships with a built-in [vmui](http://localhost:1313/victoriastack/ui/#vmui) for ad-hoc exploration.
+The stack has no bundled all-in-one UI. Use [Grafana](https://docs.victoriametrics.com/victoriastack/ui/#grafana)
+or [Perses](https://docs.victoriametrics.com/victoriastack/ui/#perses) to build dashboards and correlate all three signals.
+Every database also ships with a built-in [vmui](https://docs.victoriametrics.com/victoriastack/ui/#vmui) for ad-hoc exploration.
 
 // TODO: READINESS: visum to become all-in-one
 
@@ -28,7 +28,7 @@ while VictoriaLogs is optimized for wide events (logs and traces). Separate stor
 simple, efficient, independent, and fine-tuned for its signal. No schema or index design is required: push the data
 and VictoriaStack takes care of the rest.
 
-VictoriaStack [accepts the most popular ingestion protocols](http://localhost:1313/victoriastack/ingestion/):
+VictoriaStack [accepts the most popular ingestion protocols](https://docs.victoriametrics.com/victoriastack/ingestion/):
 
 * **Metrics**: Prometheus `remote_write`, OpenTelemetry, InfluxDB line, Graphite, DataDog, OpenTSDB.
 * **Logs**: Elasticsearch bulk, Loki JSON, syslog, journald, DataDog, OpenTelemetry.
@@ -43,14 +43,14 @@ that simplify the setup.
 Choose VictoriaStack to **own your observability** and build a **reliable**,
 **cost-efficient multitenant platform** ready for future growth.
 
-> Already running another observability stack? See [Comparisons](http://localhost:1313/victoriastack/comparisons/)
+> Already running another observability stack? See [Comparisons](https://docs.victoriametrics.com/victoriastack/comparisons/)
 > to learn how VictoriaStack differs from Grafana LGTM, ClickStack, SigNoz, Elastic Stack, and Prometheus+Thanos,
 > and when each alternative is the better fit.
 
 ## Architecture
 
 VictoriaStack runs the three databases as independent installations,
-with [vmauth](http://localhost:1313/victoriametrics/vmauth) as a single entrypoint that routes and load balances
+with [vmauth](https://docs.victoriametrics.com/victoriametrics/vmauth) as a single entrypoint that routes and load balances
 requests:
 
 ![readme-stack.webp](readme-stack.png)
@@ -102,21 +102,21 @@ flowchart LR
 with sub-clusters, where **inserts** or **selects** connect to all or to a subset of **storages**.
 
 Cluster architecture doesn't require any additional services: no extra caches, databases, or compactors. For stateless
-components we recommend [vmauth as a load balancer](http://localhost:1313/victoriametrics/vmauth/#load-balancing),
+components we recommend [vmauth as a load balancer](https://docs.victoriametrics.com/victoriametrics/vmauth/#load-balancing),
 or any other load balancer of your choice.
 
 ## What's in the stack
 
 | What                                                                                    | How                                                                                                                                                                                                                                                                                                                                                            |
 |-----------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **[Deployment](http://localhost:1313/victoriastack/deployment/)**                       | [Kubernetes Operator](http://localhost:1313/victoriastack/deployment/#victoriametrics-operator), [Helm charts](http://localhost:1313/victoriastack/deployment/#helm-charts), [Binaries](http://localhost:1313/victoriastack/deployment/#binary)                                                                                                                |
-| **[Ingestion integrations](http://localhost:1313/victoriastack/ingestion/)**            | [OpenTelemetry](http://localhost:1313/victoriastack/ingestion/#opentelemetry), [Vector, Grafana Alloy, 10+ additional integrations](http://localhost:1313/victoriastack/ingestion/#agents-and-protocols)                                                                                                                                                       |
-| **[Native ingestion](http://localhost:1313/victoriastack/ingestion/#native-ingestion)** | **High throughput, reliable on-disk buffering, replication, traffic compression** via [vmagent](http://localhost:1313/victoriastack/ingestion/#vmagent) for metrics, [vlagent](http://localhost:1313/victoriastack/ingestion/#vlagent) for logs, [vtagent](http://localhost:1313/victoriastack/ingestion/#vtagent) for traces.                                 |
-| **[Access control](http://localhost:1313/victoriastack/access-control/)**               | [vmauth](https://docs.victoriametrics.com/victoriametrics/vmauth/) for [user's authentication](http://localhost:1313/victoriastack/access-control/#authentication), [requests routing](http://localhost:1313/victoriastack/access-control/#routing-and-load-balancing), [per-tenant access](http://localhost:1313/victoriastack/access-control/#multitenancy). |
-| **[Visualization](http://localhost:1313/victoriastack/ui/)**                            | [Grafana](http://localhost:1313/victoriastack/ui/#grafana) and [Perses](http://localhost:1313/victoriastack/ui/#perses) for unified observability and dashboarding. Built-in [vmui](http://localhost:1313/victoriastack/ui/#vmui) for ad-hoc exploration.                                                                                                      |
-| **[Alerting](http://localhost:1313/victoriastack/alerting/)**                           | vmalert integrated with [Alertmanager](http://localhost:1313/victoriastack/alerting/#alertmanager) for rules evaluation and dispatching notifications                                                                                                                                                                                                          |
+| **[Deployment](https://docs.victoriametrics.com/victoriastack/deployment/)**                       | [Kubernetes Operator](https://docs.victoriametrics.com/victoriastack/deployment/#victoriametrics-operator), [Helm charts](https://docs.victoriametrics.com/victoriastack/deployment/#helm-charts), [Binaries](https://docs.victoriametrics.com/victoriastack/deployment/#binary)                                                                                                                |
+| **[Ingestion integrations](https://docs.victoriametrics.com/victoriastack/ingestion/)**            | [OpenTelemetry](https://docs.victoriametrics.com/victoriastack/ingestion/#opentelemetry), [Vector, Grafana Alloy, 10+ additional integrations](https://docs.victoriametrics.com/victoriastack/ingestion/#agents-and-protocols)                                                                                                                                                       |
+| **[Native ingestion](https://docs.victoriametrics.com/victoriastack/ingestion/#native-ingestion)** | **High throughput, reliable on-disk buffering, replication, traffic compression** via [vmagent](https://docs.victoriametrics.com/victoriastack/ingestion/#vmagent) for metrics, [vlagent](https://docs.victoriametrics.com/victoriastack/ingestion/#vlagent) for logs, [vtagent](https://docs.victoriametrics.com/victoriastack/ingestion/#vtagent) for traces.                                 |
+| **[Access control](https://docs.victoriametrics.com/victoriastack/access-control/)**               | [vmauth](https://docs.victoriametrics.com/victoriametrics/vmauth/) for [user's authentication](https://docs.victoriametrics.com/victoriastack/access-control/#authentication), [requests routing](https://docs.victoriametrics.com/victoriastack/access-control/#routing-and-load-balancing), [per-tenant access](https://docs.victoriametrics.com/victoriastack/access-control/#multitenancy). |
+| **[Visualization](https://docs.victoriametrics.com/victoriastack/ui/)**                            | [Grafana](https://docs.victoriametrics.com/victoriastack/ui/#grafana) and [Perses](https://docs.victoriametrics.com/victoriastack/ui/#perses) for unified observability and dashboarding. Built-in [vmui](https://docs.victoriametrics.com/victoriastack/ui/#vmui) for ad-hoc exploration.                                                                                                      |
+| **[Alerting](https://docs.victoriametrics.com/victoriastack/alerting/)**                           | vmalert integrated with [Alertmanager](https://docs.victoriametrics.com/victoriastack/alerting/#alertmanager) for rules evaluation and dispatching notifications                                                                                                                                                                                                          |
 | **[Anomaly detection](/victoriastack/anomaly-detection/)**                              | [vmanomaly](/anomaly-detection/) learns expected data behavior and writes a [unified anomaly score](/anomaly-detection/faq/#what-is-anomaly-score) to VictoriaMetrics for contextual alerting and investigation.                                                                                                                                               |
-| **Extended support via [Enterprise](http://localhost:1313/victoriastack/enterprise)**   | [Long Term Support(LTS) releases](http://localhost:1313/victoriastack/enterprise/#long-term-support-releases), consulting, architectural guidance, solutions engineering.                                                                                                                                                                                      |
+| **Extended support via [Enterprise](https://docs.victoriametrics.com/victoriastack/enterprise)**   | [Long Term Support(LTS) releases](https://docs.victoriametrics.com/victoriastack/enterprise/#long-term-support-releases), consulting, architectural guidance, solutions engineering.                                                                                                                                                                                      |
 
 ## Quick Start
 
@@ -126,7 +126,7 @@ or any other load balancer of your choice.
 > with [OpenTelemetry Astronomy Shop demo](https://github.com/open-telemetry/opentelemetry-demo) data.
 
 You can deploy VictoriaStack as binaries on bare metal, as docker containers, or in Kubernetes via Helm charts and the
-operator. See the [deployment docs](http://localhost:1313/victoriastack/deployment/) for details.
+operator. See the [deployment docs](https://docs.victoriametrics.com/victoriastack/deployment/) for details.
 
 The sections below deploy VictoriaStack with docker compose, the easiest way to run and experiment with it locally.
 You will need [Docker](https://docs.docker.com/get-started/get-docker/)
@@ -264,7 +264,7 @@ for [VictoriaMetrics](https://docs.victoriametrics.com/victoriametrics/single-se
 and [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/#capacity-planning).
 
 VictoriaStack has no object storage tiering: databases keep all data on local disks, and S3 or GCS is used
-for [backups](http://localhost:1313/victoriastack/deployment/#backups) only. Support for historical data in object
+for [backups](https://docs.victoriametrics.com/victoriastack/deployment/#backups) only. Support for historical data in object
 storage is in progress, see [this issue](https://github.com/VictoriaMetrics/VictoriaLogs/issues/48).
 
 // TODO: READINESS: backups for logs and traces
@@ -277,19 +277,19 @@ and per-tenant [retention filters](https://docs.victoriametrics.com/victoriametr
 
 The examples above run on generated telemetry. To build an installation of your own, go through the following steps:
 
-1. [Ingest your own data](http://localhost:1313/victoriastack/ingestion/): point the telemetry agents you already run at
+1. [Ingest your own data](https://docs.victoriametrics.com/victoriastack/ingestion/): point the telemetry agents you already run at
    VictoriaStack, or use vmagent and vlagent for higher throughput and reliable delivery.
-2. [Query the signals](http://localhost:1313/victoriastack/querying/): MetricsQL for metrics, LogsQL for logs and
+2. [Query the signals](https://docs.victoriametrics.com/victoriastack/querying/): MetricsQL for metrics, LogsQL for logs and
    traces.
-3. [Build dashboards](http://localhost:1313/victoriastack/ui/): Grafana or Perses for dashboarding, vmui for ad-hoc
+3. [Build dashboards](https://docs.victoriametrics.com/victoriastack/ui/): Grafana or Perses for dashboarding, vmui for ad-hoc
    exploration.
-4. [Set up alerting](http://localhost:1313/victoriastack/alerting/): vmalert for rules evaluation, Alertmanager for
+4. [Set up alerting](https://docs.victoriametrics.com/victoriastack/alerting/): vmalert for rules evaluation, Alertmanager for
    notifications.
-5. [Protect the installation](http://localhost:1313/victoriastack/access-control/): vmauth for authentication, request
+5. [Protect the installation](https://docs.victoriametrics.com/victoriastack/access-control/): vmauth for authentication, request
    routing, and TLS termination.
-6. [Separate data between tenants](http://localhost:1313/victoriastack/multitenancy/): one installation can serve
+6. [Separate data between tenants](https://docs.victoriametrics.com/victoriastack/multitenancy/): one installation can serve
    thousands of isolated tenants.
-7. [Deploy to production](http://localhost:1313/victoriastack/deployment/): Kubernetes operator, Helm charts, or
+7. [Deploy to production](https://docs.victoriametrics.com/victoriastack/deployment/): Kubernetes operator, Helm charts, or
    binaries.
 
 ## Get help
