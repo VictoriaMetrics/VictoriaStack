@@ -215,7 +215,7 @@ changes, the paths stay the same:
 
 <br>
 
-A clustered installation runs multiple replicas of every insert component. Put [vmauth](http://localhost:1313/victoriastack/access-control/)
+A clustered installation runs multiple replicas of every insert component. Put [vmauth](https://docs.victoriametrics.com/victoriastack/access-control/)
 in front of them to control access, balance the load, and expose a single ingestion endpoint:
 ```yaml
 unauthorized_user:
@@ -262,7 +262,7 @@ exporters:
 
 Requests without these headers write to the default tenant `0:0`.
 
-> Note: VictoriaMetrics supports [multitenancy](http://localhost:1313/victoriastack/multitenancy/) only in the cluster mode.
+> Note: VictoriaMetrics supports [multitenancy](https://docs.victoriametrics.com/victoriastack/multitenancy/) only in the cluster mode.
 
-Once the data arrives, see [Querying](http://localhost:1313/victoriastack/querying/) for the query languages and APIs of
-every signal, and [UI integrations](http://localhost:1313/victoriastack/ui/) for building dashboards on top of them.
+Once the data arrives, see [Querying](https://docs.victoriametrics.com/victoriastack/querying/) for the query languages and APIs of
+every signal, and [UI integrations](https://docs.victoriametrics.com/victoriastack/ui/) for building dashboards on top of them.

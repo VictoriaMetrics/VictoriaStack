@@ -35,19 +35,19 @@ VictoriaMetrics next to single-node VictoriaLogs.
 **Start with the single-node version.** It handles workloads far larger than most teams expect, and it keeps
 the setup simple. A single node scales vertically, so the first answer to growth is a bigger machine.
 [High availability](#high-availability) can be achieved by running multiple nodes,
-[replicating traffic](http://localhost:1313/victoriastack/ingestion/#native-ingestion) to each node and load balancing
+[replicating traffic](https://docs.victoriametrics.com/victoriastack/ingestion/#native-ingestion) to each node and load balancing
 read requests between them.
 
 Switch a database to the clustered version when:
 
 - one machine can no longer keep up with ingestion or queries, or the data no longer fits its disk;
-- you need [multitenancy](http://localhost:1313/victoriastack/multitenancy/) in VictoriaMetrics, which the
+- you need [multitenancy](https://docs.victoriametrics.com/victoriastack/multitenancy/) in VictoriaMetrics, which the
   single-node version doesn't support.
 
 The clustered versions use the same three component types in every database, named after their signal:
 `vminsert`, `vmselect`, and `vmstorage` for metrics, `vlinsert`, `vlselect`, and `vlstorage` for logs,
 `vtinsert`, `vtselect`, and `vtstorage` for traces.
-See [Architecture](http://localhost:1313/victoriastack/#architecture) for what each component does.
+See [Architecture](https://docs.victoriametrics.com/victoriastack/#architecture) for what each component does.
 
 ## High availability
 
@@ -127,7 +127,7 @@ pulling an image never turns into an unplanned [upgrade](#upgrades).
 
 ### Docker Compose
 
-The [QuickStart page](http://localhost:1313/victoriastack/#quick-start) has Docker Compose examples for running the
+The [QuickStart page](https://docs.victoriametrics.com/victoriastack/#quick-start) has Docker Compose examples for running the
 whole stack, in single-node and clustered versions.
 
 ## Kubernetes
@@ -223,12 +223,12 @@ including vmagent, vlagent, vmauth, vmalert, and Alertmanager.
 All three databases expect to run in a trusted network, unreachable from the internet. They perform no authentication
 of their own, so put [vmauth](https://docs.victoriametrics.com/victoriametrics/vmauth/) or another authorization proxy
 in front of them. It authenticates requests, terminates TLS, and routes them to the right component.
-See [Access control](http://localhost:1313/victoriastack/access-control/) for the configuration.
+See [Access control](https://docs.victoriametrics.com/victoriastack/access-control/) for the configuration.
 
 Two more things to set up for every component:
 
 - **Protect the internal HTTP endpoints.** Stack components expose sensitive endpoints for config hot reloading,
-  metrics scraping, profiling, etc. See more about [Sensitive endpoints](http://localhost:1313/victoriastack/access-control/#sensitive-endpoints).
+  metrics scraping, profiling, etc. See more about [Sensitive endpoints](https://docs.victoriametrics.com/victoriastack/access-control/#sensitive-endpoints).
 - **Enable TLS on components that serve traffic without a proxy in front** with the `-tls`, `-tlsCertFile`, and
   `-tlsKeyFile` flags. vmauth additionally supports mTLS and automatic issuing of TLS certificates.
 
@@ -264,7 +264,7 @@ zones keep serving traffic.
 
 Teams that prefer rare, low-risk updates can follow the long-term support release lines instead of the latest release.
 LTS releases are published for VictoriaMetrics only and are part of the Enterprise package,
-see [Long-term support releases](http://localhost:1313/victoriastack/enterprise/#long-term-support-releases).
+see [Long-term support releases](https://docs.victoriametrics.com/victoriastack/enterprise/#long-term-support-releases).
 
 ## Backups
 
@@ -279,7 +279,7 @@ Besides the snapshots API, VictoriaMetrics has more advanced tools for backup ma
 [vmrestore](https://docs.victoriametrics.com/victoriametrics/vmrestore/) restores them.
 [vmbackupmanager](https://docs.victoriametrics.com/victoriametrics/vmbackupmanager/) adds scheduling and backup
 retention, so backups need no additional tooling. It is a part of
-the [Enterprise package](http://localhost:1313/victoriastack/enterprise/), while vmbackup and vmrestore
+the [Enterprise package](https://docs.victoriametrics.com/victoriastack/enterprise/), while vmbackup and vmrestore
 are Apache 2 licensed. All three tools are incorporated into Helm charts and the operator.
 
 The same tooling is not available for VictoriaLogs and VictoriaTraces yet. Follow the progress

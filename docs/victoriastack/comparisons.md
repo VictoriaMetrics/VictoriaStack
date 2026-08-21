@@ -27,9 +27,9 @@ Open-source observability stacks follow one of two architectural philosophies:
 
 1. **A specialized database per signal** (*VictoriaStack, Grafana LGTM*).
    Each signal (metrics, logs, traces) gets a database optimized for its access patterns, accessed via a
-   unified UI ([Grafana, Perses](http://localhost:1313/victoriastack/ui/)).
+   unified UI ([Grafana, Perses](https://docs.victoriametrics.com/victoriastack/ui/)).
    This gives the highest efficiency and flexibility, since every signal is processed through its own optimized pipeline
-   and [can be scaled independently](http://localhost:1313/victoriastack/deployment/#single-node-or-cluster).
+   and [can be scaled independently](https://docs.victoriametrics.com/victoriastack/deployment/#single-node-or-cluster).
 2. **One general-purpose database for all signals** (*ClickStack, SigNoz, Elastic Stack*).
    All signals land in a single analytical database with a bundled UI on top. You get maximum query flexibility using the
    same query language for all signals. The cost is running a general-purpose database, not specialized for any single signal in particular.
@@ -103,8 +103,8 @@ unified UI with Lucene-style search, SQL support, dashboards, alerting, and sess
   so there are no schemas to manage for metrics, logs, or traces. There are no public benchmarks comparing the performance
   of ClickStack and VictoriaStack.
 * ClickStack bundles the HyperDX UI: one interface for everything.
-  VictoriaStack relies on [Grafana or Perses](http://localhost:1313/victoriastack/ui/),
-  plus per-database [vmui](http://localhost:1313/victoriastack/ui/#vmui).
+  VictoriaStack relies on [Grafana or Perses](https://docs.victoriametrics.com/victoriastack/ui/),
+  plus per-database [vmui](https://docs.victoriametrics.com/victoriastack/ui/#vmui).
 * ClickStack deploys ClickHouse, HyperDX, MongoDB for HyperDX metadata, and ZooKeeper or ClickHouse Keeper for coordination.
   VictoriaStack databases have no external dependencies, caches, or coordination services.
   In the cluster version, each database consists of three types of components: insert, select, and storage.
@@ -112,7 +112,7 @@ unified UI with Lucene-style search, SQL support, dashboards, alerting, and sess
   a [drop-in Prometheus remote_write target](https://docs.victoriametrics.com/victoriametrics/#prometheus-setup)
   with a PromQL-compatible query API, alerting, scraping, and service discovery.
 * ClickStack relies on OTLP for ingestion. VictoriaStack accepts OTLP as well, and additionally supports many
-  other [ingestion protocols](http://localhost:1313/victoriastack/ingestion/#agents-and-protocols) and integrations with
+  other [ingestion protocols](https://docs.victoriametrics.com/victoriastack/ingestion/#agents-and-protocols) and integrations with
   existing exporters, telemetry agents, and observability tools.
 
 **Prefer ClickStack when:**

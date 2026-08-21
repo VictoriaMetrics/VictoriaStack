@@ -57,14 +57,14 @@ datasources:
 ```
 
 > See practical [Grafana provisioning examples](https://github.com/VictoriaMetrics/VictoriaStack/tree/main/deployment/provisioning/datasources) for VictoriaStack.
-> The [QuickStart](http://localhost:1313/victoriastack/#quick-start) runs Grafana with these datasources and a demo
+> The [QuickStart](https://docs.victoriametrics.com/victoriastack/#quick-start) runs Grafana with these datasources and a demo
 > dashboard already provisioned.
 
 With the datasources in place, Grafana covers everything a team does with the stack day to day: the query builders in the
 plugins provide a queryless experience for exploring every signal, dashboards and
-[alerting views](http://localhost:1313/victoriastack/alerting/) live in one place, and a single investigation can move
+[alerting views](https://docs.victoriametrics.com/victoriastack/alerting/) live in one place, and a single investigation can move
 between metrics, logs, and traces. For the query languages behind these interfaces,
-see [Querying](http://localhost:1313/victoriastack/querying/).
+see [Querying](https://docs.victoriametrics.com/victoriastack/querying/).
 
 ## Perses
 
@@ -97,7 +97,7 @@ Depending on the Grafana datasource plugin, there could be multiple correlations
 > See examples of correlation settings configured for each datasource plugin in the [VictoriaStack provisioning](https://github.com/VictoriaMetrics/VictoriaStack/tree/main/deployment/provisioning/datasources) demo. 
 
 Logs and traces can also be turned into metrics
-with [recording rules](http://localhost:1313/victoriastack/alerting/#rules), which makes them available on the same
+with [recording rules](https://docs.victoriametrics.com/victoriastack/alerting/#rules), which makes them available on the same
 dashboards and in the same queries as the rest of the metrics.
 
 ## vmui
