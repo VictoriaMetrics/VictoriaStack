@@ -237,7 +237,7 @@ modified to allow access only to specific paths:
       - "/metrics/api/v1/labels"
       - "/metrics/api/v1/label/.+/values"
     url_prefix: "http://victoriametrics:8428/"
-    drop_src_path_prefix_parts: 1.
+    drop_src_path_prefix_parts: 1
 ```
 
 With this configuration, authorized users can query metrics and use Grafana as usual, but they cannot ingest data or
