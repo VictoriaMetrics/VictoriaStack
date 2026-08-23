@@ -78,7 +78,7 @@ services:
 
 # VictoriaTraces cluster definition
 
-  # vtstorage shards. Each shard receives 1/N of all log entries, where N is number of vlstorage (2 in this case).
+  # vtstorage shards. Each shard receives 1/N of all span entries, where N is number of vtstorage (2 in this case).
   vtstorage-1:
     image: victoriametrics/victoria-traces:v0.11.0
     command: [ "--storageDataPath=/vtraces" ]
