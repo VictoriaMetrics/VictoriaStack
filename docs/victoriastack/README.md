@@ -53,7 +53,7 @@ VictoriaStack runs the three databases as independent installations,
 with [vmauth](https://docs.victoriametrics.com/victoriametrics/vmauth) as a single entrypoint that routes and load balances
 requests:
 
-![readme-stack.webp](readme-stack.png)
+![Architecture diagram showing how telemetry is routed to VictoriaMetrics, VictoriaLogs, and VictoriaTraces via vmauth. In addition, components like VMUI, Grafana, Perses, or vmalert are also routed to the databases via vmauth. vmalert connects to Alertmanager to dispatch notifications.](readme-stack.png)
 {width="700"}
 
 All three databases share the same component model. Each of them runs either as a single binary or as a cluster
@@ -115,7 +115,7 @@ or any other load balancer of your choice.
 | **[Access control](https://docs.victoriametrics.com/victoriastack/access-control/)**               | [vmauth](https://docs.victoriametrics.com/victoriametrics/vmauth/) for [user's authentication](https://docs.victoriametrics.com/victoriastack/access-control/#authentication), [requests routing](https://docs.victoriametrics.com/victoriastack/access-control/#routing-and-load-balancing), [per-tenant access](https://docs.victoriametrics.com/victoriastack/access-control/#multitenancy). |
 | **[Visualization](https://docs.victoriametrics.com/victoriastack/ui/)**                            | [Grafana](https://docs.victoriametrics.com/victoriastack/ui/#grafana) and [Perses](https://docs.victoriametrics.com/victoriastack/ui/#perses) for unified observability and dashboarding. Built-in [vmui](https://docs.victoriametrics.com/victoriastack/ui/#vmui) for ad-hoc exploration.                                                                                                      |
 | **[Alerting](https://docs.victoriametrics.com/victoriastack/alerting/)**                           | vmalert integrated with [Alertmanager](https://docs.victoriametrics.com/victoriastack/alerting/#alertmanager) for rules evaluation and dispatching notifications                                                                                                                                                                                                          |
-| **[Anomaly detection](/victoriastack/anomaly-detection/)**                              | [vmanomaly](/anomaly-detection/) learns expected data behavior and writes a [unified anomaly score](/anomaly-detection/faq/#what-is-anomaly-score) to VictoriaMetrics for contextual alerting and investigation.                                                                                                                                               |
+| **[Anomaly detection](https://docs.victoriametrics.com/victoriastack/anomaly-detection/)**                              | [vmanomaly](https://docs.victoriametrics.com/anomaly-detection/) learns expected data behavior and writes a [unified anomaly score](https://docs.victoriametrics.com/anomaly-detection/faq/#what-is-anomaly-score) to VictoriaMetrics for contextual alerting and investigation.                                                                                                                                               |
 | **Extended support via [Enterprise](https://docs.victoriametrics.com/victoriastack/enterprise)**   | [Long Term Support(LTS) releases](https://docs.victoriametrics.com/victoriastack/enterprise/#long-term-support-releases), consulting, architectural guidance, solutions engineering.                                                                                                                                                                                      |
 
 ## Quick Start
@@ -154,37 +154,37 @@ The command starts:
 - Grafana for visualizing signals;
 - vmauth as a single entrypoint that authorizes and routes requests to the appropriate component.
 
-![readme-compose-single.webp](readme-compose-single.png)
+![Diagram showing how the demo works. The OTel Demo sends metrics, logs, and traces to the OTel Collector, which connects to vmauth. vmauth then routes the telemetry to the three databases. Grafana and vmalert also connect to the databases via vmauth.](readme-compose-single.png)
 
 After the demo was running for a few minutes, the following links are available:
 
 - Visit [VictoriaMetrics UI - http://localhost:8427/metrics/select/vmui](http://localhost:8427/metrics/select/vmui/?#/cardinality)
   to explore the stored metrics or [run a query to plot charts](http://localhost:8427/metrics/select/vmui/#/?g0.range_input=15m&g0.end_input=2026-08-17T18%3A14%3A42&g0.relative_time=last_15_minutes&g0.tab=0&g0.expr=sum%28rate%28%7B__name__%3D%22http.server.request.body.size_bucket%22%7D%5B5m%5D%29%29&g0.step_input=3s):
-  ![readme-metrics-vmui-demo.webp](readme-metrics-vmui-demo.png)
+  ![Screenshot of VMUI for VictoriaMetrics.](readme-metrics-vmui-demo.png)
   {width="500"}
 
 - Visit [VictoriaLogs UI - http://localhost:8427/logs/select/vmui](http://localhost:8427/logs/select/vmui) to see
   recently ingested logs or [run a query to plot charts](http://localhost:8427/logs/select/vmui/?#/?g0.range_input=15m&g0.relative_time=last_15_minutes&step=5s&query=*+%7C+by%28service.name%29+count%28%29&group_hits=service.name&g0.end_input=2026-08-17T18%3A17%3A27.768Z):
-  ![readme-logs-vmui-demo.webp](readme-logs-vmui-demo.png)
+  ![Screenshot of VMUI for VictoriaLogs.](readme-logs-vmui-demo.png)
   {width="500"}
 
 - [VictoriaTraces UI - http://localhost:8427/traces/select/vmui](http://localhost:8427/traces/select/vmui), but it is
   better to use Grafana's Explore [via Jaeger](http://localhost:3000/explore?schemaVersion=1&panes=%7B%220ut%22:%7B%22datasource%22:%22victoriatraces-jaeger-ds%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22jaeger%22,%22uid%22:%22victoriatraces-jaeger-ds%22%7D,%22queryType%22:%22search%22,%22service%22:%22shipping%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D,%22compact%22:false%7D%7D&orgId=1)
   or [Tempo](http://localhost:3000/explore?schemaVersion=1&panes=%7B%220ut%22:%7B%22datasource%22:%22victoriatraces-tempo-ds%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22tempo%22,%22uid%22:%22victoriatraces-tempo-ds%22%7D,%22queryType%22:%22traceqlSearch%22,%22limit%22:20,%22tableType%22:%22traces%22,%22metricsQueryType%22:%22range%22,%22serviceMapUseNativeHistograms%22:false,%22filters%22:%5B%7B%22id%22:%2219638448%22,%22operator%22:%22%3D%22,%22scope%22:%22span%22%7D%5D%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D,%22compact%22:false%7D%7D&orgId=1)
   (_login with admin:admin_):
-  ![readme-traces-grafana-explore.webp](readme-traces-grafana-explore.png)
+  ![Screenshot of Grafana's Explore page showing VictoriaTraces trace data.](readme-traces-grafana-explore.png)
   {width="500"}
 
 - [Grafana - http://localhost:3000](http://localhost:3000/explore) with preconfigured datasources
   and a simple demo dashboard (_login with admin:admin_):
-  ![readme-grafana-demo.webp](readme-grafana-demo.png)
+  ![Screenshot of Grafana showing the demo dashboard.](readme-grafana-demo.png)
   {width="500"}
 
 The demo will spawn two vmalert instances:
 1. To run alerting rules [alerts-demo.yml](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/rules/alerts-demo.yml)
    on metrics generated by OpenTelemery demo and stored in VictoriaMetrics. 
    Check rules state at [VictoriaMetrics alerting UI](http://localhost:8427/metrics/select/vmui/#/rules) or in [Grafana alerting](http://localhost:3000/alerting/list).
-   ![readme-vmui-alerts.webp](readme-vmui-alerts.png)
+   ![Screenshot of VMUI for VictoriaMetrics showing the Alerting page.](readme-vmui-alerts.png)
    {width="500"}
 
 2. To run recording rules [logs-to-metrics.yml](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/rules/logs-to-metrics.yml)
@@ -217,7 +217,7 @@ It runs the same setup as the [single-node version](#single-node-version), but e
 independently scalable components: insert, select, and storage.
 In this topology, vmauth also balances requests among insert and select components.
 
-![readme-compose-cluster.webp](readme-compose-cluster.png)
+![Diagram showing how the demo works in cluster mode. The OTel Demo sends metrics, logs, and traces to the OTel Collector, which connects to vmauth. vmauth routes the telemetry to the three clusters. Grafana and vmalert also connect to the three clusters via vmauth.](readme-compose-cluster.png)
 
 vmauth routes the requests, so the UI links stay
 the [same as in the single-node version](#single-node-version).
