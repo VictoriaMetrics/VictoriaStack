@@ -38,7 +38,7 @@ its own tenant, and restricting the endpoints they can reach.
 
 ## Routing and load balancing
 
-The following vmauth configuration acts as a gateway between VictoriaStack components and users:
+The following vmauth configuration acts as a router in front of VictoriaStack components:
 
 ```yaml
 # unauthorized_user doesn't expect any credentials to be provided
@@ -103,9 +103,10 @@ unauthorized_user:
 The config then needs no updates when replicas are added, removed, or restarted. The option can be set per user, per
 `url_map` entry, or globally with the `-discoverBackendIPs` command-line flag.
 
-Discovering the addresses behind a service name is what makes vmauth balance better than the service itself: it sees
-every replica and picks the least loaded one for every request, instead of pinning a whole connection to whichever
-replica the service happened to choose.
+Discovering the addresses behind a service name is what makes vmauth balance better than 
+[k8s service](https://kubernetes.io/docs/concepts/services-networking/service/): it sees every replica and picks 
+the least loaded one for every request, instead of pinning a whole connection to whichever replica the service happened
+to choose.
 
 When the backends listen on different ports, resolve them via
 a [DNS SRV](https://docs.victoriametrics.com/victoriametrics/vmauth/#srv-urls) record, which carries the ports along
@@ -187,7 +188,7 @@ more vmauth examples.
 
 ## Enforcing filters
 
-Tenants isolate whole datasets from each other. To limit what a user sees **inside** a single tenant, configure vmauth
+Tenants isolate whole datasets from each other. To limit what a user sees **inside a single tenant**, configure vmauth
 to [enforce query filters](https://docs.victoriametrics.com/victoriametrics/vmauth/#enforcing-query-args) to every
 proxied request. The database applies them to the query it receives, and the user cannot drop or override them.
 

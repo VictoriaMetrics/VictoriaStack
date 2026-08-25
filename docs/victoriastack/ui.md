@@ -13,8 +13,8 @@ tags:
 
 VictoriaStack has no single interface of its own that covers all three signals. **We recommend using
 [Grafana](#grafana)**: it connects to all three databases as datasources, so metrics, logs, and traces end up on the
-same dashboards and can be [correlated](#correlations) with each other. [Perses](#perses) is an alternative for teams
-that keep dashboards as code.
+same dashboards and can be [correlated](#correlations) with each other. [Perses](#perses) is an alternative visualization
+UI that can be used with VictoriaStack as well.
 
 Every database also goes with a built-in UI called [vmui](#vmui). It is available out of the box and is great for ad-hoc
 data exploration, but it doesn't allow building dashboards, correlate different signal types or manage access.
