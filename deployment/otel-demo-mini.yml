@@ -126,7 +126,7 @@ configs:
   otel_demo_flags:
     content: |
       {
-        "$schema": "https://flagd.dev/schema/v0/flags.json",
+        "$$schema": "https://flagd.dev/schema/v0/flags.json",
         "flags": {
           "shippingSlowdown": {
             "state": "ENABLED",
