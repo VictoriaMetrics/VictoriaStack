@@ -15,8 +15,6 @@ The stack has no bundled all-in-one UI. Use [Grafana](https://docs.victoriametri
 or [Perses](https://docs.victoriametrics.com/victoriastack/ui/#perses) to build dashboards and correlate all three signals.
 Every database also ships with a built-in [vmui](https://docs.victoriametrics.com/victoriastack/ui/#vmui) for ad-hoc exploration.
 
-// TODO: READINESS: visum to become all-in-one
-
 ## Why VictoriaStack?
 
 VictoriaStack is built on three core principles: **simplicity, reliability, and efficiency**.
@@ -150,7 +148,7 @@ The command starts:
 
 - a minimized version of [OpenTelemetry Demo](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-demo-mini.yml) with an OpenTelemetry collector;
 - single-node VictoriaMetrics, VictoriaLogs, and VictoriaTraces for storing and querying signals;
-- vmalert for evaluating alerting rules;
+- vmalert for evaluating alerting and recording rules;
 - Grafana for visualizing signals;
 - vmauth as a single entrypoint that authorizes and routes requests to the appropriate component.
 
@@ -246,16 +244,20 @@ VictoriaMetrics, VictoriaLogs, and VictoriaTraces are highly scalable and simple
 * add more **storage** shards to increase overall performance and overcome hardware limits like CPU, memory, IO,
   or filesystem capacity.
 
+Components **insert** and **select** are stateless and can be scaled in response to demand. The **storage** component
+is stateful and represents a storage shard. It is recommended carefully choosing the number of storage shards, as 
+scaling down is a complex operation.
+
 ## Retention and storage
 
 All three databases store data on the local filesystem and delete it automatically once it falls outside the
 configured retention:
 
-| Database                                                                                                     | Default retention | How to configure                                                                                               |
-|--------------------------------------------------------------------------------------------------------------|-------------------|----------------------------------------------------------------------------------------------------------------|
-| [VictoriaMetrics](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#retention) | 1 month           | `-retentionPeriod`, from `1d` up to years                                                                      |
-| [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/#retention)                                     | 7 days            | `-retentionPeriod`, or a disk limit via `-retention.maxDiskSpaceUsageBytes` / `-retention.maxDiskUsagePercent` |
-| [VictoriaTraces](https://docs.victoriametrics.com/victoriatraces/#retention)                                 | 7 days            | `-retentionPeriod`, or a disk limit via `-retention.maxDiskSpaceUsageBytes` / `-retention.maxDiskUsagePercent` |
+| Database                                                                                                     | Default retention | How to configure                                                                                                            |
+|--------------------------------------------------------------------------------------------------------------|-------------------|-----------------------------------------------------------------------------------------------------------------------------|
+| [VictoriaMetrics](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#retention) | 1 month           | `-retentionPeriod` (`1d`, `10y`)                                                                                            |
+| [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/#retention)                                     | 7 days            | `-retentionPeriod` (`1d`, `10y`), or a disk limit via `-retention.maxDiskSpaceUsageBytes`, `-retention.maxDiskUsagePercent` |
+| [VictoriaTraces](https://docs.victoriametrics.com/victoriatraces/#retention)                                 | 7 days            | `-retentionPeriod` (`1d`, `10y`), or a disk limit via `-retention.maxDiskSpaceUsageBytes`, `-retention.maxDiskUsagePercent` |
 
 <br>
 
@@ -269,8 +271,7 @@ storage is in progress, see [this issue](https://github.com/VictoriaMetrics/Vict
 
 // TODO: READINESS: backups for logs and traces
 
-To store metrics longer without paying for full resolution,
-Enterprise adds [downsampling](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#downsampling)
+To store metrics longer Enterprise adds [downsampling](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#downsampling)
 and per-tenant [retention filters](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#retention-filters).
 
 ## Next steps

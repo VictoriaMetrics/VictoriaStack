@@ -39,7 +39,7 @@ make otel-cluster-down
 
 # Readiness
 
-See features that are missing in the products to make the stack aligned.
+See the list of features that are missing in the products to make the stack aligned.
 
 ## UI 
 
@@ -51,6 +51,7 @@ See features that are missing in the products to make the stack aligned.
 - // TODO: READINESS: add #Upgrading docs https://github.com/VictoriaMetrics/VictoriaTraces/issues/244
 - // TODO: READINESS: https://github.com/VictoriaMetrics/VictoriaTraces/pull/242 vtagent documentation for HA
 - // TODO: READINESS: per-tenant retention in VL/VT
+- // TODO: READINESS: multitenant reads in VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/91
 - // TODO: READINESS: backups VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/123
 - // TODO: READINESS: VTDistributed https://github.com/VictoriaMetrics/operator/issues/2515
 - // TODO: READINESS: VLDistributed/VMDistributed are marked as experimental https://github.com/VictoriaMetrics/operator/issues/2329
@@ -62,6 +63,7 @@ See features that are missing in the products to make the stack aligned.
 ## VictoriaLogs
 
 - // TODO: READINESS: per-tenant retention in VL/VT
+- // TODO: READINESS: multitenant reads in VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/91
 - // TODO: READINESS: backups VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/123
 - // TODO: READINESS: VLDistributed/VMDistributed are marked as experimental https://github.com/VictoriaMetrics/operator/issues/2329
 - // TODO: READINESS: LTS releases for VT and VL

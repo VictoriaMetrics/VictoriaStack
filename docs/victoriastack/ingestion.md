@@ -21,7 +21,7 @@ There are three ways to deliver data to VictoriaStack - pick the one that matche
 
 <br>
 
-**The paths combine**: OpenTelemetry Collector or a third-party agent can push to vmagent or vlagent, which buffer the
+**The paths combine**: OpenTelemetry Collector or a third-party agent can push to vmagent/vlagent/vtagent, which buffer the
 data and forward it to the databases. That keeps the existing collection setup and still gets the delivery guarantees of
 the native agents.
 
@@ -61,17 +61,17 @@ flowchart LR
     A --> |<a href="https://docs.victoriametrics.com/victoriatraces/data-ingestion/opentelemetry/">traces</a>| T[VictoriaTraces]
 ```
 
-That's it, no additional configuration is required. Each integration still has tweaks you can apply.
-See the following docs for more details:
+Each integration has tweaks you can apply. See the following docs for more details:
 * [VictoriaMetrics OpenTelemetry Setup](https://docs.victoriametrics.com/victoriametrics/integrations/opentelemetry/)
 * [VictoriaLogs OpenTelemetry Setup](https://docs.victoriametrics.com/victorialogs/data-ingestion/opentelemetry/)
 * [VictoriaTraces OpenTelemetry Setup](https://docs.victoriametrics.com/victoriatraces/data-ingestion/opentelemetry/)
 
-> See the OpenTelemetry Collector [configuration example](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/config/otelcollector/config.yml)
+In the Quick Start we also [use OpenTelemetry Collector](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/config/otelcollector/config.yml)
+as example.
 
 ## Agents and protocols
 
-The agent you already run most likely speaks a protocol that VictoriaStack accepts:
+VictoriaStack supports a wide range of ingestion protocols and agents:
 
 | Signal      | Ingestion protocols                                                                                       | Agents                                           | Links                                                                    |
 |-------------|-----------------------------------------------------------------------------------------------------------|--------------------------------------------------|--------------------------------------------------------------------------|
@@ -85,15 +85,15 @@ Keeping the agents you already run is the simplest way to start: nothing changes
 where it is sent. Follow the docs linked above when reconfiguring them, since some agents can have their own recommended
 settings for endpoints, batching, compression, and retries.
 
-For better delivery guarantees and ingestion pipeline control put a [native agent](#native-ingestion) between them and 
-the databases: vmagent and vlagent accept the same protocols, buffer the data on disk while a database is unavailable, 
+For better delivery guarantees and ingestion pipeline control put a [native agent](#native-ingestion) between existing agents
+and stack: vmagent/vlagent/vtagent support the same protocols, buffer the data on disk while a database is unavailable, 
 and replicate it to several installations.
 
 ## Native ingestion
 
 Support of various protocols and agents makes it easy to integrate VictoriaStack with existing installations. 
 For improving cost-efficiency, high throughput, reliable on-disk buffering, replication, and traffic compression we 
-recommend using VictoriaStack agents instead or together with existing agents:
+recommend using native agents instead or together with existing agents:
 - [vmagent](#vmagent) for metrics
 - [vlagent](#vlagent) for logs
 - [vtagent](#vtagent) for traces
@@ -133,12 +133,15 @@ flowchart LR
     V -->|"replicated to N destinations"| VM
 ```
 
-As an entry point, vmagent can filter, [deduplicate](https://docs.victoriametrics.com/victoriametrics/vmagent/#flexible-deduplication),
+As an entry point, vmagent can [filter](https://docs.victoriametrics.com/victoriametrics/relabeling/#scraping-relabeling-cheatsheet),
+[deduplicate](https://docs.victoriametrics.com/victoriametrics/vmagent/#flexible-deduplication),
 [pre-aggregate](https://docs.victoriametrics.com/victoriametrics/stream-aggregation/), rate-limit ingested samples and
 [limit cardinality](https://docs.victoriametrics.com/victoriametrics/vmagent/#cardinality-limiter).
 
 The forwarded traffic is [additionally compressed](https://docs.victoriametrics.com/victoriametrics/vmagent/#victoriametrics-remote-write-protocol),
 resulting in 2x-5x network bandwidth reduction. See the blog post [Save network costs with VictoriaMetrics remote write protocol](https://victoriametrics.com/blog/victoriametrics-remote-write/).
+
+Use vmagent to make metrics delivery [highly available](https://docs.victoriametrics.com/victoriametrics/vmagent/#replication-and-high-availability).
 
 ### vlagent
 
@@ -202,16 +205,13 @@ flowchart LR
 
 ## Cluster and multitenancy
 
-The examples above target single-node databases and the default tenant. Two things change when you move beyond that.
+Clustered databases accept data on their insert components: `vminsert`, `vlinsert`, and `vtinsert`:
 
-**Clustered databases accept data on their insert components:** `vminsert`, `vlinsert`, and `vtinsert`. Only the address
-changes, the paths stay the same:
-
-| Signal      | Single-node                                                   | Clustered                                              |
-|-------------|---------------------------------------------------------------|--------------------------------------------------------|
-| **Metrics** | `http://victoriametrics:8428/api/v1/write`                     | `http://vminsert:8480/insert/prometheus/api/v1/write`  |
-| **Logs**    | `http://victorialogs:9428/insert/opentelemetry/v1/logs`        | `http://vlinsert:9428/insert/opentelemetry/v1/logs`    |
-| **Traces**  | `http://victoriatraces:10428/insert/opentelemetry/v1/traces`   | `http://vtinsert:10428/insert/opentelemetry/v1/traces` |
+| Signal      | Single-node URL                                              | Clustered URL                                          |
+|-------------|--------------------------------------------------------------|--------------------------------------------------------|
+| **Metrics** | `http://victoriametrics:8428/api/v1/write`                   | `http://vminsert:8480/insert/prometheus/api/v1/write`  |
+| **Logs**    | `http://victorialogs:9428/insert/opentelemetry/v1/logs`      | `http://vlinsert:9428/insert/opentelemetry/v1/logs`    |
+| **Traces**  | `http://victoriatraces:10428/insert/opentelemetry/v1/traces` | `http://vtinsert:10428/insert/opentelemetry/v1/traces` |
 
 <br>
 
