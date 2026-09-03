@@ -93,8 +93,8 @@ Download the binaries from the GitHub releases pages:
 - [VictoriaTraces releases](https://github.com/VictoriaMetrics/VictoriaTraces/releases)
 
 The releases pages also contain the `vmutils` and `vlutils` packages with components like
-[vmauth](https://docs.victoriametrics.com/vmauth/), [vmalert](https://docs.victoriametrics.com/vmalert/),
-[vmagent](https://docs.victoriametrics.com/vmagent/), [vlagent](https://docs.victoriametrics.com/victorialogs/vlagent/), etc.
+[vmauth](https://docs.victoriametrics.com/victoriametrics/vmauth/), [vmalert](https://docs.victoriametrics.com/victoriametrics/vmalert/),
+[vmagent](https://docs.victoriametrics.com/victoriametrics/vmagent/), [vlagent](https://docs.victoriametrics.com/victorialogs/vlagent/), [vtagent](https://docs.victoriametrics.com/victoriatraces/vtagent/), etc.
 
 Choose the archive that matches the operating system and CPU architecture of your machine.
 See detailed instructions on downloading and running binaries:

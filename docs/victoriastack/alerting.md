@@ -18,7 +18,7 @@ In VictoriaStack, the [vmalert](https://docs.victoriametrics.com/victoriametrics
 engine. It integrates with [Alertmanager](https://github.com/prometheus/alertmanager), which dispatches the
 notifications to destinations like [email, Slack, PagerDuty, or MS Teams](https://prometheus.io/docs/alerting/latest/integrations/#available-integrations).
 
-![alerting.webp](alerting.png)
+![Diagram showing how alerts work. Each database (VictoriaMetrics, VictoriaLogs, and VictoriaTraces) has a dedicated vmalert node connected to. A single Alertmanager node connects to the three vmalert nodes and forwards the notifications to systems like PagerDuty, Slack, Microsoft Teams, or email.](alerting.png)
 
 Use a separate vmalert instance per signal. This keeps the rules configuration simpler and isolates the alerting
 pipelines from each other. A single instance can also serve
