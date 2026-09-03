@@ -1,4 +1,4 @@
-**VictoriaStack** is an observability stack for metrics, logs, and traces.
+**VictoriaStack** is an open source observability stack for metrics, logs, and traces.
 
 | Signal      | Product                                                              | Query language                                                                                                                                                                                                                                  | Scalability                                                                                                                                                    |
 |-------------|----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -11,9 +11,7 @@
 Each database is a separate application, specialized for its own signal. All three share the same design philosophy,
 operational model, and ecosystem.
 
-The stack has no bundled all-in-one UI. Use [Grafana](https://docs.victoriametrics.com/victoriastack/ui/#grafana)
-or [Perses](https://docs.victoriametrics.com/victoriastack/ui/#perses) to build dashboards and correlate all three signals.
-Every database also ships with a built-in [vmui](https://docs.victoriametrics.com/victoriastack/ui/#vmui) for ad-hoc exploration.
+All three databases are open-source and free to use, Apache-2.0 licensed.
 
 ## Why VictoriaStack?
 
