@@ -2,7 +2,7 @@
 title: Deployment
 menu:
   docs:
-    weight: 1
+    weight: 2
     identifier: victoriastack-deployment
     parent: victoriastack
 tags:

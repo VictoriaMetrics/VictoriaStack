@@ -2,7 +2,7 @@
 title: Ingestion
 menu:
   docs:
-    weight: 2
+    weight: 3
     identifier: victoriastack-ingestion
     parent: victoriastack
 tags:

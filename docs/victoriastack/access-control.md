@@ -2,7 +2,7 @@
 title: Access control
 menu:
   docs:
-    weight: 5
+    weight: 6
     identifier: victoriastack-access-control
     parent: victoriastack
 tags:

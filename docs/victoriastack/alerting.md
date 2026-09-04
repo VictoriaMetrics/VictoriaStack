@@ -2,7 +2,7 @@
 title: Alerting
 menu:
   docs:
-    weight: 6
+    weight: 7
     identifier: victoriastack-alerting
     parent: victoriastack
 tags:

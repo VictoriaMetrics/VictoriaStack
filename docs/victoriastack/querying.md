@@ -2,7 +2,7 @@
 title: Querying
 menu:
   docs:
-    weight: 4
+    weight: 5
     identifier: victoriastack-querying
     parent: victoriastack
 tags:

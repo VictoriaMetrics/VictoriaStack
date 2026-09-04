@@ -126,7 +126,7 @@ view is really needed.
 
 ## Per-tenant retention
 
-By default, [retention](https://docs.victoriametrics.com/victoriastack/#retention-and-storage) applies to all data in an
+By default, [retention](https://docs.victoriametrics.com/victoriastack/quick-start/#retention-and-storage) applies to all data in an
 installation. VictoriaMetrics can also keep different retentions per tenant
 via [retention filters](https://docs.victoriametrics.com/victoriametrics/cluster-victoriametrics/#retention-filters),
 which are part of the [Enterprise](https://docs.victoriametrics.com/victoriastack/enterprise/) package. Pass the filters to
