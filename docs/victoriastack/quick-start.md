@@ -120,7 +120,7 @@ evaluating alerting rules. To stop the stack, run:
 make otel-cluster-down
 ```
 
-## Scaling
+## Scalability
 
 VictoriaMetrics, VictoriaLogs, and VictoriaTraces are highly scalable and simple to operate:
 
