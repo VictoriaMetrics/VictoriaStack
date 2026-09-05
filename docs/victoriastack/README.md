@@ -135,7 +135,7 @@ or any other load balancer of your choice.
 
 <br>
 
-Navigate documentation for available components using left navigation menu. Start with [Quick Start](https://docs.victoriametrics.com/victoriastack/quick-start/) to begin using VictoriaStack.
+Navigate documentation for available components using left navigation menu. Begin with [Quick Start](https://docs.victoriametrics.com/victoriastack/quick-start/) to begin using VictoriaStack.
 
 ## Get help
 
