@@ -13,13 +13,13 @@ tags:
 
 > If you're looking for a visual impression of the VictoriaStack,
 > visit [Playgrounds page](https://docs.victoriametrics.com/playgrounds/)
-> and try publicly running installations fed
+> and try publicly running installations of VictoriaMetrics, VictoriaLogs and VictoriaTraces fed
 > with [OpenTelemetry Astronomy Shop demo](https://github.com/open-telemetry/opentelemetry-demo) data.
 
 You can deploy VictoriaStack as binaries on bare metal, as docker containers, or in Kubernetes via Helm charts and the
 operator. See the [deployment docs](https://docs.victoriametrics.com/victoriastack/deployment/) for details.
 
-The sections below deploy VictoriaStack with docker compose, the easiest way to run and experiment with it locally.
+The sections below deploy VictoriaStack with Docker Compose, the easiest way to run and experiment with it locally.
 You will need [Docker](https://docs.docker.com/get-started/get-docker/)
 with [Compose v2](https://docs.docker.com/compose/) and `git`.
 
@@ -27,7 +27,7 @@ with [Compose v2](https://docs.docker.com/compose/) and `git`.
 
 The simplest setup runs VictoriaMetrics, VictoriaLogs, and VictoriaTraces as single-node deployments.
 Start it locally with the [otel-single-node.yml](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-single-node.yml)
-docker compose file:
+Docker Compose file:
 
 ```sh
 git clone https://github.com/VictoriaMetrics/VictoriaStack.git && cd VictoriaStack
@@ -97,7 +97,7 @@ To scale the stack horizontally, see the [clustered version](#clustered-version)
 ## Clustered version
 
 Run the stack locally with [otel-cluster.yml](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/otel-cluster.yml)
-docker compose file:
+Docker Compose file:
 
 ```sh
 git clone https://github.com/VictoriaMetrics/VictoriaStack.git && cd VictoriaStack

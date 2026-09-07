@@ -20,7 +20,7 @@ It is easy to run and maintain. It fits well in home labs and scales reliably to
 and each database is battle-tested in production.
 
 The stack focuses on what matters most for each signal. VictoriaMetrics is optimized for time series workloads,
-while VictoriaLogs is optimized for wide events (logs and traces). Separate storage backends keep each database
+while VictoriaLogs and VictoriaTraces are optimized for wide events (logs and traces). Separate storage backends keep each database
 simple, efficient, independent, and fine-tuned for its signal. No schema or index design is required: push the data
 and VictoriaStack takes care of the rest.
 

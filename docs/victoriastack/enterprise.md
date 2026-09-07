@@ -11,7 +11,7 @@ tags:
   - traces
 ---
 
-VictoriaStack is Apache 2 licensed and complete on its own: the community edition runs in production at any scale
+VictoriaStack is Apache-2.0 licensed and complete on its own: the open source version runs in production at any scale
 described in these docs. The [Enterprise](https://victoriametrics.com/products/enterprise/) offering adds two things:
 **technical support from the engineers who build the stack**, and a set of features for Enterprise-level installations.
 
@@ -84,4 +84,4 @@ Enterprise, so it is a third option for teams that prefer not to operate the sta
 
 - Request a [trial license](https://victoriametrics.com/products/enterprise/trial/) to evaluate Enterprise components in
   a non-production setup.
-- Contact [info@victoriametrics.com](mailto:info@victoriametrics.com) to discuss support and an Enterprise contract.
+- Contact [sales@victoriametrics.com](mailto:sales@victoriametrics.com) to discuss support and an Enterprise contract.

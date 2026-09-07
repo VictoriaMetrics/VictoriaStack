@@ -11,8 +11,8 @@ tags:
   - traces
 ---
 
-VictoriaStack has no single interface of its own that covers all three signals. **We recommend using
-[Grafana](#grafana)**: it connects to all three databases as datasources, so metrics, logs, and traces end up on the
+VictoriaStack has no unified interface of its own that covers all three signals, but it is in-progress. For now, 
+**we recommend using[Grafana](#grafana)**: it connects to all three databases as datasources, so metrics, logs, and traces end up on the
 same dashboards and can be [correlated](#correlations) with each other. [Perses](#perses) is an alternative visualization
 UI that can be used with VictoriaStack as well.
 

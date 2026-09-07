@@ -277,7 +277,7 @@ It is recommended to protect these endpoints from public or unauthorized access.
 below:
 
 - [vmauth security](https://docs.victoriametrics.com/victoriametrics/vmauth/#security)
-- [VictoriaMetrics security](https://docs.victoriametrics.com/victoriametrics/#general-security-recommendations)
+- [VictoriaMetrics system endpoints](https://docs.victoriametrics.com/victoriametrics/#protecting-service-endpoints)
 - [VictoriaLogs system endpoints](https://docs.victoriametrics.com/victorialogs/security-and-lb/#system-endpoints)
-- [VictoriaTraces security](https://docs.victoriametrics.com/victoriatraces/#security)
+- [VictoriaTraces system endpoints](https://docs.victoriametrics.com/victoriatraces/#security)
 - [vmalert security](https://docs.victoriametrics.com/victoriametrics/vmalert/#security)

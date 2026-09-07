@@ -164,8 +164,8 @@ metrics.
   and less space-efficient than dedicated time series databases.
 * Elasticsearch offers three licenses (Elastic License 2.0, SSPL, and AGPLv3 since 2024). VictoriaStack is Apache 2.0.
 
-**Prefer Elastic when:** search is your primary use case (security analytics, business documents, complex full-text
-queries over logs), or you already run Elastic for search and want observability to piggyback on it.
+**Prefer Elastic when:** search is your primary use case (security analytics, complex full-text
+queries over logs) and you already run Elastic for search and want observability to be built on top of it.
 
 **Prefer VictoriaStack when:**
 * You value cost-efficiency and flexibility. The savings could reach x30.
