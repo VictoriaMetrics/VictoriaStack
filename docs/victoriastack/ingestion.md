@@ -201,8 +201,6 @@ flowchart LR
     V -->|"replicate to N destinations"| VT
 ```
 
-// TODO: READINESS: https://github.com/VictoriaMetrics/VictoriaTraces/pull/242 vtagent documentation for HA
-
 ## Cluster and multitenancy
 
 Clustered databases accept data on their insert components: `vminsert`, `vlinsert`, and `vtinsert`:

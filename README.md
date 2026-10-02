@@ -48,8 +48,6 @@ See the list of features that are missing in the products to make the stack alig
 
 ## VictoriaTraces
 
-- // TODO: READINESS: add #Upgrading docs https://github.com/VictoriaMetrics/VictoriaTraces/issues/244
-- // TODO: READINESS: https://github.com/VictoriaMetrics/VictoriaTraces/pull/242 vtagent documentation for HA
 - // TODO: READINESS: per-tenant retention in VL/VT
 - // TODO: READINESS: multitenant reads in VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/91
 - // TODO: READINESS: backups VL/VT https://github.com/VictoriaMetrics/VictoriaLogs/issues/123

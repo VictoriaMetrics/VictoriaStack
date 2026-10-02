@@ -58,11 +58,11 @@ installations that are temporarily unavailable, while
 healthy ones. There is no consensus protocol and no coordination between the installations, which keeps the scheme
 simple to run and to troubleshoot.
 
-| Signal      | HA docs                                                                                                              | What replicates the data                                                                                                                                                                                           |
-|-------------|----------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Metrics** | [VictoriaMetrics](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#high-availability) | [vmagent](https://docs.victoriametrics.com/victoriametrics/vmagent/#replication-and-high-availability)                                                                                                             |
-| **Logs**    | [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/#high-availability)                                     | [vlagent](https://docs.victoriametrics.com/victorialogs/vlagent/#replication-and-high-availability)                                                                                                                |
-| **Traces**  | [VictoriaTraces](https://docs.victoriametrics.com/victoriatraces/#high-availability)                                 | [vtagent](https://docs.victoriametrics.com/victoriatraces/vtagent/#replication-and-high-availability)    // TODO: READINESS: https://github.com/VictoriaMetrics/VictoriaTraces/pull/242 vtagent documentation for HA |
+| Signal      | HA docs                                                                                                              | What replicates the data                                                                               |
+|-------------|----------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
+| **Metrics** | [VictoriaMetrics](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#high-availability) | [vmagent](https://docs.victoriametrics.com/victoriametrics/vmagent/#replication-and-high-availability) |
+| **Logs**    | [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/#high-availability)                                     | [vlagent](https://docs.victoriametrics.com/victorialogs/vlagent/#replication-and-high-availability)    |
+| **Traces**  | [VictoriaTraces](https://docs.victoriametrics.com/victoriatraces/#high-availability)                                 | [vtagent](https://docs.victoriametrics.com/victoriatraces/vtagent/#replication-and-high-availability)  |
 
 <br>
 
@@ -253,8 +253,6 @@ Most agents keep buffering data while a database restarts, so nothing is lost du
 See the detailed docs on upgrading
 [VictoriaMetrics](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#how-to-upgrade-victoriametrics),
 [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/#upgrading), [VictoriaTraces](https://docs.victoriametrics.com/victoriatraces/#upgrading).
-
-// TODO: READINESS: add #Upgrading docs https://github.com/VictoriaMetrics/VictoriaTraces/issues/244
 
 In Kubernetes, the operator manages the restarts. Pin the version of every component
 via [`spec.image.tag`](https://docs.victoriametrics.com/operator/resources/#managing-versions-of-vm), and the operator
