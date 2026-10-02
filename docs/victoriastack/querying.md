@@ -104,6 +104,9 @@ To get the basic concepts of LogsQL, please read [LogsQL tutorial](https://docs.
 
 ## Querying traces
 
+> For querying experience, take a quick look at [VictoriaTraces vmui](https://docs.victoriametrics.com/playgrounds/#victoriatraces-playground)
+> and [Grafana](https://docs.victoriametrics.com/playgrounds/#grafana-playground) playgrounds.
+
 VictoriaTraces stores spans as wide events, so it queries them
 with [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/) as well. That makes filtering and analytics over
 spans work the same way as over logs: filter by any field, extract fields at query time, and calculate stats over the
@@ -123,7 +126,7 @@ Every database answers queries over HTTP, which is what the [UIs integrations](h
   and other handlers from Prometheus querying API. Additionally, see [Graphite API](https://docs.victoriametrics.com/victoriametrics/integrations/graphite/#graphite-api-usage).
 * **Logs**: [`/select/logsql/query`](https://docs.victoriametrics.com/victorialogs/querying/#http-api) and other handlers
   from VictoriaLogs HTTP API, including tailing, statistics calculation, fileds exploration, etc. 
-* **Traces**: the same LogsQL endpoints as for logs, plus the Jaeger and Tempo APIs.
+* **Traces**: the same LogsQL endpoints as for logs, plus the [Jaeger and Tempo APIs](https://docs.victoriametrics.com/victoriatraces/querying/#http-api).
 
 Read requests select their [tenant](https://docs.victoriametrics.com/victoriastack/multitenancy/#query-path) with the `AccountID`
 and `ProjectID` HTTP headers, the same way in all three databases.

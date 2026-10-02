@@ -8,34 +8,34 @@ services:
 
   # vmstorage shards. Each shard receives 1/N of all samples, where N is number of vmstorages (2 in this case).
   vmstorage-1:
-    image: victoriametrics/vmstorage:v1.150.0-cluster
+    image: victoriametrics/vmstorage:v1.153.0-cluster
     volumes: [ "vmdata-1:/storage" ]
   vmstorage-2:
-    image: victoriametrics/vmstorage:v1.150.0-cluster
+    image: victoriametrics/vmstorage:v1.153.0-cluster
     volumes: [ "vmdata-2:/storage" ]
 
   # vminsert is an ingestion frontend. It receives metrics pushed by OTEL collector,
   # and distributes them across configured vmstorage shards.
   vminsert-1:
-    image: victoriametrics/vminsert:v1.150.0-cluster
+    image: victoriametrics/vminsert:v1.153.0-cluster
     command:
       - "--storageNode=vmstorage-1:8400"
       - "--storageNode=vmstorage-2:8400"
   vminsert-2:
-    image: victoriametrics/vminsert:v1.150.0-cluster
+    image: victoriametrics/vminsert:v1.153.0-cluster
     command:
       - "--storageNode=vmstorage-1:8400"
       - "--storageNode=vmstorage-2:8400"
 
   # vmselect is a query fronted. It serves read queries by fetching data from configured `--storageNode` shards.
   vmselect-1:
-    image: victoriametrics/vmselect:v1.150.0-cluster
+    image: victoriametrics/vmselect:v1.153.0-cluster
     command:
       - "--storageNode=vmstorage-1:8401"
       - "--storageNode=vmstorage-2:8401"
       - "--vmalert.proxyURL=http://rules-metrics:8880"
   vmselect-2:
-    image: victoriametrics/vmselect:v1.150.0-cluster
+    image: victoriametrics/vmselect:v1.153.0-cluster
     command:
       - "--storageNode=vmstorage-1:8401"
       - "--storageNode=vmstorage-2:8401"
@@ -45,32 +45,32 @@ services:
 
   # vlstorage shards. Each shard receives 1/N of all log entries, where N is number of vlstorage (2 in this case).
   vlstorage-1:
-    image: victoriametrics/victoria-logs:v1.52.0
+    image: victoriametrics/victoria-logs:v1.53.0
     command: [ "--storageDataPath=/vlogs" ]
     volumes: [ "vldata-1:/vlogs" ]
   vlstorage-2:
-    image: victoriametrics/victoria-logs:v1.52.0
+    image: victoriametrics/victoria-logs:v1.53.0
     command: [ "--storageDataPath=/vlogs" ]
     volumes: [ "vldata-2:/vlogs" ]
 
   vlinsert-1:
-    image: victoriametrics/victoria-logs:v1.52.0
+    image: victoriametrics/victoria-logs:v1.53.0
     command:
       - "--storageNode=vlstorage-1:9428"
       - "--storageNode=vlstorage-2:9428"
   vlinsert-2:
-    image: victoriametrics/victoria-logs:v1.52.0
+    image: victoriametrics/victoria-logs:v1.53.0
     command:
       - "--storageNode=vlstorage-1:9428"
       - "--storageNode=vlstorage-2:9428"
 
   vlselect-1:
-    image: victoriametrics/victoria-logs:v1.52.0
+    image: victoriametrics/victoria-logs:v1.53.0
     command:
       - "--storageNode=vlstorage-1:9428"
       - "--storageNode=vlstorage-2:9428"
   vlselect-2:
-    image: victoriametrics/victoria-logs:v1.52.0
+    image: victoriametrics/victoria-logs:v1.53.0
     command:
       - "--storageNode=vlstorage-1:9428"
       - "--storageNode=vlstorage-2:9428"
@@ -80,32 +80,32 @@ services:
 
   # vtstorage shards. Each shard receives 1/N of all span entries, where N is number of vtstorage (2 in this case).
   vtstorage-1:
-    image: victoriametrics/victoria-traces:v0.11.0
+    image: victoriametrics/victoria-traces:v0.12.0
     command: [ "--storageDataPath=/vtraces" ]
     volumes: [ "vtdata-1:/vtraces" ]
   vtstorage-2:
-    image: victoriametrics/victoria-traces:v0.11.0
+    image: victoriametrics/victoria-traces:v0.12.0
     command: [ "--storageDataPath=/vtraces" ]
     volumes: [ "vtdata-2:/vtraces" ]
 
   vtinsert-1:
-    image: victoriametrics/victoria-traces:v0.11.0
+    image: victoriametrics/victoria-traces:v0.12.0
     command:
       - "--storageNode=vtstorage-1:10428"
       - "--storageNode=vtstorage-2:10428"
   vtinsert-2:
-    image: victoriametrics/victoria-traces:v0.11.0
+    image: victoriametrics/victoria-traces:v0.12.0
     command:
       - "--storageNode=vtstorage-1:10428"
       - "--storageNode=vtstorage-2:10428"
 
   vtselect-1:
-    image: victoriametrics/victoria-traces:v0.11.0
+    image: victoriametrics/victoria-traces:v0.12.0
     command:
       - "--storageNode=vtstorage-1:10428"
       - "--storageNode=vtstorage-2:10428"
   vtselect-2:
-    image: victoriametrics/victoria-traces:v0.11.0
+    image: victoriametrics/victoria-traces:v0.12.0
     command:
       - "--storageNode=vtstorage-1:10428"
       - "--storageNode=vtstorage-2:10428"

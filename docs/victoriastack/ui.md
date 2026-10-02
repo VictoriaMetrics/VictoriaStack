@@ -110,11 +110,11 @@ exploration, focused on the signal and use case specific to the signal:
   top and active queries, query tracing, relabeling debugging.
 - [VictoriaLogs UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): LogsQL queries,
   streams and fields, live tailing, log context.
+- [VictoriaTraces UI](https://docs.victoriametrics.com/victoriatraces/querying/#web-ui): LogsQL queries,
+   filtering and exploring traces.
 
-For VictoriaTraces vmui is not yet available. It is recommended to user Grafana or Perses for traces.
-
-> Have a quick look at the vmui demo for [VictoriaMetrics](https://docs.victoriametrics.com/playgrounds/#victoriametrics-playground)
-> and [VictoriaLogs](https://docs.victoriametrics.com/playgrounds/#victorialogs-playground) at our playgrounds.
+> Have a quick look at the vmui demo for [VictoriaMetrics](https://docs.victoriametrics.com/playgrounds/#victoriametrics-playground),
+> [VictoriaLogs](https://docs.victoriametrics.com/playgrounds/#victorialogs-playground) and [VictoriaTraces](https://docs.victoriametrics.com/playgrounds/#victoriatraces-playground) at our playgrounds.
 
 vmui complements Grafana rather than replacing it. It is focused on the signal specifics and provides tools that
 are applicable to the signal. vmui for VictoriaMetrics is focused on visualizing time series, exploring metrics cardinality,

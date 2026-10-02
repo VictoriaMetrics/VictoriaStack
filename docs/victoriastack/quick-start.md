@@ -47,29 +47,53 @@ The command starts:
 
 ![Diagram showing how the demo works. The OTel Demo sends metrics, logs, and traces to the OTel Collector, which connects to vmauth. vmauth then routes the telemetry to the three databases. Grafana and vmalert also connect to the databases via vmauth.](quick-start-compose-single.png)
 
-After the demo was running for a few minutes, the following links are available:
 
-- Visit [VictoriaMetrics UI - http://localhost:8427/metrics/select/vmui](http://localhost:8427/metrics/select/vmui/?#/cardinality)
-  to explore the stored metrics or [run a query to plot charts](http://localhost:8427/metrics/select/vmui/#/?g0.range_input=15m&g0.end_input=2026-08-17T18%3A14%3A42&g0.relative_time=last_15_minutes&g0.tab=0&g0.expr=sum%28rate%28%7B__name__%3D%22http.server.request.body.size_bucket%22%7D%5B5m%5D%29%29&g0.step_input=3s):
-  ![Screenshot of VMUI for VictoriaMetrics.](quick-start-metrics-vmui-demo.png)
-  {width="500"}
+The OpenTelemery demo will keep pushing telemetry signals to the stack through the OpenTelemetry collector, and vmalert
+will keep evaluating rules. To stop the stack, run:
 
-- Visit [VictoriaLogs UI - http://localhost:8427/logs/select/vmui](http://localhost:8427/logs/select/vmui) to see
-  recently ingested logs or [run a query to plot charts](http://localhost:8427/logs/select/vmui/?#/?g0.range_input=15m&g0.relative_time=last_15_minutes&step=5s&query=*+%7C+by%28service.name%29+count%28%29&group_hits=service.name&g0.end_input=2026-08-17T18%3A17%3A27.768Z):
-  ![Screenshot of VMUI for VictoriaLogs.](quick-start-logs-vmui-demo.png)
-  {width="500"}
+```sh
+make otel-single-down
+```
 
-- [VictoriaTraces UI - http://localhost:8427/traces/select/vmui](http://localhost:8427/traces/select/vmui), but it is
-  better to use Grafana's Explore [via Jaeger](http://localhost:3000/explore?schemaVersion=1&panes=%7B%220ut%22:%7B%22datasource%22:%22victoriatraces-jaeger-ds%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22jaeger%22,%22uid%22:%22victoriatraces-jaeger-ds%22%7D,%22queryType%22:%22search%22,%22service%22:%22shipping%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D,%22compact%22:false%7D%7D&orgId=1)
-  or [Tempo](http://localhost:3000/explore?schemaVersion=1&panes=%7B%220ut%22:%7B%22datasource%22:%22victoriatraces-tempo-ds%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22tempo%22,%22uid%22:%22victoriatraces-tempo-ds%22%7D,%22queryType%22:%22traceqlSearch%22,%22limit%22:20,%22tableType%22:%22traces%22,%22metricsQueryType%22:%22range%22,%22serviceMapUseNativeHistograms%22:false,%22filters%22:%5B%7B%22id%22:%2219638448%22,%22operator%22:%22%3D%22,%22scope%22:%22span%22%7D%5D%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D,%22compact%22:false%7D%7D&orgId=1)
-  (_login with admin:admin_):
-  ![Screenshot of Grafana's Explore page showing VictoriaTraces trace data.](quick-start-traces-grafana-explore.png)
-  {width="500"}
+The single-node version is the simplest way to start experimenting and to learn how the components fit together.
+To scale the stack horizontally, see the [clustered version](#clustered-version).
 
-- [Grafana - http://localhost:3000](http://localhost:3000/explore) with preconfigured datasources
+After the demo was running for a few minutes, the links below become available.
+
+### VictoriaMetrics UI
+
+Visit [VictoriaMetrics UI - http://localhost:8427/metrics/select/vmui](http://localhost:8427/metrics/select/vmui/?#/cardinality)
+to explore the stored metrics or [run a query to plot charts](http://localhost:8427/metrics/select/vmui/#/?g0.range_input=15m&g0.end_input=2026-08-17T18%3A14%3A42&g0.relative_time=last_15_minutes&g0.tab=0&g0.expr=sum%28rate%28%7B__name__%3D%22http.server.request.body.size_bucket%22%7D%5B5m%5D%29%29&g0.step_input=3s):
+![Screenshot of VMUI for VictoriaMetrics.](quick-start-metrics-vmui-demo.png)
+{width="500"}
+
+### VictoriaLogs UI
+
+Visit [VictoriaLogs UI - http://localhost:8427/logs/select/vmui](http://localhost:8427/logs/select/vmui) to see
+recently ingested logs or [run a query to plot charts](http://localhost:8427/logs/select/vmui/?#/?g0.range_input=15m&g0.relative_time=last_15_minutes&step=5s&query=*+%7C+by%28service.name%29+count%28%29&group_hits=service.name&g0.end_input=2026-08-17T18%3A17%3A27.768Z):
+![Screenshot of VMUI for VictoriaLogs.](quick-start-logs-vmui-demo.png)
+{width="500"}
+
+### VictoriaTraces UI
+
+Visit [VictoriaTraces UI - http://localhost:8427/traces/select/vmui](http://localhost:8427/traces/select/vmui) to see recent traces:
+![Screenshot of VMUI for VictoriaTraces.](quick-start-traces-vmui-demo.png) 
+
+Or explore traces in Grafana's Explore [via Jaeger](http://localhost:3000/explore?schemaVersion=1&panes=%7B%220ut%22:%7B%22datasource%22:%22victoriatraces-jaeger-ds%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22jaeger%22,%22uid%22:%22victoriatraces-jaeger-ds%22%7D,%22queryType%22:%22search%22,%22service%22:%22shipping%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D,%22compact%22:false%7D%7D&orgId=1)
+or [Tempo](http://localhost:3000/explore?schemaVersion=1&panes=%7B%220ut%22:%7B%22datasource%22:%22victoriatraces-tempo-ds%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22tempo%22,%22uid%22:%22victoriatraces-tempo-ds%22%7D,%22queryType%22:%22traceqlSearch%22,%22limit%22:20,%22tableType%22:%22traces%22,%22metricsQueryType%22:%22range%22,%22serviceMapUseNativeHistograms%22:false,%22filters%22:%5B%7B%22id%22:%2219638448%22,%22operator%22:%22%3D%22,%22scope%22:%22span%22%7D%5D%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D,%22compact%22:false%7D%7D&orgId=1)
+(_login with admin:admin_):
+![Screenshot of Grafana's Explore page showing VictoriaTraces trace data.](quick-start-traces-grafana-explore.png)
+{width="500"}
+
+### Grafana
+
+Visit [Grafana - http://localhost:3000](http://localhost:3000/explore) with preconfigured datasources
   and a simple demo dashboard (_login with admin:admin_):
   ![Screenshot of Grafana showing the demo dashboard.](quick-start-grafana-demo.png)
   {width="500"}
+
+
+### Alerting UI
 
 The demo will spawn two vmalert instances:
 1. To run alerting rules [alerts-demo.yml](https://github.com/VictoriaMetrics/VictoriaStack/blob/main/deployment/rules/alerts-demo.yml)
@@ -83,16 +107,6 @@ The demo will spawn two vmalert instances:
    [service_name:logs_count:1m](http://localhost:8427/metrics/select/vmui/#/?g0.range_input=30m&g0.end_input=2026-08-19T09%3A18%3A20&g0.relative_time=last_30_minutes&g0.tab=0&g0.expr=service_name%3Alogs_count%3A1m)
    or [severity_text:quotes_count:1m](http://localhost:8427/metrics/select/vmui/#/?g0.range_input=30m&g0.end_input=2026-08-19T09%3A18%3A53&g0.relative_time=last_30_minutes&g0.tab=0&g0.expr=severity_text%3Aquotes_count%3A1m)
    metric names in VictoriaMetrics UI.
-
-The OpenTelemery demo will keep pushing telemetry signals to the stack through the OpenTelemetry collector, and vmalert
-will keep evaluating rules. To stop the stack, run:
-
-```sh
-make otel-single-down
-```
-
-The single-node version is the simplest way to start experimenting and to learn how the components fit together.
-To scale the stack horizontally, see the [clustered version](#clustered-version).
 
 ## Clustered version
 
