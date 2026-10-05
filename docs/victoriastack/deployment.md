@@ -261,7 +261,7 @@ by [VMDistributed or VLDistributed](#high-availability-in-kubernetes) upgrade on
 zones keep serving traffic.
 
 Teams that prefer rare, low-risk updates can follow the long-term support release lines instead of the latest release.
-LTS releases are published for VictoriaMetrics only and are part of the Enterprise package,
+LTS releases are published for VictoriaMetrics and VictoriaLogs and are part of the Enterprise package,
 see [Long-term support releases](https://docs.victoriametrics.com/victoriastack/enterprise/#long-term-support-releases).
 
 ## Backups
