@@ -24,7 +24,7 @@ languages and integrations, so each database can optimize for the data it stores
 
 Run queries run [Grafana or Perses](https://docs.victoriametrics.com/victoriastack/ui/#grafana), from the built-in
 [vmui](https://docs.victoriametrics.com/victoriastack/ui/#vmui), or from any HTTP client (see [Query APIs](#query-apis)).
-See how to use [multitenancy for read queries](http://localhost:1313/victoriastack/multitenancy/#query-path).
+See how to use [multitenancy for read queries](http://docs.victoriametrics.com/victoriastack/multitenancy/#query-path).
 
 If there is no data to query yet, start with [Ingestion docs](https://docs.victoriametrics.com/victoriastack/ingestion/).
 
