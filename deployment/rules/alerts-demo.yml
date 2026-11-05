@@ -1,0 +1,74 @@
+# Demo alerting rules for the metrics produced by the OpenTelemetry demo application.
+groups:
+  - name: demo-app
+    interval: 30s
+    # Multitenancy headers
+    headers:
+      - "AccountID: 0"
+      - "ProjectID: 0"
+    rules:
+      - alert: HighRequestLatency
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate({__name__="http.server.request.duration_bucket"})) by (le, "service.name", "http.route")
+          ) > 0.001
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Slow requests on {{ index $labels "service.name" }}{{ index $labels "http.route" }}'
+          description: 'p99 latency is {{ $value | humanizeDuration }} for route {{ index $labels "http.route" }} of service {{ index $labels "service.name" }}.'
+
+      - alert: RequestErrorsRatioHigh
+        expr: |
+          sum(rate({__name__="http.server.request.duration_count", "http.response.status_code"=~"5.."})) by ("service.name")
+          /
+          sum(rate({__name__="http.server.request.duration_count"})) by ("service.name")
+          > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Service {{ index $labels "service.name" }} returns server errors'
+          description: '{{ $value | humanizePercentage }} of requests to {{ index $labels "service.name" }} fail with a 5xx status code.'
+
+      - alert: NoQuotesCalculated
+        expr: sum(increase({__name__="quotes"}[10m])) < 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'No shipping quotes calculated in the last 10 minutes'
+          description: 'The quote service stopped producing quotes, which means the demo pipeline is idle or broken.'
+
+  - name: demo-telemetry-pipeline
+    interval: 30s
+    # Multitenancy headers
+    headers:
+      - "AccountID: 0"
+      - "ProjectID: 0"
+    rules:
+      - alert: SpanProcessorQueueFillingUp
+        expr: |
+          max({__name__="otel.sdk.processor.span.queue.size"}) by ("service.name")
+          /
+          max({__name__="otel.sdk.processor.span.queue.capacity"}) by ("service.name")
+          > 0.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Span queue of {{ index $labels "service.name" }} is {{ $value | humanizePercentage }} full'
+          description: 'The span processor cannot export spans as fast as they are produced. Spans are dropped once the queue is full.'
+
+      - alert: TelemetryExportStalled
+        expr: |
+          sum(rate({__name__="otel.sdk.exporter.span.exported"})) by ("service.name") == 0
+          and
+          sum(rate({__name__="otel.sdk.processor.span.processed"})) by ("service.name") > 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Service {{ index $labels "service.name" }} stopped exporting spans'
+          description: 'Spans are still being produced, but none reach the collector. Check the OpenTelemetry Collector and the network path to it.'

@@ -1,0 +1,140 @@
+# Minimal OpenTelemetry Demo chain for correlated traces + logs + metrics.
+#
+# Services:
+#   traffic -> shipping -> quote
+#
+# shipping and quote both emit OTLP traces, metrics, and logs.
+# shipping creates/continues the server trace and propagates the context
+# to quote over HTTP, so telemetry from both apps can be correlated.
+#
+services:
+  shipping:
+    image: ghcr.io/open-telemetry/demo:3.0.0-shipping
+    restart: unless-stopped
+    environment:
+      SHIPPING_PORT: "8080"
+      QUOTE_ADDR: http://quote:8080
+
+      FLAGD_HOST: flagd
+      FLAGD_PORT: "8013"
+
+      OTEL_SERVICE_NAME: shipping
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otelcol:4318
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_METRIC_EXPORT_INTERVAL: "10000"
+      OTEL_RESOURCE_ATTRIBUTES: >-
+        service.namespace=otel-demo-mini,
+        deployment.environment.name=showcase,
+        service.version=3.0.0
+
+      IPV6_ENABLED: "false"
+
+    depends_on:
+      - quote
+      - flagd
+
+  quote:
+    image: ghcr.io/open-telemetry/demo:3.0.0-quote
+    restart: unless-stopped
+    environment:
+      QUOTE_PORT: "8080"
+
+      OTEL_SERVICE_NAME: quote
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otelcol:4318
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_METRIC_EXPORT_INTERVAL: "10000"
+
+      # Required for the PHP OTel SDK to initialize from Composer autoload.
+      OTEL_PHP_AUTOLOAD_ENABLED: "true"
+
+      # Enables PHP SDK/internal metrics in addition to the app's quote counter.
+      OTEL_PHP_INTERNAL_METRICS_ENABLED: "true"
+
+      OTEL_RESOURCE_ATTRIBUTES: >-
+        service.namespace=otel-demo-mini,
+        deployment.environment.name=showcase,
+        service.version=3.0.0
+
+  # Shipping uses OpenFeature/flagd. This deliberately contains only the
+  # shipping-related flag instead of the full Astronomy Shop flag set.
+  flagd:
+    image: ghcr.io/open-feature/flagd:v0.16.0
+    restart: unless-stopped
+    command:
+      - start
+      - --port
+      - "8013"
+      - --ofrep-port
+      - "8016"
+      - --uri
+      - file:/etc/flagd/demo.flagd.json
+    configs:
+      - source: otel_demo_flags
+        target: /etc/flagd/demo.flagd.json
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otelcol:4318
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_SERVICE_NAME: flagd
+      OTEL_RESOURCE_ATTRIBUTES: >-
+        service.namespace=otel-demo-mini,
+        deployment.environment.name=showcase,
+        service.version=0.16.0
+
+  # Deliberately not instrumented. Shipping becomes the root application
+  # span and propagates that trace context to Quote.
+  traffic:
+    image: curlimages/curl:8.12.1
+    restart: unless-stopped
+    depends_on:
+      - shipping
+    environment:
+      REQUEST_INTERVAL: 2
+    entrypoint:
+      - /bin/sh
+      - -ec
+    command:
+      - |
+        echo "Generating requests against shipping every 2s"
+        while true; do
+          curl -fsS \
+            -H 'content-type: application/json' \
+            -X POST \
+            http://shipping:8080/get-quote \
+            --data-binary '{
+              "address": {
+                "street_address": "1 Demo Way",
+                "city": "Warsaw",
+                "state": "Mazowieckie",
+                "country": "Poland",
+                "zip_code": "00-001"
+              },
+              "items": [
+                {
+                  "product_id": "OLJCESPC7Z",
+                  "quantity": 2
+                },
+                {
+                  "product_id": "66VCHSJNUP",
+                  "quantity": 1
+                }
+              ]
+            }' >/dev/null || true
+          sleep "$${REQUEST_INTERVAL}"
+        done
+
+configs:
+  otel_demo_flags:
+    content: |
+      {
+        "$$schema": "https://flagd.dev/schema/v0/flags.json",
+        "flags": {
+          "shippingSlowdown": {
+            "state": "ENABLED",
+            "variants": {
+              "on": true,
+              "off": false
+            },
+            "defaultVariant": "off"
+          }
+        }
+      }

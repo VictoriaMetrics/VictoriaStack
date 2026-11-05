@@ -1,0 +1,66 @@
+apiVersion: 1
+
+datasources:
+    - name: VictoriaTraces Jaeger
+      type: jaeger
+      access: proxy
+      url: http://vmstack:8427/traces/select/jaeger/
+      isDefault: false
+      # is needed to link correlation from VictoriaLogs datasource
+      uid: "victoriatraces-jaeger-ds"
+      jsonData:
+        tracesToLogsV2:
+          datasourceUid: 'victorialogs-ds'
+          filterByTraceID: false
+          filterBySpanID: false
+          customQuery: true
+          query: 'trace_id:="$${__span.traceId}"'
+          spanStartTimeShift: '-1h'
+          spanEndTimeShift: '5m'
+        tracesToMetrics:
+          datasourceUid: 'victoriametrics-prometheus-ds'
+          tags: [ { key: 'process.pid', value: 'process.pid' } ]
+          spanStartTimeShift: '-1h'
+          spanEndTimeShift: '5m'
+          queries:
+            - name: 'Requests Rate'
+              query: 'sum(rate({__name__="http.server.request.body.size_count",$$__tags}[5m])) by("process.pid", "http.route")'
+
+        # multitenancy headers - https://docs.victoriametrics.com/victoriatraces/#multitenancy
+        httpHeaderName1: AccountID
+        httpHeaderName2: ProjectID
+      secureJsonData:
+        httpHeaderValue1: 0
+        httpHeaderValue2: 0
+
+    - name: VictoriaTraces Tempo
+      type: tempo
+      access: proxy
+      url: http://vmstack:8427/traces/select/tempo/
+      isDefault: false
+      # is needed to link correlation from VictoriaLogs datasource
+      uid: "victoriatraces-tempo-ds"
+      jsonData:
+        tracesToLogsV2:
+          datasourceUid: 'victorialogs-ds'
+          filterByTraceID: false
+          filterBySpanID: false
+          customQuery: true
+          query: 'trace_id:="$${__span.traceId}"'
+          spanStartTimeShift: '-1h'
+          spanEndTimeShift: '5m'
+        tracesToMetrics:
+          datasourceUid: 'victoriametrics-prometheus-ds'
+          tags: [ { key: 'process.pid', value: 'process.pid' } ]
+          spanStartTimeShift: '-1h'
+          spanEndTimeShift: '5m'
+          queries:
+            - name: 'Requests Rate'
+              query: 'sum(rate({__name__="http.server.request.body.size_count",$$__tags}[5m])) by("process.pid", "http.route")'
+
+        # multitenancy headers - https://docs.victoriametrics.com/victoriatraces/#multitenancy
+        httpHeaderName1: AccountID
+        httpHeaderName2: ProjectID
+      secureJsonData:
+        httpHeaderValue1: 0
+        httpHeaderValue2: 0

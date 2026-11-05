@@ -1,0 +1,15 @@
+# Demo recording rules to convert logs from VictoriaLogs to metrics.
+groups:
+  - name: logs-to-metrics
+    # explicitly specify the type of the query engine for VictoriaLogs.
+    type: vlogs
+    interval: 1m
+    # Multitenancy headers
+    headers:
+      - "AccountID: 0"
+      - "ProjectID: 0"
+    rules:
+      - record: service_name:logs_count:1m
+        expr: '* | stats by (service.name) count()'
+      - record: severity_text:quotes_count:1m
+        expr: '"quote" | stats by (severity_text) count()'

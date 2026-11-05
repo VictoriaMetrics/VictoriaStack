@@ -1,0 +1,31 @@
+unauthorized_user:
+  url_map:
+    # VictoriaMetrics access
+    - src_paths: ["/metrics/select/.*"]
+      drop_src_path_prefix_parts: 2
+      url_prefix:
+        - "http://victoriametrics:8428"
+    - src_paths: ["/metrics/insert/.*"]
+      drop_src_path_prefix_parts: 2
+      url_prefix:
+        - "http://victoriametrics:8428"
+
+    # VictoriaLogs access
+    - src_paths: ["/logs/select/.*"]
+      drop_src_path_prefix_parts: 1
+      url_prefix:
+        - "http://victorialogs:9428"
+    - src_paths: ["/logs/insert/.*"]
+      drop_src_path_prefix_parts: 1
+      url_prefix:
+        - "http://victorialogs:9428"
+
+    # VictoriaTraces access
+    - src_paths: [ "/traces/select/.*" ]
+      drop_src_path_prefix_parts: 1
+      url_prefix:
+        - "http://victoriatraces:10428"
+    - src_paths: [ "/traces/insert/.*" ]
+      drop_src_path_prefix_parts: 1
+      url_prefix:
+        - "http://victoriatraces:10428"

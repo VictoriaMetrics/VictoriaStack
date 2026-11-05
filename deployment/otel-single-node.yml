@@ -1,0 +1,64 @@
+services:
+  otelcol:
+    image: otel/opentelemetry-collector-contrib:latest
+    command: [ "--config=/etc/otelcol/config.yml" ]
+    volumes: [ "./config/otelcollector/config.yml:/etc/otelcol/config.yml" ]
+
+  victoriametrics:
+    image: victoriametrics/victoria-metrics:v1.155.0
+    command: [ "-vmalert.proxyURL=http://rules-metrics:8880" ]
+    ports: [ "8428:8428" ]
+    volumes: [ "vm-data:/victoria-metrics-data" ]
+
+  victorialogs:
+    image: victoriametrics/victoria-logs:v1.53.0
+    ports: [ "9428:9428" ]
+    volumes: [ "vl-data:/victoria-logs-data" ]
+
+  victoriatraces:
+    image: victoriametrics/victoria-traces:v0.12.0
+    ports: [ "10428:10428" ]
+    volumes: [ "vt-data:/victoria-traces-data" ]
+
+  grafana:
+    image: grafana/grafana:latest
+    ports: [ "3000:3000" ]
+    environment:
+      # Install VictoriaLogs datasource plugin
+      - GF_INSTALL_PLUGINS=victoriametrics-logs-datasource
+      # VictoriaMetrics is using native Prometheus datasource.
+      # VictoriaTraces is using native Jaeger datasource.
+    volumes:
+      - grafanadata:/var/lib/grafana
+      - ./provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./provisioning/dashboards/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
+      - ./provisioning/dashboards/demo.json:/var/lib/grafana/dashboards/demo.json
+
+  # Entry point into VictoriaStack: authorizes and routes requests to VictoriaMetrics, VictoriaTraces, and VictoriaLogs.
+  vmstack:
+    image: victoriametrics/vmauth:v1.155.0
+    volumes: [ "./config/vmauth/single-node.yml:/etc/auth.yml" ]
+    command: [ "--auth.config=/etc/auth.yml" ]
+    ports: [ "8427:8427" ]
+
+  rules-metrics:
+    image: victoriametrics/vmalert:v1.155.0
+    command:
+      - "-datasource.url=http://vmstack:8427/metrics/select"
+      - "-remoteWrite.url=http://vmstack:8427/metrics/insert"
+      - "-rule=/etc/vmalert/alerts-demo.yml"
+      # Replace "-notifier.blackhole" with actual "-notifier.url=<alertmanager_url>" for sending alerts
+      - "-notifier.blackhole"
+    volumes: [ "./rules:/etc/vmalert" ]
+
+  rules-logs:
+    image: victoriametrics/vmalert:v1.155.0
+    command:
+      # run rules against VictoriaLogs datasource
+      - "-datasource.url=http://vmstack:8427/logs/"
+      # persist as metrics to VictoriaMetrics
+      - "-remoteWrite.url=http://vmstack:8427/metrics/insert"
+      - "-rule=/etc/vmalert/logs-to-metrics.yml"
+    volumes: [ "./rules:/etc/vmalert" ]
+
+volumes: { vm-data: {}, vt-data: {}, vl-data: {}, grafanadata: {} }
