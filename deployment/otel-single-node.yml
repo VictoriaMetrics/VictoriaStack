@@ -5,18 +5,18 @@ services:
     volumes: [ "./config/otelcollector/config.yml:/etc/otelcol/config.yml" ]
 
   victoriametrics:
-    image: victoriametrics/victoria-metrics:v1.155.0
+    image: victoriametrics/victoria-metrics:v1.156.0
     command: [ "-vmalert.proxyURL=http://rules-metrics:8880" ]
     ports: [ "8428:8428" ]
     volumes: [ "vm-data:/victoria-metrics-data" ]
 
   victorialogs:
-    image: victoriametrics/victoria-logs:v1.53.0
+    image: victoriametrics/victoria-logs:v1.54.0
     ports: [ "9428:9428" ]
     volumes: [ "vl-data:/victoria-logs-data" ]
 
   victoriatraces:
-    image: victoriametrics/victoria-traces:v0.12.0
+    image: victoriametrics/victoria-traces:v0.13.0
     ports: [ "10428:10428" ]
     volumes: [ "vt-data:/victoria-traces-data" ]
 
@@ -36,13 +36,13 @@ services:
 
   # Entry point into VictoriaStack: authorizes and routes requests to VictoriaMetrics, VictoriaTraces, and VictoriaLogs.
   vmstack:
-    image: victoriametrics/vmauth:v1.155.0
+    image: victoriametrics/vmauth:v1.156.0
     volumes: [ "./config/vmauth/single-node.yml:/etc/auth.yml" ]
     command: [ "--auth.config=/etc/auth.yml" ]
     ports: [ "8427:8427" ]
 
   rules-metrics:
-    image: victoriametrics/vmalert:v1.155.0
+    image: victoriametrics/vmalert:v1.156.0
     command:
       - "-datasource.url=http://vmstack:8427/metrics/select"
       - "-remoteWrite.url=http://vmstack:8427/metrics/insert"
@@ -52,7 +52,7 @@ services:
     volumes: [ "./rules:/etc/vmalert" ]
 
   rules-logs:
-    image: victoriametrics/vmalert:v1.155.0
+    image: victoriametrics/vmalert:v1.156.0
     command:
       # run rules against VictoriaLogs datasource
       - "-datasource.url=http://vmstack:8427/logs/"

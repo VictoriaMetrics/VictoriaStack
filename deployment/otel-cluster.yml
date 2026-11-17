@@ -45,32 +45,32 @@ services:
 
   # vlstorage shards. Each shard receives 1/N of all log entries, where N is number of vlstorage (2 in this case).
   vlstorage-1:
-    image: victoriametrics/victoria-logs:v1.53.0
+    image: victoriametrics/victoria-logs:v1.54.0
     command: [ "--storageDataPath=/vlogs" ]
     volumes: [ "vldata-1:/vlogs" ]
   vlstorage-2:
-    image: victoriametrics/victoria-logs:v1.53.0
+    image: victoriametrics/victoria-logs:v1.54.0
     command: [ "--storageDataPath=/vlogs" ]
     volumes: [ "vldata-2:/vlogs" ]
 
   vlinsert-1:
-    image: victoriametrics/victoria-logs:v1.53.0
+    image: victoriametrics/victoria-logs:v1.54.0
     command:
       - "--storageNode=vlstorage-1:9428"
       - "--storageNode=vlstorage-2:9428"
   vlinsert-2:
-    image: victoriametrics/victoria-logs:v1.53.0
+    image: victoriametrics/victoria-logs:v1.54.0
     command:
       - "--storageNode=vlstorage-1:9428"
       - "--storageNode=vlstorage-2:9428"
 
   vlselect-1:
-    image: victoriametrics/victoria-logs:v1.53.0
+    image: victoriametrics/victoria-logs:v1.54.0
     command:
       - "--storageNode=vlstorage-1:9428"
       - "--storageNode=vlstorage-2:9428"
   vlselect-2:
-    image: victoriametrics/victoria-logs:v1.53.0
+    image: victoriametrics/victoria-logs:v1.54.0
     command:
       - "--storageNode=vlstorage-1:9428"
       - "--storageNode=vlstorage-2:9428"
@@ -80,32 +80,32 @@ services:
 
   # vtstorage shards. Each shard receives 1/N of all span entries, where N is number of vtstorage (2 in this case).
   vtstorage-1:
-    image: victoriametrics/victoria-traces:v0.12.0
+    image: victoriametrics/victoria-traces:v0.13.0
     command: [ "--storageDataPath=/vtraces" ]
     volumes: [ "vtdata-1:/vtraces" ]
   vtstorage-2:
-    image: victoriametrics/victoria-traces:v0.12.0
+    image: victoriametrics/victoria-traces:v0.13.0
     command: [ "--storageDataPath=/vtraces" ]
     volumes: [ "vtdata-2:/vtraces" ]
 
   vtinsert-1:
-    image: victoriametrics/victoria-traces:v0.12.0
+    image: victoriametrics/victoria-traces:v0.13.0
     command:
       - "--storageNode=vtstorage-1:10428"
       - "--storageNode=vtstorage-2:10428"
   vtinsert-2:
-    image: victoriametrics/victoria-traces:v0.12.0
+    image: victoriametrics/victoria-traces:v0.13.0
     command:
       - "--storageNode=vtstorage-1:10428"
       - "--storageNode=vtstorage-2:10428"
 
   vtselect-1:
-    image: victoriametrics/victoria-traces:v0.12.0
+    image: victoriametrics/victoria-traces:v0.13.0
     command:
       - "--storageNode=vtstorage-1:10428"
       - "--storageNode=vtstorage-2:10428"
   vtselect-2:
-    image: victoriametrics/victoria-traces:v0.12.0
+    image: victoriametrics/victoria-traces:v0.13.0
     command:
       - "--storageNode=vtstorage-1:10428"
       - "--storageNode=vtstorage-2:10428"
@@ -132,7 +132,7 @@ services:
     ports: [ "8427:8427" ]
 
   rules-metrics:
-    image: victoriametrics/vmalert:v1.155.0
+    image: victoriametrics/vmalert:v1.156.0
     command:
       - "-datasource.url=http://vmstack:8427/metrics/select/prometheus"
       # persist as metrics to VictoriaMetrics tenant 0 - see https://docs.victoriametrics.com/victoriametrics/vmalert/#multitenancy
@@ -144,7 +144,7 @@ services:
     volumes: [ "./rules:/etc/vmalert" ]
 
   rules-logs:
-    image: victoriametrics/vmalert:v1.155.0
+    image: victoriametrics/vmalert:v1.156.0
     command:
       # run rules against VictoriaLogs datasource
       - "-datasource.url=http://vmstack:8427/logs/"

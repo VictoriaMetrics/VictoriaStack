@@ -11,10 +11,11 @@ exporters:
   # headers: { AccountID: "0", ProjectID: "0" } identify the tenant - see http://docs.victoriametrics.com/victoriastack/multitenancy
   otlp_http/vmetrics: { metrics_endpoint: http://vmstack:8427/metrics/insert/opentelemetry/v1/metrics, headers: { AccountID: "0", ProjectID: "0" }, }
   otlp_http/vlogs: { logs_endpoint: http://vmstack:8427/logs/insert/opentelemetry/v1/logs, headers: { AccountID: "0", ProjectID: "0", VL-Stream-Fields: "service.name,service.namespace,deployment.environment.name"} }
+  otlp_http/vlogs2: { logs_endpoint: http://vmstack:8427/logs/insert/opentelemetry/v1/logs, headers: { AccountID: "1", ProjectID: "0", VL-Stream-Fields: "service.name,service.namespace,deployment.environment.name"} }
   otlp_http/vtraces: { traces_endpoint: http://vmstack:8427/traces/insert/opentelemetry/v1/traces, headers: { AccountID: "0", ProjectID: "0" } }
 
 service:
   pipelines:
-    logs: { receivers: [ otlp ], processors: [ batch ], exporters: [ otlp_http/vlogs ] }
+    logs: { receivers: [ otlp ], processors: [ batch ], exporters: [ otlp_http/vlogs,otlp_http/vlogs2 ] }
     traces: { receivers: [ otlp ], processors: [ batch ], exporters: [ otlp_http/vtraces ] }
     metrics: { receivers: [ otlp ], processors: [ batch ], exporters: [ otlp_http/vmetrics ] }
